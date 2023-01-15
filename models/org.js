@@ -41,7 +41,6 @@ const orgSchema = new mongoose.Schema({
     orgEvents: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'Events',
-        unique:true, 
         required: [true, 'Invaild EventId'],
     }
 })

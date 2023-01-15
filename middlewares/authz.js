@@ -3,40 +3,37 @@ const org = require('../models/org')
 const event = require('../models/event')
 
 async function onlyUsers(req, res, next) {
-    if (req.logedinOrg.id) {
-        res.sendStatus(201)
+    if (req.logedinOrg) {
+        res.sendStatus(401)
         return
     }
-    let data = await org.findById(req.logedinUser.id)
-    if (data.length != 0) {
-        res.sendStatus(201)
+    if (await org.findById(req.logedinUser.id)) {
+        res.sendStatus(401)
         return
     }
     next()
 }
 
 async function onlyOrgs(req, res, next) {
-    if (req.logedinUser.id) {
-        res.sendStatus(201)
+    if (req.logedinUser) {
+        res.sendStatus(401)
         return
     }
-
-    let data = await user.findById(req.logedinOrg.id)
-    if (data.length != 0) {
-        res.sendStatus(201)
+    if (await user.findById(req.logedinOrg.id)) {
+        res.sendStatus(401)
         return
     }
     next()
 }
 
 async function isOrgEventOwner(req, res, next) {
-    if (req.logedinUser.id) {
+    if (req.logedinUser) {
         next()
+        return
     }
-
-    let eventId = req.params.event
+    let eventId = req.params.eventId
     let orgx = await org.findById(req.logedinOrg.id)
-    orgx.orgEvents.includes(eventId) ? next() : res.sendStatus(201)
+    orgx.orgEvents.includes(eventId) ? next() : res.sendStatus(401)
 }
 
 async function ImageAuthz(req, res, next) {

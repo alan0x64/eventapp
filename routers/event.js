@@ -18,8 +18,8 @@ router.route('/blacklist/:eventId').get(authJWT_AT,onlyOrgs,isOrgEventOwner, eve
 
 
 //PATCH
-router.route('/checkin/:eventId').patch(authJWT_AT, event.checkIn)
-router.route('/checkout/:eventId').patch(authJWT_AT, event.checkOut)
+router.route('/checkin/:eventId').patch(authJWT_AT,onlyUsers,event.checkIn)
+router.route('/checkout/:eventId').patch(authJWT_AT,onlyUsers, event.checkOut)
 router.route('/update/:eventId').patch(
     authJWT_AT,
     onlyOrgs,

@@ -185,8 +185,8 @@ module.exports.getOrgEvents = async (req, res) => {
 }
 
 module.exports.getParticularOrgEvents = async (req, res) => {
-    let orgId = req.params.org
-    let orgx = await org.findById(orgId)
+    let orgId = req.params.orgId
+    let orgx = await org.findById(orgId).populate('orgEvents')
     let orgEvents = orgx.orgEvents
     res.send({ "OrgEvents": orgEvents })
 }

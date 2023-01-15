@@ -91,7 +91,6 @@ const eventSchema = new mongoose.Schema({
     eventCerts: {
         type: [mongoose.Schema.Types.ObjectId],
         ref: 'Certs',
-        unique: true,
         required: [true, 'Invaild CertId'],
     },
     blackListed: {
