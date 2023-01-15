@@ -184,6 +184,9 @@ module.exports.getOrgEvents = async (req, res) => {
     res.send({ "OrgEvents": orgEvents })
 }
 
-
-
-
+module.exports.getParticularOrgEvents = async (req, res) => {
+    let orgId = req.params.org
+    let orgx = await org.findById(orgId)
+    let orgEvents = orgx.orgEvents
+    res.send({ "OrgEvents": orgEvents })
+}

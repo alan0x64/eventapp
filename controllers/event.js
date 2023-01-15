@@ -112,6 +112,7 @@ module.exports.checkIn = async (req, res) => {
     //Check IF user is blocoked
     let eventId = req.params.eventId
     let userId = req.logedinUser.id
+    
     let eventx = await event.findById(eventId)
     let userx = await user.findById(userId)
 

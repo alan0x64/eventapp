@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router({mergeParams:true});
 const user=require('../controllers/user')
-const {authJWT_RT,authJWT_AT}=require("../controllers/auth")
-const {userImageHandler} =require("../controllers/file_handler")
+const {authJWT_RT,authJWT_AT}=require("../middlewares/authn")
+const {userImageHandler} =require("../middlewares/file_handler")
 
 //GET
 router.route('/profile').get(authJWT_AT,user.getLogedInUser)

@@ -5,7 +5,7 @@
 
 ### Back-End
 - Add manual to change allowCert field for admin?
-- Authorization 
+- Test Authorization 
 - Vaildation & Sanitazation & Expections 
 
 

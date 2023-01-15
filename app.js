@@ -1,47 +1,48 @@
 require("./utils/database")
 const express = require("express");
-const cors=require("cors");
+const cors = require("cors");
 const app = express();
-const path=require("path")
-const userRouter=require("./routers/user")
-const eventRouter=require("./routers/event")
-const orgRouter=require("./routers/org")
+const path = require("path")
+const userRouter = require("./routers/user")
+const eventRouter = require("./routers/event")
+const orgRouter = require("./routers/org")
 const user = require("./models/user");
 const event = require("./models/event");
 const org = require("./models/org");
 const token = require("./models/token");
-const { authJWT_AT } = require("./controllers/auth")
+const { authJWT_AT } = require("./middlewares/authn")
+const { onlyUsers } = require("./middlewares/authz")
 
 
 //Settings
-app.set('json spaces',10)
+app.set('json spaces', 10)
 
-//middleweres
+//Some Middleweres
 app.use(express.json());
-app.use(express.urlencoded({extended:true}))
+app.use(express.urlencoded({ extended: true }))
 
 app.use('/uploads',
-// authJWT_AT,
-express.static(path.join(__dirname,'/public')))
+    // authJWT_AT,
+    express.static(path.join(__dirname, '/public')))
 
 app.use('/uploads',
-// authJWT_AT,
-express.static(path.join(__dirname,'/images')))
+    // authJWT_AT,
+    express.static(path.join(__dirname, '/images')))
 
 app.use(cors())
- 
+
 //Routers
-app.use('/user',userRouter)
-app.use('/org',orgRouter)
-app.use('/event',eventRouter)
+app.use('/user', userRouter)
+app.use('/org', orgRouter)
+app.use('/event', eventRouter)
 
 
-app.get('/test',(req,res)=>{
-    res.send("Test")
+app.get('test', (req, res) => {
+    res.sendStatus(200)
 })
 
 
-app.get('/RESET', async (req,res)=>{
+app.get('/RESET', async (req, res) => {
     await user.deleteMany({})
     await org.deleteMany({})
     await event.deleteMany({})
@@ -49,12 +50,11 @@ app.get('/RESET', async (req,res)=>{
     res.send("RESETED THE DB")
 })
 
-const PORT=process.env.PORT || 4000 
-app.listen( PORT, async () => {
+const PORT = process.env.PORT || 4000
+app.listen(PORT, async () => {
     process.stdout.write('\x1Bc');
     console.log(`\n\u2705 Startred Server! [ http://localhost:${PORT}/ ]`)
-    // await genCert(0)
-
 })
 
-module.exports=app
+module.exports = app
+

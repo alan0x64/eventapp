@@ -1,18 +1,23 @@
 const express = require('express');
 const router = express.Router({ mergeParams: true });
 const org = require('../controllers/org')
-const { authJWT_RT, authJWT_AT } = require("../controllers/auth")
-const { orgImageHandler } = require("../controllers/file_handler")
+const { authJWT_RT, authJWT_AT } = require("../middlewares/authn")
+const { onlyUsers, isOrgEventOwner } = require("../middlewares/authz")
+const { orgImageHandler } = require("../middlewares/file_handler")
 
 //GET
 router.route('/profile').get(authJWT_AT, org.getLogedInOrg)
-router.route('/profile/:id').get(authJWT_AT, org.getOrg)
+router.route('/profile/:id').get(authJWT_AT, onlyUsers, org.getOrg)
 router.route('/events').get(authJWT_AT, org.getOrgEvents)
+router.route('/events').get(authJWT_AT, onlyUsers, org.getParticularOrgEvents)
 
 //POST
 router.route('/login').post(org.login)
 router.route('/logout').post(authJWT_RT, org.logout)
-router.route('/:userId/:eventId').post(authJWT_AT, org.BLUser).delete(authJWT_AT, org.UBLUser)
+router.route('/:userId/:eventId')
+    .post(authJWT_AT, isOrgEventOwner, org.BLUser)
+    .delete(authJWT_AT, isOrgEventOwner, org.UBLUser)
+
 router.route('/register').post(
     orgImageHandler.fields([
         { name: 'orgPic' },
