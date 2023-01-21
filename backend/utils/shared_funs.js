@@ -1,10 +1,10 @@
 const crypto = require("crypto");
 
-function RESPONSE(res, code = 400, data) {
+function RESPONSE(res, code, data) {
     let status
     
     if (code == 200) status = 'success'
-    if (code == 400 || 500) status = 'error'
+    if (code == 400 || code == 500) status = 'error'
     if (code == 401) status = 'not authenticated'
     if (code == 403) status = 'forbidden'
 
@@ -47,10 +47,16 @@ function attendedInMin(checkin, checkout) {
     return checkin - checkout
 }
 
+function logError(err) {
+    console.log('\n--------------------Error--------------------');
+    console.log(`\n${err.stack}\n`);
+    console.log('----------------------------------------\n');
+}
 module.exports = {
     RESPONSE,
     deleteImages,
     handleAsync,
     DateNowInMin,
     attendedInMin,
+    logError
 }

@@ -1,5 +1,6 @@
 const baseJoi = require("joi");
 const DOMPurify = require('isomorphic-dompurify');
+const { logError } = require("../utils/shared_funs");
 
 const sanitizeData=(str)=>{
     try {
@@ -13,12 +14,9 @@ const sanitizeData=(str)=>{
         //Remove any on* attributes such as onload or onclick
         clean = clean.replace(/on\w+="[^"]*"/gi, "");
 
-        //Encode any characters that have special meaning in HTML or URL
-        clean = encodeURI(clean);
-
         return clean;
     } catch (error) {
-        console.log(error);
+       logError(error)
     }
 }
 
@@ -27,7 +25,7 @@ const extension = (joi) => ({
     type: 'string',
     base: joi.string(),
     messages: {
-        'string/escapeHTML': '{{#label}} must not include HTML!'
+        'string.escapeHTML': '{{#label}} must not include HTML!'
     },
     rules: {
         escapeHTML: {

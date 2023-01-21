@@ -109,7 +109,7 @@ module.exports.login = async (req, res) => {
 
     let loginUser = await user.findOne({ 'email': req.body.userdata.email })
 
-    if (!loginUser) return RESPONSE(res,200,"User Not Found")
+    if (!loginUser) return RESPONSE(res,400,"User Not Found")
     if (!compareSync(req.body.userdata.password, loginUser.password)) return RESPONSE(res,400,"Incorrect Email or Password")
 
 

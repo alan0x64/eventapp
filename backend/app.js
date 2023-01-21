@@ -14,7 +14,7 @@ const org = require("./models/org");
 const token = require("./models/token");
 const { authJWT_AT } = require("./middlewares/authn")
 const mongoSanitize = require("express-mongo-sanitize");
-const { handleAsync, RESPONSE } = require("./utils/shared_funs");
+const { handleAsync, RESPONSE, logError } = require("./utils/shared_funs");
 
 //Settings
 app.set('json spaces', 10)
@@ -59,8 +59,8 @@ app.get('/RESET', async (req, res) => {
 
 //Error Handler
 app.use((err,req,res,next)=>{
-    console.log(`\n${err.stack}\n`);
-    RESPONSE(res,500)
+    logError(err)
+    RESPONSE(res,500,{error:err.message})
 })
 
 const PORT = process.env.PORT || 4000

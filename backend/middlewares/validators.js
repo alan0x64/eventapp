@@ -1,5 +1,5 @@
 const { validUserSchema, validOrgSchema, validEventSchema, validLoginSchema } = require("../models/schema");
-const { RESPONSE } = require('../utils/shared_funs');
+const { RESPONSE, logError } = require('../utils/shared_funs');
 
 const createValidationMiddlewear = (schema) => {
     return (req, res, next) => {
@@ -10,8 +10,8 @@ const createValidationMiddlewear = (schema) => {
 
         const { error } = schema.validate(data)
         if (error) {
-            RESPONSE(res, "error", 400, { error: error.message })
-            return
+            logError(error)
+            return RESPONSE(res, 400,error.message)
         }
         next()
     }
