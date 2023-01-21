@@ -4,9 +4,7 @@
 ## Todos 
 
 ### Back-End
-- Add manual to change allowCert field for admin?
-- Input Vaildation & Sanitazation 
-- Expections 
+- Add manual cert generation? 
 
 
 ### Front-End 
