@@ -22,10 +22,9 @@ async function authJWT_RT(req, res, next) {
     let authHeader = req.headers['authorization']
     let token = authHeader && authHeader.split(' ')[1]
     let tokenInDb = await token_collection.findOne({ 'RT': token })
- 
-    if (token == null || tokenInDb == null) return RESPONSE(res,401)
-     
 
+    if (token == null || tokenInDb == null) return RESPONSE(res,401)
+    
     jwt.verify(token, process.env.REFRESH_TOKEN, async (err, userORorg) => {
         if (err) RESPONSE(res,403)
         await user_org(req,userORorg)

@@ -1,49 +1,77 @@
 // ignore_for_file: non_constant_identifier_names, unused_field, unnecessary_this, file_names
+
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:org/net/auth.dart';
 
-class HTTP {
+class Response {
+  Response({
+    required this.status,
+    required this.statusCode,
+    required this.timeStamp,
+    this.data = const {},
+  });
 
- static Map<String, String> Header( int json_or_form) {
-    Map<String, String> header = {};
-    if (json_or_form == 0) header = {'Content-Type': 'application/json; charset=UTF-8',};
-    if (json_or_form == 1) header = {'Content-Type': 'multipart/form-data; charset=UTF-8',};
-
-    //get token from strage 
-    //
-    // header['Authorization'] = "Bearer $token";
-
-    return header;
-  }
-
-  static dynamic encodeRES(http.Response res) {
-    if (res.statusCode == 200) {
-      return jsonDecode(res.body);
-    } else {
-      throw Exception("400 Error Code ");
-    }
-  }
-
-  static Future<dynamic> GET(String url, Map<String, String> headers) async {
-    dynamic res = await http.get(url as Uri, headers: headers);
-    return encodeRES(res);
-  }
-
-  static Future<dynamic> POST(
-      String url, Map<String, String> headers, dynamic body) async {
-    dynamic res = http.post(url as Uri, headers: headers, body: body);
-    return encodeRES(res);
-  }
-
-  static Future<dynamic> PATCH(
-      String url, Map<String, String> headers, dynamic body) async {
-    dynamic res = http.patch(url as Uri, headers: headers, body: body);
-    return encodeRES(res);
-  }
-
-  static Future<dynamic> DELETE(
-      String url, Map<String, String> headers, dynamic body) async {
-    dynamic res = http.delete(url as Uri, headers: headers, body: body);
-    return encodeRES(res);
-  }
+  String status;
+  int statusCode;
+  String timeStamp;
+  Map<String, dynamic> data;
 }
+
+Future<Map<String, String>> Header(int json_or_form, String keyToAdd) async {
+  Map<String, String> header = {};
+
+  if (json_or_form == 0) {
+    header = {
+      'Content-Type': 'application/json; charset=UTF-8',
+    };
+  }
+  if (json_or_form == 1) {
+    header = {
+      'Content-Type': 'multipart/form-data; charset=UTF-8',
+    };
+  }
+
+  if (keyToAdd == '0') return header;
+
+  header['authorization'] = await getToken(keyToAdd);
+  return header;
+}
+
+Response encodeRES(http.Response res) {
+  Map<String, dynamic> data = jsonDecode(res.body);
+  return Response(
+    status: data['status'],
+    statusCode: data['statusCode'],
+    timeStamp: data['timeStamp'].toString(),
+    data: data['data'],
+  );
+}
+
+Future<Response> GET(
+  String url,
+  int json_or_form,
+  String keyToAdd,
+) async {
+  return encodeRES(await http.get(Uri.parse(url),
+      headers: await Header(json_or_form, keyToAdd)));
+}
+
+Future<Response> POST(
+    String url, int json_or_form, String keyToAdd, dynamic body) async {
+  return encodeRES(await http.post(Uri.parse(url),
+      headers: await Header(json_or_form, keyToAdd), body: jsonEncode(body)));
+}
+
+Future<Response> PATCH(
+    String url, int json_or_form, String keyToAdd, dynamic body) async {
+  return encodeRES(await http.patch(Uri.parse(url),
+      headers: await Header(json_or_form, keyToAdd), body: jsonEncode(body)));
+}
+
+Future<Response> DELETE(
+    String url, int json_or_form, String keyToAdd, dynamic body) async {
+  return encodeRES(await http.delete(Uri.parse(url),
+      headers: await Header(json_or_form, keyToAdd), body: jsonEncode(body)));
+}
+

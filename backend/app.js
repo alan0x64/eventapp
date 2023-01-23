@@ -15,6 +15,7 @@ const token = require("./models/token");
 const { authJWT_AT } = require("./middlewares/authn")
 const mongoSanitize = require("express-mongo-sanitize");
 const { handleAsync, RESPONSE, logError } = require("./utils/shared_funs");
+const morgan = require("morgan");
 
 //Settings
 app.set('json spaces', 10)
@@ -25,7 +26,7 @@ app.use(express.urlencoded({ extended: true }))
 app.use(mongoSanitize())
 app.use(xss())
 app.use(helmet())
-
+app.use(morgan('dev'))
 
 app.use('/uploads',
     authJWT_AT,
@@ -44,8 +45,7 @@ app.use('/event', eventRouter)
 
 
 app.get('/test', handleAsync(async (req, res,next) => {
-    await user.findById('4353454354354353')
-    res.sendStatus(200)
+    RESPONSE(res,200,"OK")
 }))
 
 
@@ -54,7 +54,7 @@ app.get('/RESET', async (req, res) => {
     await org.deleteMany({})
     await event.deleteMany({})
     await token.deleteMany({})
-    res.send("RESETED THE DB")
+    RESPONSE(res,200,"RESETED THE DB")
 })
 
 //Error Handler

@@ -39,6 +39,7 @@ dependencies:
   http: ^0.13.5
   flutter_secure_storage: ^7.0.1
   jwt_decode: ^0.3.1
+  fluttertoast: ^8.1.2
 
 dev_dependencies:
   flutter_test:

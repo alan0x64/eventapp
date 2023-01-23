@@ -6,7 +6,9 @@ const xss=require("xss-clean")
 const helmet = require("helmet");
 const jwt = require("jsonwebtoken")
 const mongoSanitize=require("express-mongo-sanitize")
-const { authJWT_RT, authJWT_AT } = require("./middlewares/authn")
+const { authJWT_RT, authJWT_AT } = require("./middlewares/authn");
+const { RESPONSE } = require("./utils/shared_funs");
+const morgan = require("morgan");
 
 //Settings
 app.set('json spaces', 10)
@@ -18,11 +20,12 @@ app.use(cors())
 app.use(mongoSanitize())
 app.use(xss())
 app.use(helmet())
+app.use(morgan('dev'))
 
 //Routes
 app.post('/RT', authJWT_RT, (req, res) => {
     let id
-
+    
     if (req.logedinUser) {
         id = req.logedinUser.id
     } else if (req.logedinOrg) {
@@ -33,7 +36,8 @@ app.post('/RT', authJWT_RT, (req, res) => {
         id: id
     }, process.env.ACCESS_TOKEN, { expiresIn: "15m", algorithm: "HS512" })
 
-    res.send({
+
+    RESPONSE(res,200,{
         AT: "Bearer " + AT
     })
 })

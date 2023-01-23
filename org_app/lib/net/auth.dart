@@ -1,13 +1,15 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decode/jwt_decode.dart';
+import 'package:org/net/HTTP.dart';
+import 'package:org/servers.dart';
 
-void storeTokens(String rt, String at) async {
+Future<void> storeTokens(String rt, String at) async {
   FlutterSecureStorage storage = const FlutterSecureStorage();
   await storage.write(key: "RT", value: rt);
   await storage.write(key: "AT", value: at);
 }
 
-void storeToken(String key ,String token) async {
+void storeToken(String key, String token) async {
   FlutterSecureStorage storage = const FlutterSecureStorage();
   await storage.write(key: key, value: token);
 }
@@ -24,26 +26,17 @@ Future<bool> isTokenExp(String key) async {
   return true;
 }
 
-/*
+Future<bool> renewAT() async {
+  Response res = await POST(authServer, 0, 'RT', {});
+  if (res.data.isEmpty) return false;
+  storeToken('AT', res.data['AT']);
+  return true;
+}
 
-login
-- RT-AT
-- Store Them
-- home screen
-
-- Before Any REQ
-- get AT from storage
-- check if AT valid 
-  - if no get new token
-  - replace the old AT
-  - add it to header 
-
-- Before Any REQ
-- get RT from storage
-- check if RT valid 
-  - if no ask the User to Login Again
-  - replace the old RT
-  
-
-
-*/
+Future<bool> checkOrRenewTokens() async {
+  if (!(await isTokenExp('RT'))) return false;
+  if (!(await isTokenExp('AT'))) {
+    if (await renewAT() == false) throw Exception("Got Empty Token");
+  }
+  return true;
+}
