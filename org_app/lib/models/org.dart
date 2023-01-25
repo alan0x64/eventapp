@@ -1,10 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+
 import 'package:org/net/HTTP.dart';
-import 'package:org/net/auth.dart';
-import 'package:org/screens/org/login.dart';
 import 'package:org/servers.dart';
-import 'package:org/utilities/shared.dart';
 
 class Org {
   final String orgPic;
@@ -25,36 +21,25 @@ class Org {
     required this.email,
     required this.password,
     required this.phoneNumber,
-    this.bio = "None",
-    this.orgtype = 0,
-    this.location = "None",
+    required this.bio,
+    required this.orgtype,
+    required this.location,
     required this.orgEvents,
   });
 }
 
-Future<Org> runFun(context, Function cb) async {
-  try {
-    if (await checkOrRenewTokens() == false) {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const LoginScreen(),
-          ));
-    }
-    Response res = await cb();
-    if (res.statusCode != 200) throw Exception(Console.logError(res.status));
-    return Org(
-        orgPic: res.data['orgPic'],
-        orgBackgroundPic: res.data['orgBackgroundPic'],
-        orgName: res.data['orgName'],
-        email: res.data['email'],
-        password: res.data['password'],
-        phoneNumber: res.data['phoneNumber'],
-        orgEvents: res.data['orgEvents']);
-  } catch (e) {
-    Fluttertoast.showToast(msg: e.toString());
-    throw Exception(Console.logError(e.toString()));
-  }
+Org mapOrg(res) {
+  return Org(
+      orgPic: res.data['orgPic'],
+      orgBackgroundPic: res.data['orgBackgroundPic'],
+      orgName: res.data['orgName'],
+      email: res.data['email'],
+      password: res.data['password'],
+      phoneNumber: res.data['phoneNumber'],
+      bio: res.data['bio'],
+      location: res.data['location'],
+      orgtype: res.data['orgtype'],
+      orgEvents: res.data['orgEvents']);
 }
 
 // GET
@@ -65,6 +50,7 @@ Future<Response> getProfile() async {
 Future<Response> getOrgEvents() async {
   return await GET('$devServer/org/events', 0, 'AT');
 }
+
 
 // POST
 Future<Response> login(Map<String, dynamic> data) async {
