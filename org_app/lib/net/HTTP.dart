@@ -74,4 +74,3 @@ Future<Response> DELETE(
   return encodeRES(await http.delete(Uri.parse(url),
       headers: await Header(json_or_form, keyToAdd), body: jsonEncode(body)));
 }
-

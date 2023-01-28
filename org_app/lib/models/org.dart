@@ -1,4 +1,3 @@
-
 import 'package:org/net/HTTP.dart';
 import 'package:org/servers.dart';
 
@@ -50,8 +49,6 @@ Future<Response> getProfile() async {
 Future<Response> getOrgEvents() async {
   return await GET('$devServer/org/events', 0, 'AT');
 }
-
-
 // POST
 Future<Response> login(Map<String, dynamic> data) async {
   return await POST('$devServer/org/login', 0, '0', data);
