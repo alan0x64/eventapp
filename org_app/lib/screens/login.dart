@@ -106,19 +106,20 @@ class _LoginScreenState extends State<LoginScreen> {
                     await storeTokens(res.data['RT'], res.data['AT']);
 
                     Org orgdata = mapOrg(await getProfile());
-                    
+
                     snackbar(context, "Login Sucessful", 3);
 
-                    gotoClear(context, UserDrawer(
-                      email:orgdata.email,
-                      name: orgdata.orgName,
-                      picURL: orgdata.orgPic,
-                      profileScreen:const profileScreen() ,
-                      addEventScreen:const addEvent(),
-                      homeScreen:const Home(),
-                      boxColor: const Color.fromARGB(255, 192, 148, 46),
-                      ));
-
+                    gotoClear(
+                        context,
+                        UserDrawer(
+                          email: orgdata.email,
+                          name: orgdata.orgName,
+                          picURL: orgdata.orgPic,
+                          profileScreen: const profileScreen(),
+                          addEventScreen: const addEvent(),
+                          homeScreen: const Home(),
+                          boxColor: const Color.fromARGB(255, 192, 148, 46),
+                        ));
                   } catch (e) {
                     Console.log(e);
                   }

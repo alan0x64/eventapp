@@ -28,14 +28,8 @@ app.use(xss())
 app.use(helmet())
 app.use(morgan('dev'))
 
-app.use('/uploads',
-    // authJWT_AT,
-    express.static(path.join(__dirname, '/public')))
-
-app.use('/uploads',
-    // authJWT_AT,
-    express.static(path.join(__dirname, '/images')))
-
+app.use('/uploads',cors,express.static(path.join(__dirname, '/public')))
+app.use('/uploads',cors,express.static(path.join(__dirname, '/images')))
 app.use(cors())
 
 //Routers
