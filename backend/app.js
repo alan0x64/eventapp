@@ -16,6 +16,7 @@ const { authJWT_AT } = require("./middlewares/authn")
 const mongoSanitize = require("express-mongo-sanitize");
 const { handleAsync, RESPONSE, logError } = require("./utils/shared_funs");
 const morgan = require("morgan");
+const {fileHeaders}=require("./middlewares/file_headers")
 
 //Settings
 app.set('json spaces', 10)
@@ -28,8 +29,8 @@ app.use(xss())
 app.use(helmet())
 app.use(morgan('dev'))
 
-app.use('/uploads',cors,express.static(path.join(__dirname, '/public')))
-app.use('/uploads',cors,express.static(path.join(__dirname, '/images')))
+app.use('/uploads',fileHeaders,express.static(path.join(__dirname, '/public')))
+app.use('/uploads',fileHeaders,express.static(path.join(__dirname, '/images')))
 app.use(cors())
 
 //Routers
