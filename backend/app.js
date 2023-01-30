@@ -19,7 +19,7 @@ const morgan = require("morgan");
 
 //Settings
 app.set('json spaces', 10)
-
+  
 //Some Middleweres
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
@@ -29,11 +29,11 @@ app.use(helmet())
 app.use(morgan('dev'))
 
 app.use('/uploads',
-    authJWT_AT,
+    // authJWT_AT,
     express.static(path.join(__dirname, '/public')))
 
 app.use('/uploads',
-    authJWT_AT,
+    // authJWT_AT,
     express.static(path.join(__dirname, '/images')))
 
 app.use(cors())

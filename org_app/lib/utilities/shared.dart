@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:org/net/HTTP.dart';
 import 'package:org/net/auth.dart';
@@ -6,23 +7,22 @@ import 'package:org/screens/login.dart';
 
 class Console {
   static logError(String str) {
-    return "\n---------------ERROR-------------\nstr\n----------------------------\n";
+    return "\n---------------ERROR-------------\n$str\n----------------------------\n";
   }
 
   static log(dynamic str) {
-    print("\n----------------------------\nstr\n----------------------------\n") ;
+    if (kDebugMode) {
+      print(
+          "\n----------------------------\n$str\n----------------------------\n");
+    }
   }
 }
 
 Future<dynamic> runFun(context, Function requestCallback,
-    Function mapResponseCallback, int userOrOrgMode) async {
+    Function mapResponseCallback) async {
   try {
     if (await checkOrRenewTokens() == false) {
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => LoginScreen(userOrOrgMode),
-          ));
+      gotoClear(context, const LoginScreen(1));
     }
     Response res = await requestCallback();
     if (res.statusCode != 200) throw Exception(Console.logError(res.status));
@@ -39,4 +39,33 @@ List<dynamic> mapObjs(List<dynamic> res, Function mapperCallback) {
     listOfObj[i] = mapperCallback(res[i]);
   }
   return listOfObj;
+}
+
+void snackbar(BuildContext context, String text, int duration) {
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    content: Text(text),
+    duration: Duration(seconds: duration),
+    action: SnackBarAction(
+      label: 'ACTION',
+      onPressed: () {},
+    ),
+  ));
+}
+
+void goto(context, Widget screen) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => screen,
+    ),
+  );
+}
+
+void gotoClear(context, Widget screen) {
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (context) => screen,
+    ),
+  );
 }

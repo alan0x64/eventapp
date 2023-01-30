@@ -8,10 +8,10 @@ class UserDrawer extends StatelessWidget {
     required this.name,
     required this.email,
     required this.picURL,
-    required this.profile,
-    required this.home,
-    required this.add,
-    this.boxColor = Colors.red,
+    required this.profileScreen,
+    required this.homeScreen,
+    required this.addEventScreen,
+    required this.boxColor,
   });
 
   String name;
@@ -19,9 +19,9 @@ class UserDrawer extends StatelessWidget {
   Color boxColor;
   String picURL;
   
-  Widget profile;
-  Widget home;
-  Widget add;
+  Widget profileScreen;
+  Widget homeScreen;
+  Widget addEventScreen;
 
 
   @override
@@ -36,7 +36,7 @@ class UserDrawer extends StatelessWidget {
               Navigator.pop(context);
                Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => profile));
+                MaterialPageRoute(builder: (context) => profileScreen));
               },
               child: CircleAvatar(
                 backgroundImage: NetworkImage(picURL),
@@ -58,7 +58,7 @@ class UserDrawer extends StatelessWidget {
             title: const Text('Home'),
             onTap: () {
               Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => home));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => homeScreen));
             },
           ),
           ListTile(
@@ -68,7 +68,7 @@ class UserDrawer extends StatelessWidget {
             title: const Text('New Event'),
             onTap: () {
               Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => add));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => addEventScreen));
             },
           ),
           const ListTile(),

@@ -1,3 +1,4 @@
+
 import 'package:org/net/HTTP.dart';
 import 'package:org/servers.dart';
 
@@ -11,7 +12,7 @@ class Org {
   final String bio;
   final int orgtype;
   final String location;
-  final List<String> orgEvents;
+  final List<dynamic> orgEvents;
 
   Org({
     required this.orgPic,
@@ -29,15 +30,15 @@ class Org {
 
 Org mapOrg(res) {
   return Org(
-      orgPic: res.data['orgPic'],
-      orgBackgroundPic: res.data['orgBackgroundPic'],
+      orgPic: res.data['orgPic']['url'],
+      orgBackgroundPic: res.data['orgBackgroundPic']['url'],
       orgName: res.data['orgName'],
       email: res.data['email'],
       password: res.data['password'],
       phoneNumber: res.data['phoneNumber'],
       bio: res.data['bio'],
       location: res.data['location'],
-      orgtype: res.data['orgtype'],
+      orgtype: res.data['org_type'],
       orgEvents: res.data['orgEvents']);
 }
 

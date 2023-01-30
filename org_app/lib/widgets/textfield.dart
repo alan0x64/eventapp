@@ -1,6 +1,7 @@
 // ignore_for_file: must_be_immutable
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 
 class AppTextbox extends StatelessWidget {
   bool ob;
@@ -9,18 +10,18 @@ class AppTextbox extends StatelessWidget {
   String lt;
   Icon? icon;
   Color color;
+  String? init;
 
-  String? Function(String?)? vali;
-  List<String? Function(String?)>? valis;
+  List<String? Function(String?)> valis;
 
   AppTextbox(
       {super.key,
       required this.name,
       required this.ht,
       required this.lt,
+      required this.valis,
+      this.init,
       this.icon,
-      this.valis,
-      this.vali,
       this.ob = false,
       this.color = Colors.white});
 
@@ -31,7 +32,8 @@ class AppTextbox extends StatelessWidget {
         return SizedBox(
             width: 300,
             child: FormBuilderTextField(
-                validator: vali,
+                initialValue: init,
+                validator: FormBuilderValidators.compose(valis),
                 obscureText: ob,
                 name: name,
                 decoration: InputDecoration(
@@ -43,3 +45,7 @@ class AppTextbox extends StatelessWidget {
     );
   }
 }
+// // FormBuilderValidators.match(
+                    //     r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$',
+                    //     errorText:
+                    //         "Must contain at least one letter and one number")

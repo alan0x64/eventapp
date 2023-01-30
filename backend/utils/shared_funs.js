@@ -10,12 +10,14 @@ function RESPONSE(res, code, data) {
 
     res.statusCode = code
 
+    if (typeof data == "string") data={"msg":data}
+    
     res.send(
         {
             status: status,
             statusCode: code,
             timestamp: new Date().toISOString(),
-            data: data,
+            data:data ,
         }
     )
     return
