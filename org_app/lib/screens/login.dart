@@ -109,6 +109,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     snackbar(context, "Login Sucessful", 3);
 
+                    Console.log(orgdata.orgPic);
+
                     gotoClear(
                         context,
                         UserDrawer(
