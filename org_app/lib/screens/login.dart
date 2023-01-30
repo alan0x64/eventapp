@@ -102,7 +102,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       snackbar(context, res.data['msg'], 3);
                       return;
                     }
-                    storeTokens(res.data['RT'], res.data['AT']);
+
+                    await storeTokens(res.data['RT'], res.data['AT']);
 
                     Org orgdata = mapOrg(await getProfile());
                     
@@ -117,12 +118,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       homeScreen:const Home(),
                       boxColor: const Color.fromARGB(255, 192, 148, 46),
                       ));
+
                   } catch (e) {
                     Console.log(e);
                   }
                 },
                 child: const Text("Login")),
-          )
+          ),
         ],
       ),
     );

@@ -3,10 +3,11 @@ const jwt = require("jsonwebtoken");
 const org = require("../models/org");
 const user = require("../models/user")
 const token_collection = require("../models/token")
-const { RESPONSE } = require("../utils/shared_funs");
+const { RESPONSE, logError } = require("../utils/shared_funs");
 
 async function user_org(req,userORorg)
 {
+try {
     let logedinOrg = await org.findOne({ '_id': userORorg.id })
     let logedinUser = await user.findOne({ '_id': userORorg.id })
 
@@ -14,8 +15,10 @@ async function user_org(req,userORorg)
         req.logedinOrg = logedinOrg
     } else if (logedinUser) {
         req.logedinUser = logedinUser
-    }
-
+    }    
+} catch (error) {
+    logError(error)
+}
 }
 
 async function authJWT_RT(req, res, next) {
