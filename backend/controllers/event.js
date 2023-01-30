@@ -11,11 +11,11 @@ require("express")
 function eventImages(req, eventx = {}) {
     const eventBackgroundPic = {
         fileName: req.eventPic,
-        url: `http://${process.env.HOST}:${process.env.PORT}/uploads/events/${req.eventPic}`
+        url: `${process.env.HOST}:${process.env.PORT}/uploads/events/${req.eventPic}`
     }
     const sig = {
         fileName: req.sig,
-        url: `http://${process.env.HOST}:${process.env.PORT}/uploads/sigs/${req.sig}`
+        url: `${process.env.HOST}:${process.env.PORT}/uploads/sigs/${req.sig}`
     }
 
     if (Object.keys(eventx).length == 0) { return { eventBackgroundPic, sig, } }
@@ -121,7 +121,7 @@ module.exports.checkIn = async (req, res) => {
         checkInTime: DateNowInMin(),
         cert: {
             fileName: newCertName,
-            url: `http://${process.env.HOST}:${process.env.PORT}/uploads/certs/${newCertName}`,
+            url: `${process.env.HOST}:${process.env.PORT}/uploads/certs/${newCertName}`,
         }
     }).save()
 

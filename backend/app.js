@@ -66,7 +66,7 @@ app.use((err,req,res,next)=>{
 const PORT = process.env.PORT || 4000
 app.listen(PORT, async () => {
     process.stdout.write('\x1Bc');
-    console.log(`\n\u2705 Startred Server! [ http://localhost:${PORT}/ ]`)
+    console.log(`\n\u2705 Startred Server! [ ${process.env.HOST}:${PORT}/ ]`)
 })
 
 module.exports = app

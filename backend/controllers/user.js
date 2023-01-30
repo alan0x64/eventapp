@@ -11,7 +11,7 @@ const { RESPONSE, deleteImages } = require('../utils/shared_funs')
 function userImages(req, userx = {},cert={}) {
     const profilePic = {
         fileName: req.profilePic,
-        url: `http://${process.env.HOST}:${process.env.PORT}/uploads/users/${req.profilePic}`
+        url: `${process.env.HOST}:${process.env.PORT}/uploads/users/${req.profilePic}`
     }
 
     if (Object.keys(userx).length == 0) { return { profilePic } }

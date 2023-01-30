@@ -13,12 +13,12 @@ const { deleteSingleEvent } = require("./event")
 function orgImages(req, orgx = {}) {
     const orgPic = {
         fileName: req.orgPic,
-        url: `http://${process.env.HOST}:${process.env.PORT}/uploads/orgs/org_images/${req.orgPic}`
+        url: `${process.env.HOST}:${process.env.PORT}/uploads/orgs/org_images/${req.orgPic}`
     }
 
     const orgBackgroundPic = {
         fileName: req.orgBackgroundPic,
-        url: `http://${process.env.HOST}:${process.env.PORT}/uploads/orgs/background_images/${req.orgBackgroundPic}`
+        url: `${process.env.HOST}:${process.env.PORT}/uploads/orgs/background_images/${req.orgBackgroundPic}`
     }
 
 
