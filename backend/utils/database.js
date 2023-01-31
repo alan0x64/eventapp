@@ -7,3 +7,5 @@ mongoose.connect(process.env.DB_URI).then(() => {
     console.log("\u274C ERROR WHILE CONNECTING TO DATABASE!\n");
     console.log(e);
 })
+
+mongoose.set('strictQuery', true);
