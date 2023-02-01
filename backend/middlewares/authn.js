@@ -5,7 +5,7 @@ const user = require("../models/user")
 const token_collection = require("../models/token")
 const { RESPONSE, logError } = require("../utils/shared_funs");
 
-async function user_org(req, userORorg) {
+async function user_org(req,res,userORorg) {
     try {
         let logedinOrg = await org.findOne({ '_id': userORorg.id })
         let logedinUser = await user.findOne({ '_id': userORorg.id })
@@ -31,7 +31,7 @@ async function authJWT_RT(req, res, next) {
 
         jwt.verify(token, process.env.REFRESH_TOKEN, async (err, userORorg) => {
             if (err) RESPONSE(res, 403)
-            await user_org(req, userORorg)
+            await user_org(req,res,userORorg)
             req.RT = token
             next()
         })
