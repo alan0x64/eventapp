@@ -22,6 +22,10 @@ app.use(xss())
 app.use(helmet())
 app.use(morgan('dev'))
 
+app.get('/test', handleAsync(async (req, res,next) => {
+    RESPONSE(res,200,"OK")
+}))
+
 //Routes
 app.post('/RT', authJWT_RT, handleAsync(
     (req, res) => {
@@ -53,5 +57,5 @@ app.use((err, req, res, next) => {
 const PORT = process.env.AUTH_PORT || 9000
 app.listen(PORT, () => {
     process.stdout.write('\033c');
-    console.log(`\n\u2705 AuthServer Startred! [http://${process.env.HOST}:${PORT}/RT]`)
+    console.log(`\n\u2705 AuthServer Startred! ${process.env.HOST}:${PORT}/RT`)
 })
