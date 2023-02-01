@@ -17,7 +17,6 @@ async function user_org(req,res,userORorg) {
         }
     } catch (err) {
         logError(err)
-        RESPONSE(res, 500, { error: err.message })
     }
 }
 
