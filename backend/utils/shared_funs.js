@@ -40,6 +40,16 @@ function handleAsync(fun) {
         fun(req, res, next).catch(next)
     }
 }
+ function catchFun(fun)  {
+    return (req,res,next)=>{
+        try {
+            fun(req,res,next)
+        } catch (error) {
+            logError(error)
+            return
+        }
+    }
+} 
 
 function DateNowInMin() {
     return Math.floor(Date.now() / 60000)
@@ -60,5 +70,6 @@ module.exports = {
     handleAsync,
     DateNowInMin,
     attendedInMin,
-    logError
+    logError,
+    catchFun
 }

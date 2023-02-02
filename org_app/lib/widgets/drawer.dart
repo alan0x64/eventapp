@@ -1,8 +1,8 @@
 // ignore_for_file: must_be_immutable
 import 'package:flutter/material.dart';
+import 'package:org/utilities/shared.dart';
 
 class UserDrawer extends StatelessWidget {
-
   UserDrawer({
     super.key,
     required this.name,
@@ -12,17 +12,18 @@ class UserDrawer extends StatelessWidget {
     required this.homeScreen,
     required this.addEventScreen,
     required this.boxColor,
+    required this.bgURL,
   });
 
   String name;
   String email;
   Color boxColor;
   String picURL;
-  
+  String bgURL;
+
   Widget profileScreen;
   Widget homeScreen;
   Widget addEventScreen;
-
 
   @override
   Widget build(BuildContext context) {
@@ -30,14 +31,11 @@ class UserDrawer extends StatelessWidget {
       child: ListView(
         children: <Widget>[
           UserAccountsDrawerHeader(
-            decoration: BoxDecoration(color: boxColor),
-            currentAccountPicture:InkWell(
-              onTap: () {
-              Navigator.pop(context);
-               Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => profileScreen));
-              },
+            decoration: BoxDecoration(
+                color: boxColor,
+                image: DecorationImage(
+                    image: NetworkImage(bgURL), fit: BoxFit.cover)),
+            currentAccountPicture: InkWell(
               child: CircleAvatar(
                 backgroundImage: NetworkImage(picURL),
               ),
@@ -53,12 +51,21 @@ class UserDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(
+              Icons.person,
+            ),
+            title: const Text('Account'),
+            onTap: () {
+              goto(context, profileScreen);
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(
               Icons.home,
             ),
             title: const Text('Home'),
             onTap: () {
-              Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => homeScreen));
+              goto(context, homeScreen);
             },
           ),
           ListTile(
@@ -67,8 +74,7 @@ class UserDrawer extends StatelessWidget {
             ),
             title: const Text('New Event'),
             onTap: () {
-              Navigator.pop(context);
-              Navigator.push(context, MaterialPageRoute(builder: (context) => addEventScreen));
+              goto(context, addEventScreen);
             },
           ),
           const ListTile(),

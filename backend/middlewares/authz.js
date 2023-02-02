@@ -1,9 +1,9 @@
 const user = require('../models/user')
 const org = require('../models/org')
-const { logError } = require('../utils/shared_funs')
+const { logError, catchFun, RESPONSE } = require('../utils/shared_funs')
 
-async function onlyUsers(req, res, next) {
-    try {
+module.exports.onlyUsers = catchFun(
+    async function (req, res, next) {
         if (req.logedinOrg) {
             res.sendStatus(401)
             return
@@ -13,33 +13,32 @@ async function onlyUsers(req, res, next) {
             return
         }
         next()
-    } catch (err) {
-        logError(err)
-        RESPONSE(res, 500, { error: err.message })
-
     }
-}
+)
 
-async function onlyOrgs(req, res, next) {
-    try {
+module.exports.onlyOrgs = catchFun(
+    async function (req, res, next) {
         if (req.logedinUser) {
             res.sendStatus(401)
             return
         }
+
+        if (!req.logedinOrg) {
+            RESPONSE(res,400,"Invalid Tokens")
+            console.log("\nInvalid Tokens\n");
+            return
+        }
+
         if (await user.findById(req.logedinOrg.id)) {
             res.sendStatus(401)
             return
         }
         next()
-    } catch (err) {
-        logError(err)
-        RESPONSE(res, 500, { error: err.message })
-
     }
-}
+)
 
-async function isOrgEventOwner(req, res, next) {
-    try {
+module.exports.isOrgEventOwner = catchFun(
+    async function (req, res, next) {
         if (req.logedinUser) {
             next()
             return
@@ -47,16 +46,5 @@ async function isOrgEventOwner(req, res, next) {
         let eventId = req.params.eventId
         let orgx = await org.findById(req.logedinOrg.id)
         orgx.orgEvents.includes(eventId) ? next() : res.sendStatus(401)
-    } catch (err) {
-        logError(err)
-        RESPONSE(res, 500, { error: err.message })
-
     }
-}
-
-
-module.exports = {
-    onlyUsers,
-    isOrgEventOwner,
-    onlyOrgs
-}
+)

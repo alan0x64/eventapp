@@ -86,7 +86,10 @@ module.exports.login = async (req, res) => {
 
     let loginOrg = await org.findOne({ 'email': req.body.orgdata.email })
 
-    if (!loginOrg) return RESPONSE(res,400,"Organization  Not Found")
+    if (!loginOrg)  {
+        RESPONSE(res,400,"Organization  Not Found")
+        return
+    }
     if (!compareSync(req.body.orgdata.password, loginOrg.password)) return RESPONSE(res,400,"Incorrect Email or Password")
 
     let AT = jwt.sign({

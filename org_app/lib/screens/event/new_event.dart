@@ -1,16 +1,16 @@
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter/material.dart';
+import 'package:org/widgets/screen.dart';
 
-class addEvent extends StatefulWidget {
-  const addEvent({super.key});
+class AddEvent extends StatefulWidget {
+  const AddEvent({super.key});
 
   @override
-  State<addEvent> createState() => _addEventState();
+  State<AddEvent> createState() => _AddEventState();
 }
 
-class _addEventState extends State<addEvent> {
+class _AddEventState extends State<AddEvent> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Screen(ab: AppBar(),wid: const Text("Add"),);
   }
 }

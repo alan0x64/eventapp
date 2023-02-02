@@ -2,6 +2,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decode/jwt_decode.dart';
 import 'package:org/net/HTTP.dart';
 import 'package:org/servers.dart';
+import 'package:org/utilities/shared.dart';
 
 Future<void> storeTokens(String rt, String at) async {
   FlutterSecureStorage storage = const FlutterSecureStorage();
@@ -21,9 +22,9 @@ Future<String> getToken(String key) async {
 
 Future<bool> isTokenExp(String key) async {
   FlutterSecureStorage storage = const FlutterSecureStorage();
-  String token = await storage.read(key: key) as String;
-  if (!Jwt.isExpired(token)) return false;
-  return true;
+  String? token = await storage.read(key: key);
+  if (token == null) return true;
+  return Jwt.isExpired(token);
 }
 
 Future<bool> renewAT() async {
@@ -34,9 +35,9 @@ Future<bool> renewAT() async {
 }
 
 Future<bool> checkOrRenewTokens() async {
-  if (!(await isTokenExp('RT'))) return false;
-  if (!(await isTokenExp('AT'))) {
-    if (await renewAT() == false) throw Exception("Got Empty Token");
+  if (await isTokenExp('RT')) return false;
+  if (await isTokenExp('AT')) {
+    if (await renewAT() == false) Console.logError("Cannot Renew Token");
   }
   return true;
 }

@@ -1,16 +1,49 @@
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter/material.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:org/models/org.dart';
+import 'package:org/widgets/screen.dart';
+import 'package:org/widgets/textfield.dart';
 
-class profileScreen extends StatefulWidget {
-  const profileScreen({super.key});
+class ProfileScreen extends StatefulWidget {
+  final Org data;
+
+  const ProfileScreen({super.key, required this.data});
 
   @override
-  State<profileScreen> createState() => _profileScreenState();
+  State<ProfileScreen> createState() => _ProfileScreenState();
 }
 
-class _profileScreenState extends State<profileScreen> {
+class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Screen(
+        ab: AppBar(),
+        wid: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            AppTextbox(
+              name: "name",
+              ht: "Organization Name",
+              lt: "Organization Name",
+              init: widget.data.orgName,
+              valis: [
+                FormBuilderValidators.required(),
+                FormBuilderValidators.minLength(3),
+              ],
+            ),
+            AppTextbox(
+              name: "emai;",
+              ht: "Eame",
+              lt: "Eame",
+              init: widget.data.email,
+              valis: [
+                FormBuilderValidators.required(),
+                FormBuilderValidators.email(),
+                FormBuilderValidators.minLength(5),
+              ],
+            ),
+            ElevatedButton(onPressed: () {}, child: const Text("S"))
+          ],
+        ));
   }
 }
