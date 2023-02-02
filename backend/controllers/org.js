@@ -100,7 +100,7 @@ module.exports.login = async (req, res) => {
         id: loginOrg._id,
         email: loginOrg.email,
         imei: "NULL",
-    }, process.env.REFRESH_TOKEN, { expiresIn: "2w", algorithm: "HS512" })
+    }, process.env.REFRESH_TOKEN, { expiresIn: "1w", algorithm: "HS512" })
 
 
     await new token_collection({

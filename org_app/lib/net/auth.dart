@@ -10,14 +10,16 @@ Future<void> storeTokens(String rt, String at) async {
   await storage.write(key: "AT", value: at);
 }
 
-void storeToken(String key, String token) async {
+Future<void> storeToken(String key, String token) async {
   FlutterSecureStorage storage = const FlutterSecureStorage();
   await storage.write(key: key, value: token);
 }
 
 Future<String> getToken(String key) async {
   FlutterSecureStorage storage = const FlutterSecureStorage();
-  return (await storage.read(key: key))!;
+  String? token = await storage.read(key: key);
+  if (token == null) throw Exception("NULL_TOKEN");
+  return (token);
 }
 
 Future<bool> isTokenExp(String key) async {
@@ -30,7 +32,7 @@ Future<bool> isTokenExp(String key) async {
 Future<bool> renewAT() async {
   Response res = await POST(authServer, 0, 'RT', {});
   if (res.data.isEmpty) return false;
-  storeToken('AT', res.data['AT']);
+  await storeToken('AT', res.data['AT']);
   return true;
 }
 

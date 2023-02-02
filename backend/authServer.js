@@ -7,7 +7,7 @@ const helmet = require("helmet");
 const jwt = require("jsonwebtoken")
 const mongoSanitize = require("express-mongo-sanitize")
 const { authJWT_RT } = require("./middlewares/authn");
-const { RESPONSE, logError, handleAsync } = require("./utils/shared_funs");
+const { RESPONSE, logError, handleAsync, catchFun, logx } = require("./utils/shared_funs");
 const morgan = require("morgan");
 
 //Settings
@@ -22,12 +22,12 @@ app.use(xss())
 app.use(helmet())
 app.use(morgan('dev'))
 
-app.get('/test', handleAsync(async (req, res,next) => {
-    RESPONSE(res,200,"OK")
+app.get('/test', handleAsync(async (req, res, next) => {
+    RESPONSE(res, 200,"OK")
 }))
 
 //Routes
-app.post('/RT', authJWT_RT, handleAsync(
+app.post('/RT', authJWT_RT, catchFun(
     (req, res) => {
         let id
 
@@ -36,6 +36,8 @@ app.post('/RT', authJWT_RT, handleAsync(
         } else if (req.logedinOrg) {
             id = req.logedinOrg.id
         }
+
+        if (id == null) throw Error("ID IS EMPTY")
 
         let AT = jwt.sign({
             id: id

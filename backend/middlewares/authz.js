@@ -1,6 +1,6 @@
 const user = require('../models/user')
 const org = require('../models/org')
-const { logError, catchFun, RESPONSE } = require('../utils/shared_funs')
+const { logError, catchFun, RESPONSE, logx } = require('../utils/shared_funs')
 
 module.exports.onlyUsers = catchFun(
     async function (req, res, next) {
@@ -8,6 +8,7 @@ module.exports.onlyUsers = catchFun(
             res.sendStatus(401)
             return
         }
+        if (!req.logedinUser) throw Error("USER IS NULL -ONLYUSERS")
         if (await org.findById(req.logedinUser.id)) {
             res.sendStatus(401)
             return
@@ -17,17 +18,13 @@ module.exports.onlyUsers = catchFun(
 )
 
 module.exports.onlyOrgs = catchFun(
-    async function (req, res, next) {
+    async function (req, res, next) {        
         if (req.logedinUser) {
             res.sendStatus(401)
             return
         }
 
-        if (!req.logedinOrg) {
-            RESPONSE(res,400,"Invalid Tokens")
-            console.log("\nInvalid Tokens\n");
-            return
-        }
+        if (!req.logedinOrg) throw Error("ORG IS NULL -ONLYORGS")
 
         if (await user.findById(req.logedinOrg.id)) {
             res.sendStatus(401)

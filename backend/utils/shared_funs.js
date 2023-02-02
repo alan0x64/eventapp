@@ -41,12 +41,12 @@ function handleAsync(fun) {
     }
 }
  function catchFun(fun)  {
-    return (req,res,next)=>{
+    return async (req,res,next)=>{
         try {
-            fun(req,res,next)
+            await fun(req,res,next)
         } catch (error) {
             logError(error)
-            return
+            next(error)
         }
     }
 } 
@@ -64,6 +64,13 @@ function logError(err) {
     console.log(`\n${err.stack}\n`);
     console.log('----------------------------------------\n');
 }
+
+function logx(str) {
+    console.log('\n----------------------------------------');
+    console.log(`${str}`);
+    console.log('----------------------------------------\n');
+}
+
 module.exports = {
     RESPONSE,
     deleteImages,
@@ -71,5 +78,6 @@ module.exports = {
     DateNowInMin,
     attendedInMin,
     logError,
-    catchFun
+    catchFun,
+    logx
 }
