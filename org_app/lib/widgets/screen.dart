@@ -7,13 +7,13 @@ import 'package:org/widgets/future_builder.dart';
 import '../screens/event/home.dart';
 
 class Screen extends StatefulWidget {
-  final AppBar ab;
-  final Widget wid;
+  final AppBar? ab;
+  final Widget Function(dynamic data) builder;
 
   const Screen({
     super.key,
-    required this.ab,
-    required this.wid,
+    required this.builder,
+    this.ab,
   });
 
   @override
@@ -33,15 +33,12 @@ class _ScreenState extends State<Screen> {
             name: data.orgName,
             picURL: data.orgPic,
             bgURL: data.orgBackgroundPic,
-            profileScreen: ProfileScreen(
-              data: data,
-            ),
+            profileScreen:  ProfileScreen(),
             addEventScreen: const AddEvent(),
             homeScreen: const Home(),
-            boxColor: const Color.fromARGB(255, 192, 148, 46),
           ),
           appBar: widget.ab,
-          body: widget.wid,
+          body: widget.builder(data),
         );
       },
     );

@@ -62,11 +62,28 @@ const validUserSchema = joi.object({
 const validOrgSchema = joi.object({
     orgName: joi.string().escapeHTML().required().error(new Error('Invalid OrgName')),
     email: joi.string().escapeHTML().lowercase().email().required().error(new Error('Invalid Email')),
-    password: joi.string().escapeHTML().required().error(new Error('Invalid Password')),
     phoneNumber: joi.number().required().error(new Error('Invalid Phone Number or Phone Number Is Already Used')),
-    bio: joi.string().escapeHTML().default("None"),
     org_type: joi.number().valid(0, 1, 2).default(0).error(new Error('Invalid Org Type')),
+    bio: joi.string().escapeHTML().default("None"),
+    website:joi.string().escapeHTML().default("None"),
+    socialMedia:joi.string().escapeHTML().default("None"),
     location: joi.string().escapeHTML().default("None"),
+    password: joi.string().escapeHTML().required().error(new Error('Invalid Password')),
+});
+
+const validUpdateOrgSchema = joi.object({
+    orgName: joi.string().escapeHTML().required().error(new Error('Invalid OrgName')),
+    email: joi.string().escapeHTML().lowercase().email().required().error(new Error('Invalid Email')),
+    phoneNumber: joi.number().required().error(new Error('Invalid Phone Number or Phone Number Is Already Used')),
+    org_type: joi.number().valid(0, 1, 2).default(0).error(new Error('Invalid Org Type')),
+    bio: joi.string().escapeHTML().default("None"),
+    location: joi.string().escapeHTML().default("None"),
+    website:joi.string().escapeHTML().default("None"),
+    socialMedia:joi.string().escapeHTML().default("None"),
+});
+
+const validPasswordSchema = joi.object({
+    password: joi.string().escapeHTML().required().error(new Error('Invalid Password')),
 });
 
 const validEventSchema = joi.object({
@@ -89,5 +106,7 @@ module.exports = {
     validUserSchema,
     validOrgSchema,
     validEventSchema,
-    validLoginSchema
+    validLoginSchema,
+    validUpdateOrgSchema,
+    validPasswordSchema
 }

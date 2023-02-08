@@ -1,4 +1,4 @@
-const { validUserSchema, validOrgSchema, validEventSchema, validLoginSchema } = require("../models/schema");
+const {validPasswordSchema, validUserSchema, validOrgSchema, validEventSchema, validLoginSchema,validUpdateOrgSchema } = require("../models/schema");
 const { RESPONSE, logError } = require('../utils/shared_funs');
 
 const createValidationMiddlewear = (schema) => {
@@ -20,4 +20,6 @@ const createValidationMiddlewear = (schema) => {
 module.exports.validateLogin = createValidationMiddlewear(validLoginSchema)
 module.exports.validateUser = createValidationMiddlewear(validUserSchema)
 module.exports.validateOrg = createValidationMiddlewear(validOrgSchema)
+module.exports.validateUpdateOrg = createValidationMiddlewear(validUpdateOrgSchema)
+module.exports.validatePassword = createValidationMiddlewear(validPasswordSchema)
 module.exports.validateEvent = createValidationMiddlewear(validEventSchema)

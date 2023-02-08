@@ -1,5 +1,5 @@
 import 'package:org/net/HTTP.dart';
-import 'package:org/servers.dart';
+import 'package:org/server.dart';
 
 class Event {
   String eventBackgroundPic;

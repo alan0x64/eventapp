@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:org/utilities/shared.dart';
 
+import '../screens/settings.dart';
+
 class UserDrawer extends StatelessWidget {
   UserDrawer({
     super.key,
@@ -11,13 +13,11 @@ class UserDrawer extends StatelessWidget {
     required this.profileScreen,
     required this.homeScreen,
     required this.addEventScreen,
-    required this.boxColor,
     required this.bgURL,
   });
 
   String name;
   String email;
-  Color boxColor;
   String picURL;
   String bgURL;
 
@@ -32,7 +32,6 @@ class UserDrawer extends StatelessWidget {
         children: <Widget>[
           UserAccountsDrawerHeader(
             decoration: BoxDecoration(
-                color: boxColor,
                 image: DecorationImage(
                     image: NetworkImage(bgURL), fit: BoxFit.cover)),
             currentAccountPicture: InkWell(
@@ -51,16 +50,6 @@ class UserDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(
-              Icons.person,
-            ),
-            title: const Text('Account'),
-            onTap: () {
-              goto(context, profileScreen);
-            },
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(
               Icons.home,
             ),
             title: const Text('Home'),
@@ -75,6 +64,16 @@ class UserDrawer extends StatelessWidget {
             title: const Text('New Event'),
             onTap: () {
               goto(context, addEventScreen);
+            },
+          ),
+          const Divider(),
+           ListTile(
+            leading: const Icon(
+              Icons.settings,
+            ),
+            title: const Text('Settings'),
+            onTap: () {
+              goto(context,const Settings());
             },
           ),
           const ListTile(),

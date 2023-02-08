@@ -9,26 +9,22 @@
 
 ### Front-End 
 
+#### Organization App
+- Create Event
+- Event View - Joined Users - See blacklist - Cert Genration
+- Update Event
+- Delete Event 
+- Home Screen
+
+
 #### User App
 - Login
 - SingUp
-- Home Screen
-- Event Screen
 - User Profile
 - Update Profile
-- ??????
-
-#### Organization App
-- Login
-- SingUp
 - Home Screen
-- Event
-- Create Event
-- Update Event
-- Organization Profile
-- Update Profile
+- Event View -Join -Scan
 - ??????
-
 
 
 

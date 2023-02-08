@@ -1,7 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:org/utilities/shared.dart';
 import 'package:org/widgets/screen.dart';
 
@@ -12,17 +12,21 @@ class Home extends StatefulWidget {
 }
 
 class HomeState extends State<Home> {
+  LatLng x = LatLng(0, 0);
   @override
   Widget build(BuildContext context) {
-    return Screen(
-        ab: AppBar(),
-        wid: Center(
-            child: ElevatedButton(
-                onPressed: () async {
-                  await const FlutterSecureStorage().deleteAll();
-                  snackbar(
-                      context, "Tokens Are Cleared , You must login again", 1);
+    return RefreshIndicator(
+      onRefresh: ()async {
+        setState(() {});
+      },
+      child: Screen(
+          ab: buildAppBar(context, "Home"),
+          builder: (data) => ListView.builder(
+            itemCount: 0,
+                itemBuilder: (context, index) {
+                  return const Text("Empty");
                 },
-                child: const Text("Clear Storage"))));
+              )),
+    );
   }
 }

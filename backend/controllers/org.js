@@ -7,7 +7,7 @@ const user = require("../models/user")
 const cert = require("../models/cert")
 const token_collection = require("../models/token")
 const { hashSync, compareSync } = require('bcrypt')
-const { RESPONSE, deleteImages } = require('../utils/shared_funs')
+const { RESPONSE, deleteImages, logx } = require('../utils/shared_funs')
 const { deleteSingleEvent } = require("./event")
 
 function orgImages(req, orgx = {}) {
@@ -21,7 +21,6 @@ function orgImages(req, orgx = {}) {
         url: `${process.env.HOST}:${process.env.PORT}/uploads/orgs/background_images/${req.orgBackgroundPic}`
     }
 
-
     if (Object.keys(orgx).length == 0) { return { orgPic, orgBackgroundPic } }
 
     const imagesToDelete = [
@@ -33,28 +32,50 @@ function orgImages(req, orgx = {}) {
 
 }
 module.exports.createOrg = async (req, res) => {
+    logx(req.body.password)
     await new org({
-        ...req.body.orgdata,
+        ...req.body,
         orgPic: orgImages(req).orgPic,
         orgBackgroundPic: orgImages(req).orgBackgroundPic,
-        password: hashSync(req.body.orgdata.password, 12)
+        password: hashSync(req.body.password, 12)
     }).save()
 
-    RESPONSE(res,200,"Org Created")
+    RESPONSE(res, 200, "Organization Created")
 }
 
 module.exports.updateOrg = async (req, res) => {
     let orgId = req.logedinOrg.id
+    let orgx = await org.findById(orgId)
+    let orgPic
+    let orgBackgroundPic
 
-    let orgx = await org.findByIdAndUpdate(orgId, {
-        ...req.body.orgdata,
-        orgPic: orgImages(req).orgPic,
-        orgBackgroundPic: orgImages(req).orgBackgroundPic,
-        password: hashSync(req.body.orgdata.password, 12)
+    if (!req.orgBackgroundPic) {
+        deleteImages([orgImages(req, orgx).imagesToDelete[0]])
+        orgPic = orgImages(req).orgPic
+
+    } else if (!req.orgPic) {
+        deleteImages([orgImages(req, orgx).imagesToDelete[1]])
+        orgBackgroundPic = orgImages(req).orgBackgroundPic
+
+    } else {
+        deleteImages(orgImages(req, orgx).imagesToDelete)
+        orgPic = orgImages(req).orgPic
+        orgBackgroundPic = orgImages(req).orgBackgroundPic
+    }
+
+    await org.findByIdAndUpdate(orgId, {
+        ...req.body,
+        orgPic,
+        orgBackgroundPic
     })
 
-    deleteImages(orgImages(req, orgx).imagesToDelete)
-    RESPONSE(res,200,"Org Updated")
+    RESPONSE(res, 200, "Organization Updated")
+}
+
+module.exports.updateOrgx = async (req, res) => {
+    let orgId = req.logedinOrg.id
+    await org.findByIdAndUpdate(orgId, { ...req.body.orgdata })
+    RESPONSE(res, 200, "Updated Organization")
 }
 
 module.exports.deleteOrg = async (req, res) => {
@@ -64,10 +85,29 @@ module.exports.deleteOrg = async (req, res) => {
     orgx.orgEvents.forEach(eventId => {
         deleteSingleEvent(eventId)
     });
-    
-    deleteImages(orgImages(req, orgx).imagesToDelete)
+
     await token_collection.deleteMany({ 'orgId': orgId })
-    RESPONSE(res,200,"Org Deleted")
+    deleteImages(orgImages(req, orgx).imagesToDelete)
+    RESPONSE(res, 200, "Organization Deleted")
+}
+
+module.exports.updatePassword = async (req, res) => {
+    let orgId = req.logedinOrg.id
+    let orgx = await org.findById(orgId)
+
+    logx(req.body.cuurentPassword)
+    logx(orgx.password)
+    logx(req.body.newPassword)
+
+
+    if (!compareSync(req.body.cuurentPassword, orgx.password)) 
+    return RESPONSE(res, 400, "Incorrect Current Password")
+
+    await orgx.updateOne({
+        password: hashSync(req.body.newPassword, 12)
+    })
+    
+    RESPONSE(res, 200, "Password Updated")
 }
 
 
@@ -86,11 +126,11 @@ module.exports.login = async (req, res) => {
 
     let loginOrg = await org.findOne({ 'email': req.body.orgdata.email })
 
-    if (!loginOrg)  {
-        RESPONSE(res,400,"Organization  Not Found")
+    if (!loginOrg) {
+        RESPONSE(res, 400, "Organization Not Found")
         return
     }
-    if (!compareSync(req.body.orgdata.password, loginOrg.password)) return RESPONSE(res,400,"Incorrect Email or Password")
+    if (!compareSync(req.body.orgdata.password, loginOrg.password)) return RESPONSE(res, 400, "Incorrect Email or Password")
 
     let AT = jwt.sign({
         id: loginOrg._id
@@ -110,7 +150,7 @@ module.exports.login = async (req, res) => {
     }).save()
 
 
-    RESPONSE(res,200, {
+    RESPONSE(res, 200, {
         AT: "Bearer " + AT,
         RT: "Bearer " + RT,
     })
@@ -141,9 +181,9 @@ module.exports.BLUser = async (req, res) => {
     let eventx = await event.findById(eventId)
     let userx = await user.findById(userId)
 
-    if (eventx.blackListed.includes(userId)) return  RESPONSE(res,200,'User Is Already Blcoked')
+    if (eventx.blackListed.includes(userId)) return RESPONSE(res, 200, 'User Is Already Blcoked')
 
-    if (!userx.joinedEvents.includes(eventId)) return RESPONSE(res,200,'User Did Join Event')
+    if (!userx.joinedEvents.includes(eventId)) return RESPONSE(res, 200, 'User Did Join Event')
 
     await user.findByIdAndUpdate(userId, {
         "$pull": { 'joinedEvents': eventId }
@@ -174,33 +214,33 @@ module.exports.BLUser = async (req, res) => {
         })
     }
 
-    RESPONSE(res,200,"User Blocked")
+    RESPONSE(res, 200, "User Blocked")
 }
 
 module.exports.UBLUser = async (req, res) => {
     let userId = req.params.userId
     let eventId = req.params.eventId
-    let eventx=await event.findById(eventId)
+    let eventx = await event.findById(eventId)
 
-    if (!eventx.blackListed.includes(userId)) return RESPONSE(res,200,"User Is Not Blocked")
+    if (!eventx.blackListed.includes(userId)) return RESPONSE(res, 200, "User Is Not Blocked")
 
     await event.findByIdAndUpdate(eventId, {
         "$pull": { 'blackListed': userId }
     })
 
-    RESPONSE(res,200,"Unblocked User")
+    RESPONSE(res, 200, "Unblocked User")
 }
 
 module.exports.getOrgEvents = async (req, res) => {
     let orgId = req.logedinOrg.id
     let orgx = await org.findById(orgId).populate('orgEvents')
-    if (orgx.length == 0) return  RESPONSE(res, 400, "Org Not Found")
+    if (orgx.length == 0) return RESPONSE(res, 400, "Org Not Found")
     RESPONSE(res, 200, orgx.orgEvents)
 }
 
 module.exports.getParticularOrgEvents = async (req, res) => {
     let orgId = req.params.orgId
     let orgx = await org.findById(orgId).populate('orgEvents')
-    if (orgx.length == 0)return RESPONSE(res, 400, "Org Not Found")
+    if (orgx.length == 0) return RESPONSE(res, 400, "Org Not Found")
     RESPONSE(res, 200, orgx.orgEvents)
 }

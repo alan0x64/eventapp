@@ -11,6 +11,6 @@ class AddEvent extends StatefulWidget {
 class _AddEventState extends State<AddEvent> {
   @override
   Widget build(BuildContext context) {
-    return Screen(ab: AppBar(),wid: const Text("Add"),);
+    return Screen(ab: AppBar(),builder:(data) => const Text("Add"),);
   }
 }

@@ -3,49 +3,97 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
-class AppTextbox extends StatelessWidget {
+class AppTextbox extends StatefulWidget {
   bool ob;
+  bool border;
+  bool isSecret;
   String name;
-  String ht;
   String lt;
-  Icon? icon;
-  Color color;
+  String? ht;
   String? init;
+  int ml;
+  TextInputType? keyboard;
+  TextEditingController? txt = TextEditingController();
+  bool hideinit;
 
   List<String? Function(String?)> valis;
 
   AppTextbox(
       {super.key,
       required this.name,
-      required this.ht,
-      required this.lt,
       required this.valis,
+      this.ht,
+      this.ml = 1,
       this.init,
-      this.icon,
+      this.lt = "",
+      this.border = true,
       this.ob = false,
-      this.color = Colors.white});
+      this.keyboard,
+      this.txt,
+      this.hideinit = false,
+      this.isSecret = false});
 
   @override
+  State<AppTextbox> createState() => _AppTextboxState();
+}
+
+class _AppTextboxState extends State<AppTextbox> {
+  @override
   Widget build(BuildContext context) {
+    InputDecoration deco =
+        InputDecoration(hintText: widget.ht, suffix: obscurebutton());
+
+    if (widget.hideinit) {
+      widget.init = "";
+    }
+
+    if (widget.border) {
+      deco = InputDecoration(
+          hintText: widget.ht,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)));
+    }
+    if (widget.isSecret) {
+      deco = InputDecoration(
+          suffix: obscurebutton(),
+          hintText: widget.ht,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)));
+    }
+
     return StatefulBuilder(
       builder: (context, setState) {
-        return SizedBox(
-            width: 300,
-            child: FormBuilderTextField(
-                initialValue: init,
-                validator: FormBuilderValidators.compose(valis),
-                obscureText: ob,
-                name: name,
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                        borderSide: BorderSide(color: color),
-                        borderRadius: BorderRadius.circular(8)),
-                    hintText: ht)));
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              widget.lt,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+            const SizedBox(
+              height: 7,
+            ),
+            FormBuilderTextField(
+              controller: widget.txt,
+              keyboardType: widget.keyboard,
+              maxLines: widget.ml,
+              initialValue: widget.init,
+              validator: FormBuilderValidators.compose(widget.valis),
+              obscureText: widget.ob,
+              name: widget.name,
+              decoration: deco,
+            ),
+          ],
+        );
       },
     );
   }
+
+  Widget obscurebutton() {
+    return IconButton(
+      onPressed: () {
+        widget.ob == true ? widget.ob = false : widget.ob = true;
+        setState(() {});
+      },
+      icon: Icon(widget.ob ? Icons.visibility : Icons.visibility_off),
+    );
+  }
 }
-// // FormBuilderValidators.match(
-                    //     r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$',
-                    //     errorText:
-                    //         "Must contain at least one letter and one number")

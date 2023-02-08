@@ -5,10 +5,10 @@ import 'dart:convert';
 import 'package:org/net/auth.dart';
 
 class Response {
-  Response({
-    required this.status,
-    required this.statusCode,
-    required this.timeStamp,
+Response({
+    this.status="ERROR",
+    this.statusCode=500,
+    this.timeStamp= "00:00:00",
     this.data = const {},
   });
 
@@ -44,11 +44,11 @@ Response encodeRES(http.Response res) {
     status: data['status'],
     statusCode: data['statusCode'],
     timeStamp: data['timeStamp'].toString(),
-    data: data['data'],
+    data: data['data'] ?? {"msg": "DATA IS EMPTY"},
   );
 }
 
-Future<Response> GET(
+Future<dynamic> GET(
   String url,
   int json_or_form,
   String keyToAdd,
@@ -66,6 +66,12 @@ Future<Response> POST(
 Future<Response> PATCH(
     String url, int json_or_form, String keyToAdd, dynamic body) async {
   return encodeRES(await http.patch(Uri.parse(url),
+      headers: await Header(json_or_form, keyToAdd), body: jsonEncode(body)));
+}
+
+Future<Response> PUT(
+    String url, int json_or_form, String keyToAdd, dynamic body) async {
+  return encodeRES(await http.put(Uri.parse(url),
       headers: await Header(json_or_form, keyToAdd), body: jsonEncode(body)));
 }
 

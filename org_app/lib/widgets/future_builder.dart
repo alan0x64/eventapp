@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:org/utilities/shared.dart';
 
-
 class BuildFuture extends StatefulWidget {
-  final Function callback;
+  final ResCallback callback;
   final Function mapper;
   final Function(dynamic data) builder;
 

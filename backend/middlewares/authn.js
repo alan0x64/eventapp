@@ -21,7 +21,6 @@ async function user_org(req,userORorg) {
 
     } catch (error) {
         logError(error)
-        throw Error("userorg error")
     }
 }
 
@@ -32,13 +31,14 @@ module.exports.authJWT_RT = catchFun(
         let token = authHeader && authHeader.split(' ')[1]
         let tokenInDb = await token_collection.findOne({ 'RT': token })
 
-        if (token == null || tokenInDb == null) return RESPONSE(res, 401)
+        if (token == null || tokenInDb == null) return RESPONSE(res, 401,"Not Logged In")
         
         jwt.verify(token, process.env.REFRESH_TOKEN, async (err, userORorg) => {
             if (err) {
-                logError(err)
+                logError("RT EXPIERD\n"+err)
                 return RESPONSE(res, 403,err.name)
             }
+            
             await user_org(req,userORorg)
             req.RT = token
             next()
@@ -56,7 +56,7 @@ module.exports.authJWT_AT = catchFun(
         if (token == null) { return RESPONSE(res, 401) }
         jwt.verify(token, process.env.ACCESS_TOKEN, async (err, t) => {
             if (err) {
-                logError(err)
+                logError("AT EXPIERD\n"+err)
                 return RESPONSE(res, 403, err.name)
             }
 

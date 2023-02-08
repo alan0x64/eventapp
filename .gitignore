@@ -6,3 +6,4 @@ node_modules
 
 # backend/images/*
 # backend/public/*
+org_app/lib/env.dart

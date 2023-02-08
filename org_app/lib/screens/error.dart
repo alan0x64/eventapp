@@ -1,9 +1,10 @@
-
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, use_build_context_synchronously
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
+import 'package:org/models/org.dart';
+import 'package:org/net/auth.dart';
 
 class ErrorScreen extends StatelessWidget {
   final FlutterErrorDetails errorDetails;
@@ -36,13 +37,15 @@ class ErrorScreen extends StatelessWidget {
                         margin: const EdgeInsets.all(5),
                         child: Text(errorDetails.toString())),
                   )),
-                  const Divider(),
+            const Divider(),
             Expanded(
               flex: 0,
               child: Container(
                 margin: const EdgeInsets.all(10),
                 child: ElevatedButton(
-                    onPressed: () {
+                    onPressed: () async {
+                      await logout();
+                      await clearTokens();
                       Phoenix.rebirth(context);
                     },
                     child: const Text("Restart App")),

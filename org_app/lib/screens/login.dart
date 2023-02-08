@@ -1,5 +1,4 @@
 // ignore_for_file: use_build_context_synchronously
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
@@ -8,8 +7,10 @@ import 'package:org/models/org.dart';
 import 'package:org/net/HTTP.dart';
 import 'package:org/net/auth.dart';
 import 'package:org/screens/event/home.dart';
+import 'package:org/screens/org/sing_up.dart';
 import 'package:org/utilities/shared.dart';
 import 'package:org/widgets/textfield.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({
@@ -21,6 +22,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
+  bool allowPress = true;
   final _formKey = GlobalKey<FormBuilderState>();
   final List<String> images = [
     'assets/backgrounds/con_1.jpg',
@@ -39,6 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
       child: Scaffold(
+        appBar: buildAppBar(context, "Origanazation App"),
         body: FormBuilder(
           key: _formKey,
           child: SingleChildScrollView(
@@ -59,64 +62,98 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 40),
                   AppTextbox(
-                    init: "patato@patato.com",
+                    init: "kpop@org.com",
                     name: "email",
                     ht: "Email",
                     lt: "Email",
                     valis: [
                       FormBuilderValidators.required(),
-                      FormBuilderValidators.email()
+                      // FormBuilderValidators.email()
                     ],
                   ),
                   const SizedBox(height: 20),
                   AppTextbox(
-                      init: "patato",
+                      init: "kpopkpop",
                       name: "password",
-                      ht: "Password",
-                      lt: "password",
+                      lt: "Password",
+                      ml: 1,
                       ob: true,
                       valis: [
                         FormBuilderValidators.required(),
-                        FormBuilderValidators.min(8),
+                        FormBuilderValidators.minLength(8),
                       ]),
                   const SizedBox(height: 40),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      ElevatedButton(
+                          onPressed: () async {
+                            try {
+                              goto(context, SingUp());
+                            } catch (e) {
+                              String errorMessage =
+                                  e.toString().split('\n').take(5).join('\n');
+                              snackbar(context, errorMessage, 2);
+                            }
+                          },
+                          child: const Text("Sing Up")),
+                      ElevatedButton(
+                          onPressed: allowPress
+                              ? () async {
+                                  try {
+                                    if (!_formKey.currentState!.validate()) {
+                                      return;
+                                    }
+                                    String email = _formKey
+                                        .currentState!.fields['email']!.value;
+                                    String password = _formKey.currentState!
+                                        .fields['password']!.value;
+
+                                    Map<String, dynamic> data = {
+                                      "orgdata": {
+                                        "email": email,
+                                        "password": password
+                                      }
+                                    };
+
+                                    Response res = await login(data);
+                                    if (res.statusCode != 200) {
+                                      snackbar(context, res.data['msg'], 3);
+                                      setState(() {
+                                        allowPress = true;
+                                      });
+                                      return;
+                                    }
+
+                                    await storeTokens(
+                                        res.data['RT'], res.data['AT']);
+                                    setState(() {
+                                      allowPress = false;
+                                    });
+                                    gotoClear(context, const Home());
+                                  } catch (e) {
+                                    snackbar(context, e.toString(), 3);
+                                    Console.log(e);
+                                  }
+                                }
+                              : null,
+                          child: const Text("Login")),
+                    ],
+                  ),
+                  const SizedBox(width: 5),
                   ElevatedButton(
                       onPressed: () async {
                         try {
-                          if (!_formKey.currentState!.validate()) return;
-                          String email =
-                              _formKey.currentState!.fields['email']!.value;
-                          String password =
-                              _formKey.currentState!.fields['password']!.value;
-
-                          Map<String, dynamic> data = {
-                            "orgdata": {"email": email, "password": password}
-                          };
-
-                          Response res = await login(data);
-                          if (res.statusCode == 400) {
-                            snackbar(context, res.data['msg'], 3);
-                            return;
-                          }
-
-                          await storeTokens(res.data['RT'], res.data['AT']);
-                          gotoClear(context, const Home());
+                          !await launchUrl(
+                              Uri.parse('https://youtu.be/dDFqbVG-Hsk'));
                         } catch (e) {
-                          snackbar(context, e.toString(), 3);
-                          Console.log(e);
+                          String errorMessage =
+                              e.toString().split('\n').take(5).join('\n');
+                          snackbar(context, errorMessage, 2);
+                          Console.log(errorMessage);
                         }
                       },
-                      child: const Text("Login")),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                      onPressed: () async {
-                        if (kDebugMode) {
-                          print(await isTokenExp("RT"));
-                          print(await isTokenExp("AT"));
-                        }
-                        snackbar(context, "OMG WHAT HAVE YOU DONE!!", 2);
-                      },
-                      child: const Text("DO NOT TOUCH!!!")),
+                      child: const Text("DO NOT TOUCH!!!"))
                 ],
               ),
             ),

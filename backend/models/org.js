@@ -27,6 +27,14 @@ const orgSchema = new mongoose.Schema({
         type: String,
         default: "None",
     },
+    website:{
+        type: String,
+        default: "None",
+    },
+    socialMedia:{
+        type: String,
+        default: "None",
+    },
     org_type: {
         // ['Organization','University', 'Company'],
         type: Number,
