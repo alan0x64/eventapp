@@ -13,12 +13,14 @@ class CustomDialog extends StatelessWidget {
   final String smallerText;
   final ResCallback fun;
   final Color bc;
+  final bool quit;
 
   const CustomDialog({
     super.key,
     required this.bigText,
     required this.smallerText,
     required this.fun,
+    this.quit=false,
     this.bc = const Color.fromARGB(255, 182, 31, 21),
   });
 
@@ -48,9 +50,14 @@ class CustomDialog extends StatelessWidget {
                   context,
                   fun,
                 );
-                Provider.of<LocationProvider>(context,listen: false).setOrgLocation(LatLng(0,0));
+                if (quit) {                  
+                Provider.of<LocationProvider>(context, listen: false)
+                    .setOrgLocation(LatLng(0, 0));
+                Provider.of<LocationProvider>(context, listen: false)
+                    .setEventLocation(LatLng(0, 0));
                 await clearTokens();
                 gotoClear(context, const LoginScreen());
+                }
               },
               child: const Text("Continue")),
         ],

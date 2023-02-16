@@ -7,7 +7,7 @@ import 'package:org/models/org.dart';
 import 'package:org/net/HTTP.dart';
 import 'package:org/net/auth.dart';
 import 'package:org/screens/event/home.dart';
-import 'package:org/screens/org/sing_up.dart';
+import 'package:org/screens/org/org_sing_up.dart';
 import 'package:org/utilities/shared.dart';
 import 'package:org/widgets/textfield.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -41,7 +41,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
       child: Scaffold(
-        appBar: buildAppBar(context, "Origanazation App"),
+        appBar: buildAppBar(context, "Origanazation App",showdialog: false),
         body: FormBuilder(
           key: _formKey,
           child: SingleChildScrollView(
@@ -62,7 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 40),
                   AppTextbox(
-                    init: "kpop@org.com",
+                    init: "kpop2@org.com",
                     name: "email",
                     ht: "Email",
                     lt: "Email",
@@ -110,10 +110,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                         .fields['password']!.value;
 
                                     Map<String, dynamic> data = {
-                                      "orgdata": {
                                         "email": email,
                                         "password": password
-                                      }
                                     };
 
                                     Response res = await login(data);

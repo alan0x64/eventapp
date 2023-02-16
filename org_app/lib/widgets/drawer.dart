@@ -10,7 +10,6 @@ class UserDrawer extends StatelessWidget {
     required this.name,
     required this.email,
     required this.picURL,
-    required this.profileScreen,
     required this.homeScreen,
     required this.addEventScreen,
     required this.bgURL,
@@ -21,7 +20,6 @@ class UserDrawer extends StatelessWidget {
   String picURL;
   String bgURL;
 
-  Widget profileScreen;
   Widget homeScreen;
   Widget addEventScreen;
 

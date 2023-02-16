@@ -3,12 +3,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:org/models/org.dart';
 import 'package:org/net/HTTP.dart';
-import 'package:org/screens/org/form.dart';
+import 'package:org/screens/org/org_form.dart';
+import 'package:org/utilities/providers.dart';
 import 'package:org/utilities/shared.dart';
 import 'package:org/widgets/future_builder.dart';
 import 'package:org/widgets/profile_widget.dart';
+import 'package:provider/provider.dart';
 
 import '../../server.dart';
 
@@ -34,39 +37,50 @@ class _EditOrgState extends State<EditOrg> {
     final ImagePicker picker = ImagePicker();
     return RefreshIndicator(
       onRefresh: () async {
-        widget.orgdata = mapOrg(await runFun(context, getProfile));
+        widget.orgdata = toOrg(await runFun(context, getOrg));
         setState(() {});
       },
       child: BuildFuture(
-          callback: getProfile,
-          mapper: mapOrg,
+          callback: getOrg,
+          mapper: toOrg,
           builder: (data) {
             widget.orgdata = data;
             return Scaffold(
-              appBar: buildAppBar(context, "Edit Account",
-                  button: const BackButton()),
+              appBar: buildAppBar(context, "Edit Account", button: BackButton(
+                onPressed: () {
+                  List<String> latlong =
+                      getLocationList(context, widget.orgdata!.location);
+                  Provider.of<LocationProvider>(context, listen: false)
+                      .setOrgLocation(LatLng(
+                          double.parse(latlong[0]), double.parse(latlong[1])));
+                  Navigator.pop(context);
+                },
+              )),
               body: FormBuilder(
                 key: _formKey,
                 child: ListView(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
                   physics: const BouncingScrollPhysics(),
                   children: [
-                    ProfileWidget(
-                      background: widget.backgroundImage,
-                      profile: widget.profileImage,
-                      bgPath: widget.orgdata!.orgBackgroundPic,
-                      imagepath: widget.orgdata!.orgPic,
-                      isEdit: true,
-                      onClick: () async {
-                        widget.profileImage =
-                            await picker.pickImage(source: ImageSource.gallery);
-                        setState(() {});
-                      },
-                      onClickbg: () async {
-                        widget.backgroundImage =
-                            await picker.pickImage(source: ImageSource.gallery);
-                        setState(() {});
-                      },
+                    Container(
+                      margin: const EdgeInsets.all(5),
+                      child: ProfileWidget(
+                        background: widget.backgroundImage,
+                        profile: widget.profileImage,
+                        bgPath: widget.orgdata!.orgBackgroundPic,
+                        imagepath: widget.orgdata!.orgPic,
+                        isEdit: true,
+                        onClick: () async {
+                          widget.profileImage =
+                              await picker.pickImage(source: ImageSource.gallery);
+                          setState(() {});
+                        },
+                        onClickbg: () async {
+                          widget.backgroundImage =
+                              await picker.pickImage(source: ImageSource.gallery);
+                          setState(() {});
+                        },
+                      ),
                     ),
                     OrgForm(
                       orgdata: widget.orgdata!,
@@ -82,23 +96,26 @@ class _EditOrgState extends State<EditOrg> {
                         snackbar(context, "Cleared Selected Images", 3);
                       },
                       mainButton: () {
+                        validateLocationBeforeUpdating(context, widget.orgdata!.location,0);
                         FormRequestHandler(
-                            orgdata: widget.orgdata!,
-                            formKey: _formKey,
-                            requestHandler: (data, res) async {
-                              return await appUpdateHandler(
-                                  orgdata: widget.orgdata!,
-                                  data: data,
-                                  res: res,
-                                  formkey: _formKey,
-                                  context: context,
-                                  profileImage: widget.profileImage,
-                                  backgroundImage: widget.backgroundImage);
-                            },
-                            setState: () => setState(() {}),
-                            context: context,
-                            profileImage: widget.profileImage,
-                            backgroundImage: widget.backgroundImage);
+                          create: false,
+                          context: context,
+                          org_event_user: 0,
+                          formKey: _formKey,
+                          setState: () => setState(() {}),
+                          location: widget.orgdata!.location,
+                          formdata: getOrgFromForm(context, _formKey),
+                          requestHandler: (data, res) async {
+                            return await appUpdateHandler(
+                                orgdata: widget.orgdata!,
+                                data: data,
+                                res: res,
+                                formkey: _formKey,
+                                context: context,
+                                profileImage: widget.profileImage,
+                                backgroundImage: widget.backgroundImage);
+                          },
+                        );
                       },
                     ),
                   ],
@@ -125,7 +142,7 @@ class _EditOrgState extends State<EditOrg> {
         return true;
       }
     }
-    if (orgdata.location != getLocationString(context)) return true;
+    if (orgdata.location != getLocationString(context, 0)) return true;
 
     return false;
   }
@@ -143,14 +160,20 @@ class _EditOrgState extends State<EditOrg> {
         didFieldsChange(formkey, orgdata)) {
       res =
           await runFun(context, () async => await updateProfileNoImages(data));
-    } else if (didFieldsChange(formkey, orgdata) ||
-        profileImage != null ||
-        backgroundImage != null) {
+    } else if (didFieldsChange(formkey, orgdata)) {
       res = await runFun(
         context,
         () async {
-          return await formREQ(data, profileImage, backgroundImage,
-              "$devServer/org/update", "PATCH");
+          return await multipartRequest(
+            data: data,
+            method: "PATCH",
+            file: profileImage,
+            file2: backgroundImage,
+            url: "$devServer/org/update",
+            addFields: (req, data) => addOrgFields(request: req, data: data),
+            filefield1: "orgPic",
+            filefield2: "orgBackgroundPic",
+          );
         },
       );
     } else {

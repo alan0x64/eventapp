@@ -54,6 +54,8 @@ dependencies:
   flutter_map_location_marker: ^5.2.0+2
   flutter_compass: ^0.7.0
   geolocator: ^9.0.2
+  webview_flutter: ^4.0.2
+  qr_flutter: ^4.0.0
 
 dev_dependencies:
   flutter_test:

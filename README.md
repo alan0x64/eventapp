@@ -4,18 +4,24 @@
 ## Todos 
 
 ### Back-End
-- Add manual cert generation? 
+- Forgot to add 5 new routes to docs
+- Refactor Cert Gen Fun
 
 
 ### Front-End 
 
 #### Organization App
-- Create Event
-- Event View - Joined Users - See blacklist - Cert Genration
-- Update Event
+- Event View - Finsh and Genrate Cert Genration Button - notification 
+- Attenders and blacklisted users should be disbaled when event is yet to be started  
+- Search in HomeScreen and Attenders and Blacklisted
+- mobile_scanner
+- Edit Event
 - Delete Event 
-- Home Screen
 
+##### Bugs 
+- Fix Refresh on home Screen  
+- Re order date validation in event creation
+- Theme Resets after app restarts
 
 #### User App
 - Login

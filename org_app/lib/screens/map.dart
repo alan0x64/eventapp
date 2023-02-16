@@ -3,12 +3,11 @@ import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:org/utilities/providers.dart';
 import 'package:org/utilities/shared.dart';
-import 'package:provider/provider.dart';
 
 class Mapx extends StatefulWidget {
-  const Mapx({super.key});
+  final  void Function(LatLng? setLocation) setLocationButton;
+  const Mapx({super.key, required this.setLocationButton});
 
   @override
   State<Mapx> createState() => _MapxState();
@@ -73,17 +72,17 @@ class _MapxState extends State<Mapx> {
           child: Align(
             alignment: Alignment.bottomCenter,
             child: ElevatedButton(
-              child: const Text("Set Location"),
               onPressed: () {
                 if (_selectedLocation == null) {
                   snackbar(context, "Set a Location First", 2);
                   return;
                 }
-                Provider.of<LocationProvider>(context, listen: false)
-                    .setOrgLocation(_selectedLocation as LatLng);
+                widget.setLocationButton(_selectedLocation);
                 Console.log("Location Set");
                 Navigator.pop(context);
+                snackbar(context, "Location Set", 2);
               },
+              child: const Text("Set Location"),
             ),
           ),
         )

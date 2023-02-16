@@ -1,5 +1,7 @@
 const crypto = require("crypto");
 const fs = require('fs')
+const chalk=require("chalk")
+
 function RESPONSE(res, code, data) {
     let status
     
@@ -71,6 +73,32 @@ function logx(str) {
     console.log('----------------------------------------\n');
 }
 
+function logger(req,res,next) {
+
+    const start=Date.now()
+    url=req.url
+    res.on('finish',()=>{
+        let x = (Date.now() - start);
+        let color = 'white';
+        let statusCode = res.statusCode
+        if (statusCode >= 200 && statusCode < 300) {
+          color = 'green';
+        } else if (statusCode >= 300 && statusCode < 400) {
+          color = 'yellow';
+        } else if (statusCode >= 400) {
+          color = 'red';
+        }
+        let ip = req.socket.remoteAddress||req.ip 
+        if (ip.substr(0, 7) === "::ffff:") {
+            ip = ip.substr(7);
+        }
+        console.log(
+            `${req.method} ${url} ${chalk[color](statusCode)} ${x} ms ${ip}`
+        );
+    })
+    next()
+}
+
 module.exports = {
     RESPONSE,
     deleteImages,
@@ -79,5 +107,6 @@ module.exports = {
     attendedInMin,
     logError,
     catchFun,
-    logx
+    logx,
+    logger
 }

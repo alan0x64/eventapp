@@ -1,14 +1,9 @@
 const {validPasswordSchema, validUserSchema, validOrgSchema, validEventSchema, validLoginSchema,validUpdateOrgSchema } = require("../models/schema");
-const { RESPONSE, logError } = require('../utils/shared_funs');
+const { RESPONSE, logError,logx } = require('../utils/shared_funs');
 
 const createValidationMiddlewear = (schema) => {
     return (req, res, next) => {
-        let data
-        if (req.body.userdata) data = req.body.userdata
-        if (req.body.orgdata) data = req.body.orgdata
-        if (req.body.eventdata) data = req.body.eventdata
-
-        const { error } = schema.validate(data)
+        const { error } = schema.validate({...req.body})
         if (error) {
             logError(error)
             return RESPONSE(res, 400,error.message)

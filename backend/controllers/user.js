@@ -32,9 +32,9 @@ function userImages(req, userx = {},cert={}) {
 
 module.exports.createUser = async (req, res) => {
     await new user({
-        ...req.body.userdata,
+        ...req.body,
         profilePic: userImages(req).profilePic,
-        password: hashSync(req.body.userdata.password, 12)
+        password: hashSync(req.body.password, 12)
     }).save()
     RESPONSE(res, 200, "User Created")
 }
@@ -43,9 +43,9 @@ module.exports.createUser = async (req, res) => {
 
 module.exports.updateUser = async (req, res) => {
     let userx = await user.findByIdAndUpdate(req.logedinUser.id, {
-        ...req.body.userdata,
+        ...req.body,
         profilePic: userImages(req).profilePic,
-        password: hashSync(req.body.userdata.password, 12)
+        password: hashSync(req.body.password, 12)
     })
     deleteImages(userImages(req, userx).imagesToDelete)
     RESPONSE(res,200,"User Updated")
@@ -98,6 +98,7 @@ module.exports.deleteUser = async (req, res) => {
 module.exports.getUser = async (req, res) => {
     let data = await user.findOne({ '_id': req.params.id })
     if (data.length == 0) return RESPONSE(res, 400, { error: 'User Not Found' })
+    console.log(data);
     RESPONSE(res, 200, data)
 }
 
@@ -107,10 +108,10 @@ module.exports.getLogedInUser = async (req, res) => {
 
 module.exports.login = async (req, res) => {
 
-    let loginUser = await user.findOne({ 'email': req.body.userdata.email })
+    let loginUser = await user.findOne({ 'email': req.body.email })
 
     if (!loginUser) return RESPONSE(res,400,"User Not Found")
-    if (!compareSync(req.body.userdata.password, loginUser.password)) return RESPONSE(res,400,"Incorrect Email or Password")
+    if (!compareSync(req.body.password, loginUser.password)) return RESPONSE(res,400,"Incorrect Email or Password")
 
 
     const AT = jwt.sign({
@@ -159,7 +160,6 @@ module.exports.AddUserToEvent = async (req, res) => {
     let eventId = req.params.eventId
     let eventx = await event.findById(eventId)
 
-    if (eventx.eventMembers.length >= eventx.sets) return RESPONSE(res,200,"No Sets Left")
     if (eventx.blackListed.includes(userId)) return RESPONSE(res,200,"User Is Blocked")
     if (eventx.eventMembers.includes(userId)) return RESPONSE(res,200,"User Already Joined Event")
 
@@ -218,5 +218,5 @@ module.exports.getCertificate = async (req, res) => {
 
 
 module.exports.getJoinedEvents=async (req,res)=>{
-    return RESPONSE(res,200,(await user.findById(req.logedinUser._id).populate('joinedEvents')).joinedEvents)
+    return RESPONSE(res,200,{'events':(await user.findById(req.logedinUser._id).populate('joinedEvents')).joinedEvents})
 }

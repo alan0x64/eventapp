@@ -12,22 +12,20 @@ const event = require("./models/event");
 const helmet = require("helmet");
 const org = require("./models/org");
 const token = require("./models/token");
-const { authJWT_AT } = require("./middlewares/authn")
 const mongoSanitize = require("express-mongo-sanitize");
-const { handleAsync, RESPONSE, logError } = require("./utils/shared_funs");
-const morgan = require("morgan");
+const { handleAsync, RESPONSE, logError, logger } = require("./utils/shared_funs");
 const { fileHeaders } = require("./middlewares/file_headers")
 
 //Settings
 app.set('json spaces', 10)
 
 //Some Middleweres
+app.use(logger);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 app.use(mongoSanitize())
 app.use(xss())
 app.use(helmet())
-app.use(morgan('dev'))
 
 app.use('/uploads', fileHeaders, express.static(path.join(__dirname, '/public')))
 app.use('/uploads', fileHeaders, express.static(path.join(__dirname, '/images')))

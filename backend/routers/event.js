@@ -17,6 +17,9 @@ router.route('/info/:eventId').get(authJWT_AT,isOrgEventOwner,handleAsync(event.
 router.route('/members/:eventId').get(authJWT_AT,isOrgEventOwner, handleAsync(event.getEventMembers))
 
 router.route('/certificate/:eventId').get(authJWT_AT,onlyOrgs,isOrgEventOwner, handleAsync(event.genCerts))
+
+router.route('/certificate/:userId/:eventId').get(authJWT_AT,onlyOrgs,isOrgEventOwner, handleAsync(event.genCert))
+
 router.route('/blacklist/:eventId').get(authJWT_AT,onlyOrgs,isOrgEventOwner, handleAsync(event.getBlockedMembers))
 
 
@@ -27,8 +30,8 @@ router.route('/update/:eventId').patch(
     authJWT_AT,
     onlyOrgs,
     isOrgEventOwner,
-    eventImageHandler.single('eventBackgroundPic'),
     validateEvent,
+    eventImageHandler.single('eventBackgroundPic'),
     handleAsync(event.updateEvent))
 
 
@@ -40,7 +43,7 @@ router.route('/register').post(
         { name: 'eventBackgroundPic' },
         { name: 'sig' },
     ]),
-    validateEvent,
+    validateEvent, 
     handleAsync(event.createEvent))
 
 

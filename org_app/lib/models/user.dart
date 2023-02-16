@@ -1,20 +1,25 @@
 
 
+import '../net/HTTP.dart';
+import '../server.dart';
+
 class User {
   String profilePic;
   String fullName;
   String email;
   String password;
   String phoneNumber;
-  DateTime dateOfBirth;
+  String dateOfBirth;
   String university;
   String faculty;
   String department;
   String scientificTitle;
   String bio;
-  List<String> joinedEvents;
+  String id;
+  List<dynamic> joinedEvents;
 
   User({
+    required this.id,
     required this.profilePic,
     required this.fullName,
     required this.email,
@@ -30,13 +35,14 @@ class User {
   });
 }
 
-User user(dynamic res) {
+User toUser(dynamic res) {
   return User(
-    profilePic: res['profilePic'],
+    id: res['_id'],
+    profilePic: res['profilePic']['url'],
     fullName: res['fullName'],
     email: res['email'],
     password: res['password'],
-    phoneNumber: res['phoneNumber'],
+    phoneNumber: res['phoneNumber'].toString(),
     dateOfBirth: res['date_of_birth'],
     university: res['university'],
     faculty: res['faculty'],
@@ -45,4 +51,19 @@ User user(dynamic res) {
     bio: res['bio'],
     joinedEvents: res['joinedEvents'],
   );
+}
+
+Future<Response> getUser(String userId) async {
+  return await GET('$devServer/user/profile/$userId', 0, 'AT');
+}
+
+
+// PATCH 
+
+Future<Response> checkIn(String eventId) async {
+  return await PATCH('$devServer/event/checkin/$eventId', 0, 'AT', {});
+}
+
+Future<Response> checkOut(String eventId) async {
+  return await PATCH('$devServer/event/checkout/$eventId', 0, 'AT', {});
 }

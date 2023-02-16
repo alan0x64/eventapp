@@ -3,25 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
-class AppTextbox extends StatefulWidget {
+class AppDateTImePicker extends StatefulWidget {
   bool ob;
   bool border;
   bool isSecret;
+  bool hideinit;
   String name;
   String lt;
   String? ht;
-  String? init;
   int ml;
+  DateTime? init;
+  List<String? Function(DateTime?)> valis;
   TextInputType? keyboard;
   TextEditingController? txt = TextEditingController();
-  bool hideinit;
 
-  List<String? Function(String?)> valis;
-
-  AppTextbox({
+  AppDateTImePicker({
     super.key,
     required this.name,
-    required this.valis,
     this.ht,
     this.ml = 1,
     this.init,
@@ -32,32 +30,22 @@ class AppTextbox extends StatefulWidget {
     this.txt,
     this.hideinit = false,
     this.isSecret = false,
+    required this.valis,
   });
 
   @override
-  State<AppTextbox> createState() => _AppTextboxState();
+  State<AppDateTImePicker> createState() => _AppDateTImePickerState();
 }
 
-class _AppTextboxState extends State<AppTextbox> {
+class _AppDateTImePickerState extends State<AppDateTImePicker> {
   @override
   Widget build(BuildContext context) {
-    InputDecoration deco =
-        InputDecoration(hintText: widget.ht, suffix: obscurebutton());
+    InputDecoration deco = InputDecoration(
+        hintText: widget.ht,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)));
 
     if (widget.hideinit) {
-      widget.init = "";
-    }
-
-    if (widget.border) {
-      deco = InputDecoration(
-          hintText: widget.ht,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)));
-    }
-    if (widget.isSecret) {
-      deco = InputDecoration(
-          suffix: obscurebutton(),
-          hintText: widget.ht,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)));
+      widget.init = null;
     }
 
     return StatefulBuilder(
@@ -72,29 +60,17 @@ class _AppTextboxState extends State<AppTextbox> {
             const SizedBox(
               height: 7,
             ),
-            FormBuilderTextField(
-              controller: widget.txt,
-              keyboardType: widget.keyboard,
-              maxLines: widget.ml,
-              initialValue: widget.init,
+            FormBuilderDateTimePicker(
               validator: FormBuilderValidators.compose(widget.valis),
-              obscureText: widget.ob,
+              currentDate: DateTime.now(),
+              firstDate: DateTime.now(),
+              initialValue: widget.init,
               name: widget.name,
               decoration: deco,
             ),
           ],
         );
       },
-    );
-  }
-
-  Widget obscurebutton() {
-    return IconButton(
-      onPressed: () {
-        widget.ob == true ? widget.ob = false : widget.ob = true;
-        setState(() {});
-      },
-      icon: Icon(widget.ob ? Icons.visibility : Icons.visibility_off),
     );
   }
 }

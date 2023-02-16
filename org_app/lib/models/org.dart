@@ -1,8 +1,6 @@
-import 'package:image_picker/image_picker.dart';
 import 'package:org/net/HTTP.dart';
 import 'package:org/server.dart';
 import 'package:http/http.dart' as http;
-import 'package:org/utilities/shared.dart';
 
 class Org {
   final String orgPic;
@@ -34,7 +32,7 @@ class Org {
   });
 }
 
-Org mapOrg(res) {
+Org toOrg(res) {
   return Org(
       orgPic: res.data['orgPic']['url'],
       orgBackgroundPic: res.data['orgBackgroundPic']['url'],
@@ -56,7 +54,7 @@ Future<Response> isServerUp() async {
   return await GET('$devServer/test', 0, '0');
 }
 
-Future<Response> getProfile() async {
+Future<Response> getOrg() async {
   return await GET('$devServer/org/profile', 0, 'AT');
 }
 
@@ -97,33 +95,12 @@ Future<Response> unblockUser(String userId, String eventId) async {
   return await DELETE('$devServer/org/$userId/$eventId', 0, 'AT', {});
 }
 
-Future<Response> formREQ(Map<String, dynamic> data, XFile? proile,
-    XFile? backgroundPic, String url, String method,
-    {String token = 'AT'}) async {
-  try {
-    var request = http.MultipartRequest(method, Uri.parse(url));
-    Map<String, String> headers = await Header(1, token);
 
-    if (proile != null) {
-      var orgPic = http.MultipartFile.fromBytes(
-        'orgPic',
-        await proile.readAsBytes(),
-        filename: proile.name,
-      );
-      request.files.add(orgPic);
-    }
-
-    if (backgroundPic != null) {
-      var orgBackgroundPic = http.MultipartFile.fromBytes(
-        'orgBackgroundPic',
-        await backgroundPic.readAsBytes(),
-        filename: backgroundPic.name,
-      );
-      request.files.add(orgBackgroundPic);
-    }
-
-    data = data['orgdata'];
-
+http.MultipartRequest addOrgFields(
+    {
+      required http.MultipartRequest request,
+      required Map<String, dynamic> data
+    }) {
     request.fields['orgName'] = data['orgName'];
     request.fields['email'] = data['email'];
     request.fields['phoneNumber'] = data['phoneNumber'].toString();
@@ -138,12 +115,5 @@ Future<Response> formREQ(Map<String, dynamic> data, XFile? proile,
       request.fields['password'] = data['password'];
     }
 
-    for (String key in headers.keys) {
-      request.headers[key] = headers[key] as String;
-    }
-    return encodeRES(await http.Response.fromStream(await request.send()));
-  } catch (e) {
-    Console.log(e);
-    throw Exception("ERROR\n$e");
-  }
+  return request;
 }

@@ -74,7 +74,7 @@ module.exports.updateOrg = async (req, res) => {
 
 module.exports.updateOrgx = async (req, res) => {
     let orgId = req.logedinOrg.id
-    await org.findByIdAndUpdate(orgId, { ...req.body.orgdata })
+    await org.findByIdAndUpdate(orgId, { ...req.body })
     RESPONSE(res, 200, "Updated Organization")
 }
 
@@ -96,9 +96,7 @@ module.exports.updatePassword = async (req, res) => {
     let orgx = await org.findById(orgId)
 
     logx(req.body.cuurentPassword)
-    logx(orgx.password)
     logx(req.body.newPassword)
-
 
     if (!compareSync(req.body.cuurentPassword, orgx.password)) 
     return RESPONSE(res, 400, "Incorrect Current Password")
@@ -124,13 +122,13 @@ module.exports.getLogedInOrg = async (req, res) => {
 
 module.exports.login = async (req, res) => {
 
-    let loginOrg = await org.findOne({ 'email': req.body.orgdata.email })
+    let loginOrg = await org.findOne({ 'email': req.body.email })
 
     if (!loginOrg) {
         RESPONSE(res, 400, "Organization Not Found")
         return
     }
-    if (!compareSync(req.body.orgdata.password, loginOrg.password)) return RESPONSE(res, 400, "Incorrect Email or Password")
+    if (!compareSync(req.body.password, loginOrg.password)) return RESPONSE(res, 400, "Incorrect Email or Password")
 
     let AT = jwt.sign({
         id: loginOrg._id
@@ -235,12 +233,12 @@ module.exports.getOrgEvents = async (req, res) => {
     let orgId = req.logedinOrg.id
     let orgx = await org.findById(orgId).populate('orgEvents')
     if (orgx.length == 0) return RESPONSE(res, 400, "Org Not Found")
-    RESPONSE(res, 200, orgx.orgEvents)
+    RESPONSE(res, 200, {"events":orgx.orgEvents})
 }
 
 module.exports.getParticularOrgEvents = async (req, res) => {
     let orgId = req.params.orgId
     let orgx = await org.findById(orgId).populate('orgEvents')
     if (orgx.length == 0) return RESPONSE(res, 400, "Org Not Found")
-    RESPONSE(res, 200, orgx.orgEvents)
+    RESPONSE(res, 200, {"events":orgx.orgEvents})
 }

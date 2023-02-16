@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:org/models/org.dart';
-import 'package:org/screens/org/edit.dart';
+import 'package:org/screens/org/edit_org.dart';
 import 'package:org/screens/org/view_org.dart';
 import 'package:org/screens/password.dart';
 import 'package:org/utilities/shared.dart';
@@ -47,6 +47,7 @@ class _SettingsState extends State<Settings> {
                   showDialog(
                       context: context,
                       builder: ((context) => const CustomDialog(
+                        quit: true,
                             bigText: "Sure You Wanna Delete Account?",
                             smallerText:
                                 "Please be advised that executing this action will permanently delete all data, excluding any data associated with the Certificates. This operation cannot be undone",
@@ -60,6 +61,7 @@ class _SettingsState extends State<Settings> {
                 onPressed: (context) => showDialog(
                     context: context,
                     builder: ((context) => const CustomDialog(
+                        quit: true,
                           bigText: "Are you sure you want to sing out?",
                           smallerText: "You Need To Log In Again In Order To Use The App",
                           fun: logout,

@@ -30,32 +30,32 @@ const eventSchema = new mongoose.Schema({
     },
     startDateTime: {
         //2022-12-27T00:00:00.000Z
-        type: Date,
+        type: String,
         required: [true, "Invaild Start Date&Time"]
     },
     endDateTime: {
         //2022-12-27T00:00:00.000Z
-        type: Date,
+        type: String,
         required: [true, "Invaild End Date&Time"]
     },
     minAttendanceTime: {
-        type: Number,
-        default: 0,
-        validate: {
-            validator: (value) => {
-                return value >= 0
-            },
-            message: 'Invaild Minimum Attendance Time'
-        },
-    },
-    sets: {
         type: Number,
         default: 1,
         validate: {
             validator: (value) => {
                 return value >= 1
             },
-            message: 'Invaild Number Of Sets'
+            message: 'Invaild Minimum Attendance Time'
+        },
+    },
+    seats: {
+        type: Number,
+        default: 1,
+        validate: {
+            validator: (value) => {
+                return value >= 1
+            },
+            message: 'Invaild Number Of Seats'
         },
     },
     Attenders: {

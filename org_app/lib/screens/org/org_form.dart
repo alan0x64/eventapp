@@ -3,8 +3,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:org/screens/map.dart';
+import 'package:org/utilities/providers.dart';
 import 'package:org/utilities/shared.dart';
+import 'package:provider/provider.dart';
 
 import '../../models/org.dart';
 import '../../widgets/textfield.dart';
@@ -53,7 +56,12 @@ class _OrgFormState extends State<OrgForm> {
                     )),
               ElevatedButton(
                   onPressed: () {
-                    goto(context, const Mapx());
+                    goto(context, Mapx(
+                      setLocationButton: (setLocationButton) {
+                        Provider.of<LocationProvider>(context, listen: false)
+                            .setOrgLocation(setLocationButton as LatLng);
+                      },
+                    ));
                   },
                   child: const Text(
                     "Set Headquarters",
@@ -88,7 +96,7 @@ class _OrgFormState extends State<OrgForm> {
         if (widget.singupMode)
           const SizedBox(
             height: 25,
-          ), 
+          ),
         AppTextbox(
             name: 'email',
             lt: "Email",
@@ -115,9 +123,10 @@ class _OrgFormState extends State<OrgForm> {
               FormBuilderValidators.required(),
               FormBuilderValidators.minLength(5)
             ]),
-            const SizedBox(
-          height: 25,),
-             AppTextbox(
+        const SizedBox(
+          height: 25,
+        ),
+        AppTextbox(
             name: 'socialMedia',
             lt: "SocialMedia",
             ht: "socialMedia",
@@ -128,16 +137,17 @@ class _OrgFormState extends State<OrgForm> {
               FormBuilderValidators.required(),
               FormBuilderValidators.minLength(5)
             ]),
-             const SizedBox(
-          height: 25,),
-              AppTextbox(
+        const SizedBox(
+          height: 25,
+        ),
+        AppTextbox(
             name: 'website',
             lt: "Website",
             ht: "Website",
             hideinit: widget.hideinit,
             init: widget.orgdata.website.toString(),
             valis: [
-             FormBuilderValidators.required(),
+              FormBuilderValidators.required(),
               FormBuilderValidators.minLength(5)
             ]),
         const SizedBox(

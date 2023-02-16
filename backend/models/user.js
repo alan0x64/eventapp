@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
         required: [true, 'Invaild Password'],
     },
     phoneNumber: {
-        type: Number,
+        type: String,
         unique: true,
         required: [true, 'Invaild Phone Number or Phone Number Is Already Used']
     },

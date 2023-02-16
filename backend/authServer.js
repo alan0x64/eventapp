@@ -7,20 +7,19 @@ const helmet = require("helmet");
 const jwt = require("jsonwebtoken")
 const mongoSanitize = require("express-mongo-sanitize")
 const { authJWT_RT } = require("./middlewares/authn");
-const { RESPONSE, logError, handleAsync, catchFun, logx } = require("./utils/shared_funs");
-const morgan = require("morgan");
+const { RESPONSE, logError, handleAsync, catchFun, logx, logger } = require("./utils/shared_funs");
 
 //Settings
 app.set('json spaces', 10)
 
 //middleweres
+app.use(logger);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }))
 app.use(cors())
 app.use(mongoSanitize())
 app.use(xss())
 app.use(helmet())
-app.use(morgan('dev'))
 
 app.get('/test', handleAsync(async (req, res, next) => {
     RESPONSE(res, 200,"OK")

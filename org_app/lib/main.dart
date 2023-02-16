@@ -12,7 +12,6 @@ import './server.dart';
 
 void main() {
   host(true);
-  
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.dumpErrorToConsole(
       details,
@@ -26,8 +25,8 @@ void main() {
     child: Phoenix(
       child: ThemeProvider(
         themes: [
-          AppTheme.light(),
           AppTheme.dark(),
+          AppTheme.light(),
         ],
         child: ThemeConsumer(child: Builder(
           builder: (context) {
