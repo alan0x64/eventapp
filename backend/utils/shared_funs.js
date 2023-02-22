@@ -1,5 +1,6 @@
 const crypto = require("crypto");
 const fs = require('fs')
+const {ObjectId}=require('mongodb')
 const chalk=require("chalk")
 
 function RESPONSE(res, code, data) {
@@ -99,8 +100,16 @@ function logger(req,res,next) {
     next()
 }
 
+const validateObjectID=(req,res,next)=>{
+    const {userId,eventId}=req.body
+    if (userId==null||eventId==null) return RESPONSE(res,400,"Missing IDs")
+    if (!ObjectId.isValid(userId) || !ObjectId.isValid(eventId)) return RESPONSE(res,400,"Invalid IDs")
+    next()
+}
+
 module.exports = {
     RESPONSE,
+    validateObjectID,
     deleteImages,
     handleAsync,
     DateNowInMin,

@@ -34,17 +34,13 @@ class HomeState extends State<Home> {
                   itemCount: events?.length,
                   itemBuilder: (context, index) {
                     Event eventx = events![index];
-                    String start = eventx
-                        .startDateTime
-                        .toString()
-                        .substring(0, 10);
-                    String end =
-                        eventx.endDateTime.toString().substring(0, 10);
+                    String start =
+                        eventx.startDateTime.toString().substring(0, 10);
+                    String end = eventx.endDateTime.toString().substring(0, 10);
 
                     String seats = (eventx.seats - eventx.attenders).toString();
                     String type = Event.eventTypeList[eventx.eventType];
-                    String status =
-                        Event.eventStatusList[eventx.status];
+                    String status = Event.eventStatusList[eventx.status];
                     Color statusColor =
                         Event.eventStatusColorList[eventx.status];
                     Color typeColor =
@@ -141,24 +137,24 @@ class HomeState extends State<Home> {
                                               ),
                                             ),
                                           ),
-                                          if(eventx.seats==1)
-                                          const SizedBox(width: 10),
-                                          if(eventx.seats==1)
-                                          Container(
-                                            padding: const EdgeInsets.all(4),
-                                            decoration: BoxDecoration(
-                                              color: seatsColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                            ),
-                                            child: Text(
-                                              seats,
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
+                                          if (eventx.status == 1)
+                                            const SizedBox(width: 10),
+                                          if (eventx.status == 1)
+                                            Container(
+                                              padding: const EdgeInsets.all(4),
+                                              decoration: BoxDecoration(
+                                                color: seatsColor,
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                              ),
+                                              child: Text(
+                                                seats,
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
                                               ),
                                             ),
-                                          ),
                                         ],
                                       ),
                                       const SizedBox(height: 10),

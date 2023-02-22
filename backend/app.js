@@ -7,6 +7,7 @@ const xss = require("xss-clean");
 const userRouter = require("./routers/user")
 const eventRouter = require("./routers/event")
 const orgRouter = require("./routers/org")
+const notifactionRouter = require("./routers/notification")
 const user = require("./models/user");
 const event = require("./models/event");
 const helmet = require("helmet");
@@ -35,7 +36,7 @@ app.use(cors())
 app.use('/user',userRouter)
 app.use('/org',orgRouter)
 app.use('/event',eventRouter)
-
+app.use('/notify',notifactionRouter)
 
 app.get('/test', handleAsync(async (req, res, next) => {
     RESPONSE(res, 200, "OK")

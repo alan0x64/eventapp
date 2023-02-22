@@ -40,7 +40,7 @@ module.exports.isOrgEventOwner = catchFun(
             next()
             return
         }
-        let eventId = req.params.eventId
+        let eventId = req.params.eventId || req.body.eventId 
         let orgx = await org.findById(req.logedinOrg.id)
         orgx.orgEvents.includes(eventId) ? next() : res.sendStatus(401)
     }

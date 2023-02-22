@@ -114,7 +114,7 @@ Future<Response> genCerts(String eventId) async {
 
 //PATCH
 Future<Response> updateEvent(String eventId, Map<String, dynamic> data) async {
-  return await PATCH('$devServer/event/update/$eventId', 1, 'AT', data);
+  return await PATCH('$devServer/event/update/$eventId', 0, 'AT', data);
 }
 
 //DELETE
@@ -136,4 +136,19 @@ http.MultipartRequest addEventFields(
   request.fields['location'] = data['location'].toString();
 
   return request;
+}
+
+Future<dynamic> updateEventStatus(BuildContext context,Event eventdata,int status) async {
+  return await runFun(
+    context,
+    () async {
+      return await updateEvent(eventdata.id, {
+        "title": eventdata.title,
+        'startDateTime': eventdata.startDateTime,
+        'endDateTime': eventdata.endDateTime,
+        "status": status,
+        "onlyFields": true
+      });
+    },
+  );
 }

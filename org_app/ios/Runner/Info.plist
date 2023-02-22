@@ -54,6 +54,10 @@
 	<key>NSMotionUsageDescription</key>
 	<string>App needs access to your motion activity to provide relevant information</string>
 
+	<key>NSCameraUsageDescription</key>
+  <string>This app needs camera access to scan QR codes</string>
+  
+
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>

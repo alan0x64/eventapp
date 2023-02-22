@@ -56,6 +56,11 @@ dependencies:
   geolocator: ^9.0.2
   webview_flutter: ^4.0.2
   qr_flutter: ^4.0.0
+  firebase_core: ^2.6.1
+  firebase_messaging: ^14.2.4
+  awesome_notifications: ^0.7.4+1
+  mobile_scanner: ^3.0.0
+  qr_code_scanner: ^1.0.1
 
 dev_dependencies:
   flutter_test:

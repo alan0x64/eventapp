@@ -79,6 +79,14 @@ void goto(context, Widget screen) {
   );
 }
 
+void gotoNamed(BuildContext? context, String screen,dynamic arg) {
+  Navigator.pushNamed(
+    context!,
+    screen,
+    arguments: arg
+  );
+}
+
 void gotoClear(context, Widget screen) {
   Navigator.pushAndRemoveUntil(context,
       MaterialPageRoute(builder: (context) => screen), (route) => false);

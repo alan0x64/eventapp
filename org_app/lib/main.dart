@@ -4,14 +4,24 @@ import 'package:org/net/auth.dart';
 import 'package:org/screens/error.dart';
 import 'package:org/screens/event/home.dart';
 import 'package:org/screens/login.dart';
+import 'package:org/utilities/notofocation.dart';
 import 'package:org/utilities/providers.dart';
 import 'package:org/utilities/shared.dart';
 import 'package:provider/provider.dart';
 import 'package:theme_provider/theme_provider.dart';
 import './server.dart';
 
-void main() {
-  host(true);
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+void main() async {
+  host(false);
+  WidgetsFlutterBinding.ensureInitialized();
+  await intilizeLocalNotification();
+  await initlizeFirebase();
+  await handleBackground();
+  await handleForeground();
+  await handleInApp();
+
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.dumpErrorToConsole(
       details,
@@ -31,8 +41,12 @@ void main() {
         child: ThemeConsumer(child: Builder(
           builder: (context) {
             return MaterialApp(
+              routes: {
+                '/': (context) => const App(),
+              },
+              initialRoute: '/',
+              navigatorKey: navigatorKey,
               theme: ThemeProvider.themeOf(context).data,
-              home: const App(),
               debugShowCheckedModeBanner: false,
               builder: (BuildContext context, Widget? widget) {
                 ErrorWidget.builder = (FlutterErrorDetails errorDetails) {

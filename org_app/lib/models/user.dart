@@ -60,10 +60,16 @@ Future<Response> getUser(String userId) async {
 
 // PATCH 
 
-Future<Response> checkIn(String eventId) async {
-  return await PATCH('$devServer/event/checkin/$eventId', 0, 'AT', {});
+Future<Response> checkIn(String eventId,String userId) async {
+  return await PATCH('$devServer/event/checkin', 0, 'AT', {
+    "userId":userId,
+    "eventId":eventId
+  });
 }
 
-Future<Response> checkOut(String eventId) async {
-  return await PATCH('$devServer/event/checkout/$eventId', 0, 'AT', {});
+Future<Response> checkOut(String eventId,String userId) async {
+  return await PATCH('$devServer/event/checkout', 0, 'AT', {
+    "userId":userId,
+    "eventId":eventId
+  });
 }

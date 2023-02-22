@@ -1,8 +1,9 @@
-const {validPasswordSchema, validUserSchema, validOrgSchema, validEventSchema, validLoginSchema,validUpdateOrgSchema } = require("../models/schema");
+const {validPasswordSchema, validUserSchema, validOrgSchema, validEventSchema, validLoginSchema,validUpdateOrgSchema, validCheckInOutSchema } = require("../models/schema");
 const { RESPONSE, logError,logx } = require('../utils/shared_funs');
 
 const createValidationMiddlewear = (schema) => {
     return (req, res, next) => {
+        console.log(req.body)
         const { error } = schema.validate({...req.body})
         if (error) {
             logError(error)
@@ -18,3 +19,5 @@ module.exports.validateOrg = createValidationMiddlewear(validOrgSchema)
 module.exports.validateUpdateOrg = createValidationMiddlewear(validUpdateOrgSchema)
 module.exports.validatePassword = createValidationMiddlewear(validPasswordSchema)
 module.exports.validateEvent = createValidationMiddlewear(validEventSchema)
+module.exports.validateCheckInOut = createValidationMiddlewear(validCheckInOutSchema)
+

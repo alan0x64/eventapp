@@ -4,8 +4,8 @@ const event = require('../controllers/event')
 const { authJWT_AT } = require("../middlewares/authn")
 const { eventImageHandler } = require("../middlewares/file_handler")
 const { onlyUsers, isOrgEventOwner,onlyOrgs } = require("../middlewares/authz")
-const { validateEvent } = require("../middlewares/validators");
-const { handleAsync } = require('../utils/shared_funs');
+const { validateEvent,validateCheckInOut } = require("../middlewares/validators");
+const { handleAsync, validateObjectID, catchFun } = require('../utils/shared_funs');
 
 
 
@@ -24,16 +24,33 @@ router.route('/blacklist/:eventId').get(authJWT_AT,onlyOrgs,isOrgEventOwner, han
 
 
 //PATCH
-router.route('/checkin/:eventId').patch(authJWT_AT,onlyUsers,handleAsync(event.checkIn))
-router.route('/checkout/:eventId').patch(authJWT_AT,onlyUsers, handleAsync(event.checkOut))
+router.route('/checkin').patch(
+    authJWT_AT,
+    onlyOrgs,
+    isOrgEventOwner,
+    validateCheckInOut,
+    catchFun(validateObjectID),
+    handleAsync(event.checkIn))
+
+router.route('/checkout').patch(
+    authJWT_AT,
+    onlyOrgs,
+    isOrgEventOwner,
+    validateCheckInOut,
+    validateObjectID,
+    handleAsync(event.checkOut)
+    )
+
 router.route('/update/:eventId').patch(
     authJWT_AT,
     onlyOrgs,
     isOrgEventOwner,
     validateEvent,
-    eventImageHandler.single('eventBackgroundPic'),
+    eventImageHandler.fields([
+        { name: 'eventBackgroundPic' },
+        { name: 'sig' },
+    ]),
     handleAsync(event.updateEvent))
-
 
 //POST
 router.route('/register').post(

@@ -48,16 +48,18 @@ module.exports.createEvent = async (req, res) => {
 }
 
 module.exports.updateEvent = async (req, res) => {
+    let onlyFields=req.body.onlyFields
     let orgId = req.logedinOrg.id
-    await event.findByIdAndUpdate(req.params.eventId,
-        {
-            ...req.body,
-            eventBackgroundPic: eventImages(req).eventBackgroundPic,
-            sig: eventImages(req).sig,
-            orgId: orgId,
-        })
-
-    deleteImages(eventImages(req).imagesToDelete)
+    let body={...req.body,orgId: orgId,}
+    let eventimage=eventImages(req)
+    
+    if (!onlyFields) {
+        body.eventBackgroundPic=eventimage.eventBackgroundPic,
+        body.sig=eventimage.sig,                
+        deleteImages(eventimage.imagesToDelete)
+    }       
+    
+    await event.findByIdAndUpdate(req.params.eventId,body)    
     RESPONSE(res, 200, "Event Updated")
 }
 
@@ -92,18 +94,18 @@ module.exports.getEventMembers = async (req, res) => {
 
 module.exports.getBlockedMembers = async (req, res) => {
     let eventx=await event.findById(req.params.eventId).populate('blackListed')
-    console.log(eventx.blackListed);
     RESPONSE(res, 200, { "members": eventx.blackListed })
 }
 
 module.exports.checkIn = async (req, res) => {
-    //Check IF user is blocoked
-    let eventId = req.params.eventId
-    let userId = req.logedinUser.id
+
+    let eventId = req.body.eventId
+    let userId = req.body.userId
 
     let eventx = await event.findById(eventId)
     let userx = await user.findById(userId)
 
+    if (eventx.eventMembers.includes(userId)) return RESPONSE(res, 200, "Already Checked In")
     if (eventx.blackListed.includes(userId)) return RESPONSE(res, 400, "User Is Blocked")
     if (eventx.eventMembers.includes(userId) == false && userx.joinedEvents.includes(userId) == false)
         return RESPONSE(res, 400, "User Must Join The Event First")
@@ -136,8 +138,9 @@ module.exports.checkIn = async (req, res) => {
 }
 
 module.exports.checkOut = async (req, res) => {
-    let eventId = req.params.eventId
-    let userId = req.logedinUser.id
+    let eventId = req.body.eventId
+    let userId = req.body.userId
+    let orgId = req.logedinUser.id
     let eventx = await event.findById(eventId)
 
     if (eventx.length == 0) return RESPONSE(res, 400, "Event Does Not Exist")

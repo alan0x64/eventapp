@@ -6,4 +6,6 @@ node_modules
 
 backend/images/*
 backend/public/*
+backend/config/*
 org_app/lib/env.dart
+org_app/android/google-services.json
