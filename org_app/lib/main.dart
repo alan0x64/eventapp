@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:org/net/auth.dart';
@@ -14,7 +15,7 @@ import './server.dart';
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
-  host(false);
+  host(kReleaseMode);
   WidgetsFlutterBinding.ensureInitialized();
   await intilizeLocalNotification();
   await initlizeFirebase();

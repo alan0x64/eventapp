@@ -59,9 +59,6 @@ const orgImageHandler = multer({
 const eventImageHandler = multer({
     storage: multer.diskStorage({
         destination: (req, file, fun) => {
-            if (req.body.onlyFields) {
-                return
-            }
             if (file.fieldname == 'eventBackgroundPic') {
                 fun(null, 'images/events')
             }
@@ -70,9 +67,8 @@ const eventImageHandler = multer({
             }
         },
         filename: (req, file, fun) => {
-            if (req.body.onlyFields) {
-                return
-            }
+            if (req.body.onlyFields) return   
+            
             let name = Date.now() + path.extname(file.originalname)
             if (file.fieldname == 'eventBackgroundPic') {
                 req.eventPic = name
@@ -154,9 +150,18 @@ async function sendEventImages(req, res) {
     }
 }
 
+function handleEventImages(req,res,next) {
+    eventImageHandler.fields([
+        { name: 'eventBackgroundPic' },
+        { name: 'sig' },
+    ])(req,res)
+    next()
+}
+
 module.exports = {
     orgImageHandler,
     userImageHandler,
     eventImageHandler,
     certFileHandler,
+    handleEventImages
 }

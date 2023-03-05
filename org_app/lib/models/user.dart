@@ -1,37 +1,43 @@
-
-
 import '../net/HTTP.dart';
 import '../server.dart';
 
 class User {
-  String profilePic;
-  String fullName;
-  String email;
-  String password;
-  String phoneNumber;
-  String dateOfBirth;
-  String university;
-  String faculty;
-  String department;
-  String scientificTitle;
-  String bio;
-  String id;
-  List<dynamic> joinedEvents;
+  final String profilePic;
+  final String fullName;
+  final String email;
+  final String password;
+  final String phoneNumber;
+  final String dateOfBirth;
+  final String university;
+  final String faculty;
+  final String department;
+  final String scientificTitle;
+  final String bio;
+  final String id;
+  final List<dynamic> joinedEvents;
 
-  User({
-    required this.id,
-    required this.profilePic,
-    required this.fullName,
-    required this.email,
-    required this.password,
-    required this.phoneNumber,
-    required this.dateOfBirth,
-    required this.university,
-    required this.faculty,
-    required this.department,
-    required this.scientificTitle,
-    required this.bio,
-    required this.joinedEvents,
+ static List<String> userSearchFields = [
+    'FullName',
+    'Email',
+    'University',
+    'Faculty',
+    'Department',
+    'Scientific Title'
+  ];
+  const User({
+    this.id = "",
+    this.profilePic = "",
+    this.fullName = "",
+    this.email = "",
+    this.password = "",
+    this.phoneNumber = "",
+    this.dateOfBirth = "",
+    this.university = "",
+    this.faculty = "",
+    this.department = "",
+    this.scientificTitle = "",
+    this.bio = "",
+    this.joinedEvents = const [],
   });
 }
 
@@ -57,19 +63,20 @@ Future<Response> getUser(String userId) async {
   return await GET('$devServer/user/profile/$userId', 0, 'AT');
 }
 
+// PATCH
 
-// PATCH 
-
-Future<Response> checkIn(String eventId,String userId) async {
-  return await PATCH('$devServer/event/checkin', 0, 'AT', {
-    "userId":userId,
-    "eventId":eventId
-  });
+Future<Response> checkIn(String eventId, String userId) async {
+  return await PATCH('$devServer/event/checkin', 0, 'AT',
+      {"userId": userId, "eventId": eventId});
 }
 
-Future<Response> checkOut(String eventId,String userId) async {
-  return await PATCH('$devServer/event/checkout', 0, 'AT', {
-    "userId":userId,
-    "eventId":eventId
-  });
+Future<Response> checkOut(String eventId, String userId) async {
+  return await PATCH('$devServer/event/checkout', 0, 'AT',
+      {"userId": userId, "eventId": eventId});
+}
+
+Future<Response> searchUsers(String eventId, dynamic value,
+    {int lnum = 0, int fnum = 0}) async {
+  return await POST('$devServer/user/search', 0, 'AT',
+      {"eventId": eventId, "fnum": fnum, "lnum": lnum, "fieldValue": value});
 }

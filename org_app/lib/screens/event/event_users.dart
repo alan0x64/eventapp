@@ -1,19 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:org/models/user.dart';
+import 'package:org/screens/users/usersearch.dart';
 import 'package:org/widgets/user_card.dart';
 
 import '../../models/event.dart';
+import '../../net/HTTP.dart';
 import '../../utilities/shared.dart';
 import '../../widgets/future_builder.dart';
 
 class ViewEventUser extends StatefulWidget {
   final String eventId;
   final bool blacklist;
+  final bool registred;
+  final bool showControl;
 
   const ViewEventUser({
     super.key,
     required this.eventId,
     this.blacklist = false,
+    this.registred = false,
+    this.showControl = true,
   });
 
   @override
@@ -22,35 +28,51 @@ class ViewEventUser extends StatefulWidget {
 
 class _ViewEventUser extends State<ViewEventUser> {
   List<dynamic>? users;
+  String screenTitle = "Attenders";
+  Future<Response> Function()? cb;
 
   @override
   Widget build(BuildContext context) {
-      String screenTitle =
-      widget.blacklist ? 'Blacklisted' : 'Attenders';
+    int lnum=0;
+    cb = () async => await getAttenders(widget.eventId);
+
+    if (widget.blacklist) {
+      screenTitle = 'Blacklisted';
+      lnum = 2;
+      cb = () async => await getBlacklistMembers(widget.eventId);
+    } else if (widget.registred) {
+      screenTitle = 'Registred Users';
+      lnum = 1;
+      cb = () async => await getEventMembers(widget.eventId);
+    }
+
     return BuildFuture(
-      callback: () => widget.blacklist
-          ? getBlacklistMembers(widget.eventId)
-          : getEventMembers(widget.eventId),
+      callback: cb!,
       mapper: (resdata) {
         return mapObjs(resdata.data['members'], toUser);
       },
       builder: (data) {
         return Scaffold(
-          appBar:
-              buildAppBar(context, screenTitle, button: const BackButton()),
+          appBar: buildAppBar(context, screenTitle,
+              button: const BackButton(),
+              search: true,
+              searchWidget: userSearch(
+                lnum,
+                eventId: widget.eventId,
+                blacklist: widget.blacklist,
+                showControl: widget.showControl,
+              )),
           body: ListView.builder(
             physics: const BouncingScrollPhysics(),
             itemCount: data?.length,
             itemBuilder: (context, index) {
               User userx = data![index];
               return UserCard(
-                  eventId: widget.eventId,
-                  name: userx.fullName,
-                  email: userx.email,
-                  imageUrl: userx.profilePic,
-                  phoneNumber: userx.phoneNumber,
-                  userId: userx.id,
-                  blacklist: widget.blacklist,);
+                eventId: widget.eventId,
+                user: userx,
+                blacklist: widget.blacklist,
+                showControl: widget.showControl,
+              );
             },
           ),
         );

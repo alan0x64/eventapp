@@ -3,9 +3,10 @@ const path = require("path")
 const event = require("../models/event")
 const user = require("../models/user");
 const org = require("../models/org")
+const orgCon = require('../controllers/org')
 const cert = require("../models/cert")
 const PDF = require('pdf-lib').PDFDocument;
-const { deleteImages, DateNowInMin, attendedInMin, RESPONSE, logx } = require('../utils/shared_funs')
+const { deleteImages, DateNowInMin, attendedInMin, RESPONSE, logx, logError, toMin } = require('../utils/shared_funs');
 require("express")
 
 function eventImages(req, eventx = {}) {
@@ -38,6 +39,7 @@ module.exports.createEvent = async (req, res) => {
         eventBackgroundPic: eventImages(req).eventBackgroundPic,
         sig: eventImages(req).sig,
         orgId: orgId,
+        status:0
     }).save()
 
     await org.findByIdAndUpdate(orgId, {
@@ -48,36 +50,46 @@ module.exports.createEvent = async (req, res) => {
 }
 
 module.exports.updateEvent = async (req, res) => {
-    let onlyFields=req.body.onlyFields
     let orgId = req.logedinOrg.id
-    let body={...req.body,orgId: orgId,}
-    let eventimage=eventImages(req)
-    
-    if (!onlyFields) {
-        body.eventBackgroundPic=eventimage.eventBackgroundPic,
-        body.sig=eventimage.sig,                
-        deleteImages(eventimage.imagesToDelete)
-    }       
-    
-    await event.findByIdAndUpdate(req.params.eventId,body)    
+    let eventx=await event.findById(req.params.eventId)
+    let eventimage = eventImages(req,eventx)
+    let body = { ...req.body, orgId: orgId, }
+
+    if (req.method=="PUT") {
+        if (req.eventPic) {
+            body.eventBackgroundPic = eventimage.eventBackgroundPic,
+            deleteImages([eventimage.imagesToDelete[0]])
+            
+        }else{
+            body.sig = eventimage.sig,
+            deleteImages([eventimage.imagesToDelete[1]])
+        }
+    }
+
+    await eventx.updateOne(body)
     RESPONSE(res, 200, "Event Updated")
 }
 
 module.exports.deleteEvent = async (req, res) => {
     let eventId = req.params.eventId
-    this.deleteSingleEvent(eventId)
+    this.deleteSingleEvent(req, eventId)
     RESPONSE(res, 200, "Event Deleted")
 }
 
 
 module.exports.getEvent = async (req, res) => {
     let eventx = await event.findById(req.params.eventId)
-    if (eventx.length == 0) return RESPONSE(res, 400, "Event Does Not Exist")
+    if (eventx.length == 0 || eventx == null) return RESPONSE(res, 400, "Event Does Not Exist")
+    await this.autoEvent(req,res,req.params.eventId || req.body.eventId )
     RESPONSE(res, 200, eventx)
 }
 
 module.exports.getEvents = async (req, res) => {
-    RESPONSE(res, 200, { "events": await event.find({}) })
+    let events=await event.find({})
+    events.forEach( async event  =>  {
+        await this.autoEvent(req,res,event.id )
+    });
+    RESPONSE(res, 200, { "events": events  })
 }
 
 module.exports.getEventOwner = async (req, res) => {
@@ -87,13 +99,24 @@ module.exports.getEventOwner = async (req, res) => {
     RESPONSE(res, 200, orgx)
 }
 
+
+module.exports.getEventCerts = async (req, res) => {
+    let eventx = await event.findById(req.params.eventId).populate({
+        path: 'eventCerts',
+        populate: {
+            'path': 'userId'
+        }
+    })
+    RESPONSE(res, 200, { 'certs': eventx.eventCerts })
+}
+
 module.exports.getEventMembers = async (req, res) => {
     let eventx = await event.findById(req.params.eventId).populate('eventMembers')
     RESPONSE(res, 200, { "members": eventx.eventMembers })
 }
 
 module.exports.getBlockedMembers = async (req, res) => {
-    let eventx=await event.findById(req.params.eventId).populate('blackListed')
+    let eventx = await event.findById(req.params.eventId).populate('blackListed')
     RESPONSE(res, 200, { "members": eventx.blackListed })
 }
 
@@ -105,10 +128,9 @@ module.exports.checkIn = async (req, res) => {
     let eventx = await event.findById(eventId)
     let userx = await user.findById(userId)
 
-    if (eventx.eventMembers.includes(userId)) return RESPONSE(res, 200, "Already Checked In")
     if (eventx.blackListed.includes(userId)) return RESPONSE(res, 400, "User Is Blocked")
     if (eventx.eventMembers.includes(userId) == false && userx.joinedEvents.includes(userId) == false)
-        return RESPONSE(res, 400, "User Must Join The Event First")
+        return RESPONSE(res, 400, "User Must Register First")
     if (eventx.Attenders >= eventx.seats) return RESPONSE(res, 200, "No Seats Left")
 
     await cert.findOneAndDelete({
@@ -119,7 +141,7 @@ module.exports.checkIn = async (req, res) => {
 
     let newCertName = Date.now() + '.pdf'
 
-    await new cert({
+    let certx = await new cert({
         userId: userId,
         eventId: eventx._id,
         orgId: eventx.orgId,
@@ -131,7 +153,8 @@ module.exports.checkIn = async (req, res) => {
     }).save()
 
     await eventx.updateOne({
-        Attenders: (await cert.find({})).length
+        Attenders: (await cert.find({})).length,
+        "$push": { 'eventCerts': certx._id }
     })
 
     RESPONSE(res, 200, "User Checked In")
@@ -140,8 +163,8 @@ module.exports.checkIn = async (req, res) => {
 module.exports.checkOut = async (req, res) => {
     let eventId = req.body.eventId
     let userId = req.body.userId
-    let orgId = req.logedinUser.id
     let eventx = await event.findById(eventId)
+    let checkOutTime = DateNowInMin()
 
     if (eventx.length == 0) return RESPONSE(res, 400, "Event Does Not Exist")
     if (eventx.blackListed.includes(userId)) return RESPONSE(res, 400, "User Is Blocked")
@@ -152,97 +175,99 @@ module.exports.checkOut = async (req, res) => {
         orgId: eventx.orgId,
     })
 
-    if (certx.length == 0) return RESPONSE(res, 400, "User Must Check In First")
+    if (!certx || certx.length == 0 || checkOutTime < certx.checkInTime) return RESPONSE(res, 400, "User Must Check In First")
 
-    let checkoutTime = DateNowInMin()
-    let attendedMins = attendedInMin(checkoutTime, certx.checkInTime)
+    let attendedMins = attendedInMin(checkOutTime, certx.checkInTime)
     let allowCert = attendedMins >= eventx.minAttendanceTime
 
-
-    if (allowCert) {
-        await certx.updateOne({
-            checkoutTime,
-            attendedMins,
-            allowCert: allowCert
-        })
-
-        await eventx.updateOne({
-            "$inc": { 'Attended': 1 },
-            "$push": { eventCerts: certx._id }
-        })
-
+    let updatebody = {
+        'checkOutTime': checkOutTime,
+        'attendedMins': attendedMins,
+        'allowCert': allowCert
     }
-    //should the cert be deleted if they re checkouted?
-    // else {
-    //     await certx.deleteOne()
-    //     let certs = await cert.find({})
-    //     await eventx.updateOne({
-    //         Attenders: certs.length
-    //     })
-    // }
+    console.log(updatebody);
+
+
+    let xxx = await certx.updateOne({ ...updatebody })
+
+    console.log(xxx);
+    await eventx.updateOne({
+        'Attended': (await cert.find({
+            'eventId': eventx._id
+        })).length
+    })
 
     RESPONSE(res, 200, "Checked Out")
 }
 
-module.exports.genCerts = async (req, res) => {
+module.exports.genCerts = async (req, res, sendRes) => {
+    if (sendRes == null) sendRes = 1
+    try {
 
-    let file = ""
-    let eventId = req.params.eventId
-    let eventx = await event.findById(eventId).populate('eventCerts')
 
-    //set paths
-    let certs = path.join(`${__dirname}/..`, `/public/certs`)
-    let sigs = path.join(`${__dirname}/..`, `/public/sigs`)
+        let file = ""
+        let eventId = req.params.eventId
+        let eventx = await event.findById(eventId).populate('eventCerts')
 
-    //read files
-    if (eventx.eventType == 0) {
-        file = fs.readFileSync(`${certs}/con.pdf`)
-    } else {
-        file = fs.readFileSync(`${certs}/sem.pdf`)
-    }
+        //set paths
+        let certs = path.join(`${__dirname}/..`, `/public/certs`)
+        let sigs = path.join(`${__dirname}/..`, `/public/sigs`)
 
-    //check if user has 2 certs?
-    eventx.eventCerts.forEach(async currentCert => {
-        if (fs.existsSync(`${certs}/${currentCert.cert.fileName}`))
-            fs.unlink(`${certs}/${currentCert.cert.fileName}`)
-
-        if (
-            currentCert.eventId.toString() == eventx._id.toString() &&
-            currentCert.orgId.toString() == eventx.orgId.toString() &&
-            currentCert.allowCert
-        ) {
-
-            //load pdf and get page 
-            const pdf = await PDF.load(file)
-            const page = pdf.getPages()[0]
-
-            //load image 
-            const imageBuffer = fs.readFileSync(`${sigs}/${eventx.sig.fileName}`)
-            const pngImage = await pdf.embedPng(imageBuffer)
-
-            let userx = await user.findById(currentCert.userId)
-            let orgx = await org.findById(eventx.orgId)
-
-            //set text size
-            page.setFontSize(18)
-
-            //draw text
-            page.drawText(userx.fullName, { x: 270, y: 630 })
-            page.drawText(eventx.title, { x: 257, y: 570 })
-            page.drawText(new Date().toLocaleDateString(), { x: 257, y: 515 })
-
-            const { width, height } = pngImage.scale(0.3);
-            page.drawImage(pngImage, { x: 190, y: 410, width, height }, page)
-
-            //writeback to file system
-            fs.writeFileSync(`public/certs/${currentCert.cert.fileName}`, await pdf.save())
+        //read files
+        if (eventx.eventType == 0) {
+            file = fs.readFileSync(`${certs}/con.pdf`)
+        } else {
+            file = fs.readFileSync(`${certs}/sem.pdf`)
         }
-    });
-    await eventx.update({
-        status: 2
-    })
 
-    RESPONSE(res, 200, "Certs Generated")
+        //check if user has 2 certs?
+        eventx.eventCerts.forEach(async currentCert => {
+            if (fs.existsSync(`${certs}/${currentCert.cert.fileName}`))
+                fs.unlink(`${certs}/${currentCert.cert.fileName}`, () => { })
+
+            if (
+                currentCert.eventId.toString() == eventx._id.toString() &&
+                currentCert.orgId.toString() == eventx.orgId.toString() &&
+                currentCert.allowCert
+            ) {
+
+                //load pdf and get page 
+                const pdf = await PDF.load(file)
+                const page = pdf.getPages()[0]
+
+                //load image 
+                const imageBuffer = fs.readFileSync(`${sigs}/${eventx.sig.fileName}`)
+
+                let userx = await user.findById(currentCert.userId)
+                let image
+
+                if (eventx.sig.fileName.substring(eventx.sig.fileName.indexOf('.') + 1) == 'jpg') {
+                    image = await pdf.embedJpg(imageBuffer)
+                } else if (eventx.sig.fileName.substring(eventx.sig.fileName.indexOf('.') + 1) == 'png') {
+                    image = await pdf.embedPng(imageBuffer)
+                }
+                else {
+                    return RESPONSE(res, 400, "The signature file either lacks a PNG or JPG extension, or it has a different extension")
+                }
+                //set text size
+                page.setFontSize(18)
+
+                //draw text
+                page.drawText(userx.fullName, { x: 270, y: 630 })
+                page.drawText(eventx.title, { x: 257, y: 570 })
+                page.drawText(new Date().toLocaleDateString(), { x: 257, y: 515 })
+
+                const { width, height } = image.scale(0.3);
+                page.drawImage(image, { x: 190, y: 410, width, height }, page)
+
+                //writeback to file system
+                fs.writeFileSync(`public/certs/${currentCert.cert.fileName}`, await pdf.save())
+            }
+        });
+        if (sendRes) RESPONSE(res, 200, "Certs Generated")
+    } catch (error) {
+        logError(error)
+    }
 }
 
 
@@ -283,7 +308,7 @@ module.exports.genCert = async (req, res) => {
 
         //check if user has 2 certs
         if (fs.existsSync(`${certs}/${certx.cert.fileName}`))
-            fs.unlink(`${certs}/${certx.cert.fileName}`,()=>{})
+            fs.unlink(`${certs}/${certx.cert.fileName}`, () => { })
 
 
         //load pdf and get page 
@@ -327,7 +352,7 @@ module.exports.genCert = async (req, res) => {
 
 
 
-module.exports.deleteSingleEvent = async function (id) {
+module.exports.deleteSingleEvent = async function (req, id) {
     let eventx = await event.findById(id)
     let users = await user.find({
         'joinedEvents': eventx._id
@@ -346,4 +371,68 @@ module.exports.deleteSingleEvent = async function (id) {
     deleteImages(eventImages(req, eventx).imagesToDelete)
     await eventx.deleteOne()
     return
+}
+
+
+module.exports.getAttenders = async (req, res) => {
+    let attenders = []
+    let eventId = req.params.eventId
+    let eventx = await event.findById(eventId).populate(
+        {
+            path: 'eventCerts',
+            populate: {
+                path: 'userId'
+            }
+        }
+    )
+
+    eventx.eventCerts.forEach(cert => {
+        attenders.push(cert.userId)
+    });
+
+    return RESPONSE(res, 200, { 'members': attenders })
+}
+
+
+
+module.exports.removeUserFromEvent = async (req, res) => {
+    return orgCon.BLUser(req, res, false)
+}
+
+
+module.exports.search = async (req, res) => {
+
+    console.log(req.body)
+
+    let { eventId, fieldValue, lnum, fnum } = req.body
+    let eventx = await event.findById(eventId).populate("eventCerts")
+
+    let lists = [
+        getUsersInCerts(eventx.eventCerts),
+        eventx.eventMembers,
+        eventx.blackListed
+    ]
+
+    let userx = await searchFor(user, lists[lnum], userSearchFields[fnum], fieldValue)
+    return RESPONSE(res, 200, { 'members': userx })
+}
+
+module.exports.autoEvent=async  function  (req,res,eventId)  {
+    let eventx = await event.findById(eventId)
+
+    // if (eventx.status != 1 && DateNowInMin() < toMin(eventx.endDateTime) && DateNowInMin() > toMin(eventx.startDateTime)) {
+    //     await eventx.updateOne({
+    //         'status': 1
+    //     })
+    //     notficationSender(req, res, 0)
+    // }
+
+    // if (eventx.status != 2 && DateNowInMin() > toMin(eventx.endDateTime)) {
+    //     this.genCerts(req, res, 0)
+    //     await eventx.updateOne({
+    //         'status': 2
+    //     })
+    //     notficationSender(req, res, 0)
+    // }
+    return 
 }

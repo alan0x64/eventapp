@@ -72,12 +72,6 @@ class _SettingsState extends State<Settings> {
               ),
             ],
           ),
-          const SettingsSection(
-           title: Text("App Settings"), 
-            tiles: <SettingsTile>[
-              // SettingsTile.switchTile(initialValue: 0, onToggle: true, title: title)
-
-          ])
         ],
       ),
     );

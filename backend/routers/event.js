@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router({ mergeParams: true });
 const event = require('../controllers/event')
 const { authJWT_AT } = require("../middlewares/authn")
-const { eventImageHandler } = require("../middlewares/file_handler")
+const { eventImageHandler,handleEventImages } = require("../middlewares/file_handler")
 const { onlyUsers, isOrgEventOwner,onlyOrgs } = require("../middlewares/authz")
 const { validateEvent,validateCheckInOut } = require("../middlewares/validators");
 const { handleAsync, validateObjectID, catchFun } = require('../utils/shared_funs');
@@ -23,6 +23,14 @@ router.route('/certificate/:userId/:eventId').get(authJWT_AT,onlyOrgs,isOrgEvent
 router.route('/blacklist/:eventId').get(authJWT_AT,onlyOrgs,isOrgEventOwner, handleAsync(event.getBlockedMembers))
 
 
+router.route('/attenders/:eventId').get(authJWT_AT,onlyOrgs,isOrgEventOwner, handleAsync(event.getAttenders))
+
+router.route('/certs/:eventId').get(authJWT_AT,onlyOrgs,isOrgEventOwner,handleAsync(event.getEventCerts))
+
+
+
+
+
 //PATCH
 router.route('/checkin').patch(
     authJWT_AT,
@@ -41,18 +49,28 @@ router.route('/checkout').patch(
     handleAsync(event.checkOut)
     )
 
-router.route('/update/:eventId').patch(
+router.route('/update/:eventId').
+put(
     authJWT_AT,
     onlyOrgs,
     isOrgEventOwner,
-    validateEvent,
     eventImageHandler.fields([
         { name: 'eventBackgroundPic' },
         { name: 'sig' },
     ]),
-    handleAsync(event.updateEvent))
+    validateEvent,
+    handleAsync(event.updateEvent)).
+patch(
+        authJWT_AT,
+        onlyOrgs,
+        isOrgEventOwner,
+        validateEvent,
+        handleAsync(event.updateEvent)
+    )
 
-//POST
+router.route('/:userId/:eventId').patch(authJWT_AT,isOrgEventOwner, handleAsync(event.removeUserFromEvent))
+
+//POST 
 router.route('/register').post(
     authJWT_AT,
     onlyOrgs,
@@ -62,6 +80,8 @@ router.route('/register').post(
     ]),
     validateEvent, 
     handleAsync(event.createEvent))
+    
+router.route('/search').post(authJWT_AT,isOrgEventOwner, handleAsync(event.search))
 
 
 

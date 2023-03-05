@@ -99,7 +99,6 @@ class _SingUpState extends State<SingUp> {
                       org_event_user: 0,
                       formKey: _formKey,
                       context: context,
-                      location: getLocationString(context, 0),
                       setState: () => setState(() {}),
                       formdata: getOrgFromForm(context, _formKey),
                       requestHandler: (data, res) async {

@@ -103,7 +103,6 @@ class _EditOrgState extends State<EditOrg> {
                           org_event_user: 0,
                           formKey: _formKey,
                           setState: () => setState(() {}),
-                          location: widget.orgdata!.location,
                           formdata: getOrgFromForm(context, _formKey),
                           requestHandler: (data, res) async {
                             return await appUpdateHandler(

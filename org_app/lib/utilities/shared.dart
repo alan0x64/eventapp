@@ -21,6 +21,7 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models/event.dart';
+import '../models/user.dart';
 
 typedef ResCallback = Future<Response> Function();
 typedef FORMKEY = GlobalKey<FormBuilderState>;
@@ -79,26 +80,35 @@ void goto(context, Widget screen) {
   );
 }
 
-void gotoNamed(BuildContext? context, String screen,dynamic arg) {
-  Navigator.pushNamed(
-    context!,
-    screen,
-    arguments: arg
-  );
+void moveBack(context, int steps) {
+  Navigator.popUntil(context, (route) => steps-- == 0);
 }
 
-void gotoClear(context, Widget screen) {
-  Navigator.pushAndRemoveUntil(context,
-      MaterialPageRoute(builder: (context) => screen), (route) => false);
+void gotoNamed(BuildContext? context, String screen, dynamic arg) {
+  Navigator.pushNamed(context!, screen, arguments: arg);
+}
+
+void gotoClear(context, Widget screen, {bool x = false}) {
+  Navigator.pushAndRemoveUntil(
+      context, MaterialPageRoute(builder: (context) => screen), (route) => x);
 }
 
 AppBar buildAppBar(BuildContext context, String title,
-    {bool showdialog = true, Widget? button}) {
+    {bool showdialog = true,
+    Widget? button,
+    bool search = false,
+    SearchDelegate? searchWidget}) {
   return AppBar(
     title: Text(title),
     leading: button,
     elevation: 0,
     actions: [
+      if (search)
+        IconButton(
+            onPressed: () {
+              showSearch(context: context, delegate: searchWidget!);
+            },
+            icon: const Icon(Icons.search)),
       IconButton(
         icon: const Icon(CupertinoIcons.moon_stars),
         onPressed: () {
@@ -131,7 +141,6 @@ AppBar buildAppBar(BuildContext context, String title,
 void FormRequestHandler({
   bool create = false,
   required int org_event_user,
-  required String location,
   required FORMKEY formKey,
   required VoidCallback setState,
   required BuildContext context,
@@ -189,15 +198,16 @@ Map<String, dynamic> getOrgFromForm(
   };
 }
 
-Map<String, dynamic> getEventFromForm(
-  BuildContext context,
-  FORMKEY formKey,
-) {
+Map<String, dynamic> getEventFromForm(BuildContext context, FORMKEY formKey,
+    {String location = ''}) {
+  if (location.isEmpty || getLocationString(context, 1) != "0.0,0.0") {
+    location = getLocationString(context, 1);
+  }
+
   return {
     'title': formKey.currentState!.fields['title']!.value,
     'description': formKey.currentState!.fields['description']!.value,
     'eventType': formKey.currentState!.fields['eventType']!.value.toString(),
-    'status': formKey.currentState!.fields['status']!.value.toString(),
     'startDateTime':
         formKey.currentState!.fields['startDateTime']!.value.toString(),
     'endDateTime':
@@ -205,7 +215,7 @@ Map<String, dynamic> getEventFromForm(
     'minAttendanceTime':
         formKey.currentState!.fields['minAttendanceTime']!.value.toString(),
     'seats': formKey.currentState!.fields['seats']!.value.toString(),
-    'location': getLocationString(context, 1),
+    'location': location,
   };
 }
 
@@ -298,7 +308,6 @@ Ink loadImageNet(String path, {bool profile = false}) {
   if (profile) {
     hight = 128;
     width = 128;
-    fit = BoxFit.cover;
   }
 
   return Ink.image(
@@ -378,19 +387,6 @@ void ResetForm({
   formkey.currentState!.reset();
 }
 
-// void pickImageAndaveState({
-//   required BuildContext context,
-//   required FORMKEY formKey,
-//   required ImagePicker picker,
-//   required XFile? file,
-//   required Map<String, dynamic>? formdata,
-//   required VoidCallback fun,
-// }) async {
-//   file = await picker.pickImage(source: ImageSource.gallery);
-//   formdata = getEventFromForm(context, formKey);
-//   fun();
-// }
-
 Event mapEvent(Map<String, dynamic>? data) {
   if (data == null) {
     return const Event();
@@ -435,52 +431,6 @@ Event mapEvent(Map<String, dynamic>? data) {
       startDateTime: startDateTime,
       endDateTime: endDateTime);
 }
-
-Event toEvent(Map<String, dynamic> json) {
-  return Event(
-    eventBackgroundPic: json['eventBackgroundPic']['url'],
-    sig: json['sig']['url'],
-    id: json['_id'],
-    title: json['title'],
-    description: json['description'],
-    location: json['location'],
-    status: json['status'],
-    eventType: json['eventType'],
-    startDateTime: json['startDateTime'],
-    endDateTime: json['endDateTime'],
-    minAttendanceTime: json['minAttendanceTime'],
-    seats: json['seats'],
-    attended: json['Attended'],
-    attenders: json['Attenders'],
-    orgId: json['orgId'],
-    eventMembers: json['eventMembers'],
-    eventCerts: json['eventCerts'],
-    blackListed: json['blackListed'],
-  );
-}
-
-// Event toUser(Map<String, dynamic> json) {
-//   return User(
-//     eventBackgroundPic: json['eventBackgroundPic']['url'],
-//     sig: json['sig']['url'],
-//     id: json['_id'],
-//     title: json['title'],
-//     description: json['description'],
-//     location: json['location'],
-//     status: json['status'],
-//     eventType: json['eventType'],
-//     startDateTime: json['startDateTime'],
-//     endDateTime: json['endDateTime'],
-//     minAttendanceTime: json['minAttendanceTime'],
-//     seats: json['seats'],
-//     attended: json['Attended'],
-//     attenders: json['Attenders'],
-//     orgId: json['orgId'],
-//     eventMembers: json['eventMembers'],
-//     eventCerts: json['eventCerts'],
-//     blackListed: json['blackListed'],
-//   );
-// }
 
 buildTitle(
   String textOne,
@@ -532,10 +482,84 @@ String timeTo12(String date) {
   return formatter.format(dateTime);
 }
 
-void showOnMap(BuildContext context,String location) {
+int getTimeInMin(String date) {
+  if (DateTime.tryParse(date) == null) return 0;
+  var time = DateTime.tryParse(date);
+  return ((time!.microsecondsSinceEpoch / 1000000) / 60).floor();
+}
+
+void showOnMap(BuildContext context, String location) {
   List<String> l = getLocationList(context, location);
   String lat = l[0];
   String lng = l[1];
   Console.log("https://www.google.com/maps?q=$lat,$lng");
   launchUrl(Uri.parse('https://www.google.com/maps?q=$lat,$lng'));
+}
+
+Future<Response> QRCheckin(
+  BuildContext context,
+  String eventId,
+  int scan,
+  Future<String> Function() getString,
+) async {
+  Console.log("mode: $scan");
+  Response res = Response();
+  res = await runFun(
+    context,
+    () async {
+      if (scan == 0) {
+        return await checkIn(eventId, await getString());
+      } else {
+        return await checkOut(eventId, await getString());
+      }
+    },
+  );
+  return res;
+}
+
+int getTheme(context) {
+  return ThemeProvider.themeOf(context).id == "default_dark_theme" ? 0 : 1;
+}
+
+String? validateAttendanceTime(timeInMin, GlobalKey<FormBuilderState> formKey) {
+  DateTime start = formKey.currentState!.fields['startDateTime']!.value;
+  DateTime end = formKey.currentState!.fields['endDateTime']!.value;
+  if (int.parse(timeInMin) >
+      ((end.millisecondsSinceEpoch - start.millisecondsSinceEpoch) / 1000) /
+          60) {
+    return "Attendance Time Is Bigger Then Event Time";
+  }
+  return null;
+}
+
+bool validateStartEnd(
+    BuildContext context, GlobalKey<FormBuilderState> formKey) {
+  DateTime start = formKey.currentState!.fields['startDateTime']!.value;
+  DateTime end = formKey.currentState!.fields['endDateTime']!.value;
+
+  if (start.millisecondsSinceEpoch >= end.millisecondsSinceEpoch) {
+    snackbar(
+        context,
+        "The start time should not be later than the end time, and the event time should not be earlier than the start time",
+        2);
+    return true;
+  }
+  return false;
+}
+
+bool didFieldsChange(
+    {required BuildContext context,
+    required GlobalKey<FormBuilderState> formkey,
+    required dynamic object,
+    required Map<String, dynamic> objectMap,
+    required int org_event_user}) {
+  for (var key in objectMap.keys) {
+    if (formkey.currentState!.fields[key]?.value.toString() != objectMap[key]) {
+      return true;
+    }
+  }
+
+  if (org_event_user != 2) if (object.location !=getLocationString(context, org_event_user)) return true;
+
+  return false;
 }

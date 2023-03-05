@@ -26,42 +26,46 @@ class CustomDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
-        title: Text(bigText),
-        actionsOverflowButtonSpacing: 20,
-        actions: [
-          ElevatedButton(
-              style: const ButtonStyle(
-                backgroundColor: MaterialStatePropertyAll<Color>(
-                    Color.fromARGB(255, 14, 192, 20)),
-              ),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text("Cancel")),
-          ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStatePropertyAll<Color>(bc),
-              ),
-              onPressed: () async {
-                await runFun(
-                  context,
-                  fun,
-                );
-                if (quit) {                  
-                Provider.of<LocationProvider>(context, listen: false)
-                    .setOrgLocation(LatLng(0, 0));
-                Provider.of<LocationProvider>(context, listen: false)
-                    .setEventLocation(LatLng(0, 0));
-                await clearTokens();
-                gotoClear(context, const LoginScreen());
-                }
-              },
-              child: const Text("Continue")),
-        ],
-        content: Text(smallerText));
+    return Stack(
+      children:  [
+        ModalBarrier(dismissible: false, color: Colors.black.withOpacity(0.5)),
+        AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
+          title: Text(bigText),
+          actionsOverflowButtonSpacing: 20,
+          actions: [
+            ElevatedButton(
+                style: const ButtonStyle(
+                  backgroundColor: MaterialStatePropertyAll<Color>(
+                      Color.fromARGB(255, 14, 192, 20)),
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("Cancel")),
+            ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStatePropertyAll<Color>(bc),
+                ),
+                onPressed: () async {
+                  await runFun(
+                    context,
+                    fun,
+                  );
+                  if (quit) {                  
+                  Provider.of<LocationProvider>(context, listen: false)
+                      .setOrgLocation(LatLng(0, 0));
+                  Provider.of<LocationProvider>(context, listen: false)
+                      .setEventLocation(LatLng(0, 0));
+                  await clearTokens();
+                  gotoClear(context, const LoginScreen());
+                  }
+                },
+                child: const Text("Continue")),
+          ],
+          content: Text(smallerText))],
+    );
   }
 }
 

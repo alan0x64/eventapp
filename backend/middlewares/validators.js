@@ -3,7 +3,6 @@ const { RESPONSE, logError,logx } = require('../utils/shared_funs');
 
 const createValidationMiddlewear = (schema) => {
     return (req, res, next) => {
-        console.log(req.body)
         const { error } = schema.validate({...req.body})
         if (error) {
             logError(error)

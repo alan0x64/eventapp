@@ -19,6 +19,7 @@ class Response {
   int statusCode;
   String timeStamp;
   Map<String, dynamic> data;
+  static const errorStatus = [400, 500];
 }
 
 Future<Map<String, String>> Header(int json_or_form, String keyToAdd) async {
@@ -85,7 +86,8 @@ Future<Response> DELETE(
 }
 
 Future<Response> multipartRequest(
-    {String token = 'AT',
+    {
+    String token = 'AT',
     required Map<String, dynamic> data,
     required String url,
     required String method,
@@ -117,12 +119,13 @@ Future<Response> multipartRequest(
       );
       request.files.add(pic2);
     }
-    
+
     request = addFields(request, data);
 
     for (String key in headers.keys) {
       request.headers[key] = headers[key] as String;
     }
+
     return encodeRES(await http.Response.fromStream(await request.send()));
   } catch (e) {
     Console.log(e);

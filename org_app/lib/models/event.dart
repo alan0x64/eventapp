@@ -64,25 +64,40 @@ class Event {
   });
 }
 
-Event event(res) {
+Event toEvent(Map<String, dynamic> json) {
   return Event(
-    eventBackgroundPic: res['eventBackgroundPic'],
-    sig: res['sig'],
-    title: res['title'],
-    description: res['description'],
-    location: res['location'],
-    status: res['status'],
-    eventType: res['eventType'],
-    startDateTime: res['startDateTime'],
-    endDateTime: res['endDateTime'],
-    minAttendanceTime: res['minAttendanceTime'],
-    seats: res['seats'],
-    attenders: res['Attenders'],
-    attended: res['Attended'],
-    eventMembers: res['eventMembers'],
-    eventCerts: res['eventCerts'],
-    blackListed: res['blackListed'],
+    eventBackgroundPic: json['eventBackgroundPic']['url'],
+    sig: json['sig']['url'],
+    id: json['_id'],
+    title: json['title'],
+    description: json['description'],
+    location: json['location'],
+    status: json['status'],
+    eventType: json['eventType'],
+    startDateTime: json['startDateTime'],
+    endDateTime: json['endDateTime'],
+    minAttendanceTime: json['minAttendanceTime'],
+    seats: json['seats'],
+    attended: json['Attended'],
+    attenders: json['Attenders'],
+    orgId: json['orgId'],
+    eventMembers: json['eventMembers'],
+    eventCerts: json['eventCerts'],
+    blackListed: json['blackListed'],
   );
+}
+
+Map<String, dynamic> eventToMap(Event event) {
+  return {
+    'title': event.title,
+    'description': event.description,
+    'eventType': event.eventType.toString(),
+    'startDateTime':event.startDateTime,
+    'endDateTime':event.endDateTime,
+    'minAttendanceTime':event.minAttendanceTime.toString(),
+    'seats': event.seats.toString(),
+    'location': event.location,
+  };
 }
 
 //GET
@@ -90,13 +105,12 @@ Future<Response> getEventInfo(String eventId) async {
   return await GET('$devServer/event/info/$eventId', 0, 'AT');
 }
 
-Future<Response> genUserCert(String userId, String eventId) async {
-  Console.log('$devServer/event/certificate/$userId/$eventId');
-  return await GET('$devServer/event/certificate/$userId/$eventId', 0, 'AT');
-}
-
 Future<Response> getEventMembers(String eventId) async {
   return await GET('$devServer/event/members/$eventId', 0, 'AT');
+}
+
+Future<Response> getAttenders(String eventId) async {
+  return await GET('$devServer/event/attenders/$eventId', 0, 'AT');
 }
 
 Future<Response> getBlacklistMembers(String eventId) async {
@@ -108,13 +122,13 @@ Future<Response> createEvent(Map<String, dynamic> data) async {
   return await POST('$devServer/event/register', 1, 'AT', data);
 }
 
-Future<Response> genCerts(String eventId) async {
-  return await POST('$devServer/event/cert/$eventId', 0, 'AT', {});
-}
-
 //PATCH
 Future<Response> updateEvent(String eventId, Map<String, dynamic> data) async {
   return await PATCH('$devServer/event/update/$eventId', 0, 'AT', data);
+}
+
+Future<Response> removeUser(String userId, String eventId) async {
+  return await PATCH('$devServer/event/$userId/$eventId', 0, 'AT', {});
 }
 
 //DELETE
@@ -124,21 +138,21 @@ Future<Response> deleteEvent(String eventId) async {
 
 http.MultipartRequest addEventFields(
     {required http.MultipartRequest request,
-    required Map<String, dynamic> data}) {
+    required Map<String, dynamic> data,
+    bool onlyfields=false}) {
   request.fields['title'] = data['title'];
   request.fields['description'] = data['description'];
   request.fields['seats'] = data['seats'].toString();
-  request.fields['status'] = data['status'].toString();
   request.fields['eventType'] = data['eventType'].toString();
   request.fields['minAttendanceTime'] = data['minAttendanceTime'].toString();
   request.fields['startDateTime'] = data['startDateTime'].toString();
   request.fields['endDateTime'] = data['endDateTime'].toString();
   request.fields['location'] = data['location'].toString();
-
   return request;
 }
 
-Future<dynamic> updateEventStatus(BuildContext context,Event eventdata,int status) async {
+Future<dynamic> updateEventStatus(
+    BuildContext context, Event eventdata, int status) async {
   return await runFun(
     context,
     () async {

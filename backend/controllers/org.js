@@ -7,8 +7,9 @@ const user = require("../models/user")
 const cert = require("../models/cert")
 const token_collection = require("../models/token")
 const { hashSync, compareSync } = require('bcrypt')
-const { RESPONSE, deleteImages, logx } = require('../utils/shared_funs')
-const { deleteSingleEvent } = require("./event")
+const { RESPONSE, deleteImages, logx, userSearchFields, getUsersInCerts, searchFor } = require('../utils/shared_funs')
+const { deleteSingleEvent, autoEvent } = require("./event")
+
 
 function orgImages(req, orgx = {}) {
     const orgPic = {
@@ -83,7 +84,7 @@ module.exports.deleteOrg = async (req, res) => {
     let orgx = await org.findByIdAndDelete(orgId)
 
     orgx.orgEvents.forEach(eventId => {
-        deleteSingleEvent(eventId)
+        deleteSingleEvent(req, eventId)
     });
 
     await token_collection.deleteMany({ 'orgId': orgId })
@@ -98,13 +99,13 @@ module.exports.updatePassword = async (req, res) => {
     logx(req.body.cuurentPassword)
     logx(req.body.newPassword)
 
-    if (!compareSync(req.body.cuurentPassword, orgx.password)) 
-    return RESPONSE(res, 400, "Incorrect Current Password")
+    if (!compareSync(req.body.cuurentPassword, orgx.password))
+        return RESPONSE(res, 400, "Incorrect Current Password")
 
     await orgx.updateOne({
         password: hashSync(req.body.newPassword, 12)
     })
-    
+
     RESPONSE(res, 200, "Password Updated")
 }
 
@@ -172,20 +173,17 @@ module.exports.logout = async (req, res) => {
     RESPONSE(res, 200, "Loged Out")
 }
 
-module.exports.BLUser = async (req, res) => {
+module.exports.BLUser = async (req, res, blockmode) => {
+    if (blockmode == null) blockmode = true
+
     let userId = req.params.userId
     let eventId = req.params.eventId
 
     let eventx = await event.findById(eventId)
     let userx = await user.findById(userId)
 
-    if (eventx.blackListed.includes(userId)) return RESPONSE(res, 200, 'User Is Already Blcoked')
-
-    if (!userx.joinedEvents.includes(eventId)) return RESPONSE(res, 200, 'User Did Join Event')
-
-    await user.findByIdAndUpdate(userId, {
-        "$pull": { 'joinedEvents': eventId }
-    })
+    if (eventx.blackListed.includes(userId)) return RESPONSE(res, 200, 'User Is Blcoked')
+    if (!userx.joinedEvents.includes(eventId)) return RESPONSE(res, 200, 'User Did Not Join Event')
 
     let certx = await cert.findOneAndDelete({
         userId: userx._id,
@@ -195,23 +193,25 @@ module.exports.BLUser = async (req, res) => {
 
     let certs = await cert.find({ 'eventId': eventx._id, 'orgId': eventx.orgId })
 
-    //check if de attenders or attedeeded
-    if (certx.allowCert) {
-        await eventx.updateOne({
-            "$push": { 'blackListed': userx._id },
-            "$pull": { 'eventMembers': userx._id },
-            "$pull": { eventCerts: certx._id },
-            "$inc": { Attended: -1 },
-            Attenders: certs.length,
-        })
-    } else {
-        await eventx.updateOne({
-            "$push": { 'blackListed': userx._id },
-            "$pull": { 'eventMembers': userx._id },
-            Attenders: certs.length,
-        })
+    updatebody = {
+        "$pull": { 'eventMembers': userx._id },
+        Attenders: certs.length,
+        "$push": {},
     }
 
+    if (certx) updatebody["$pull"]['eventCerts'] = certx._id
+    if (blockmode) updatebody["$push"]['blackListed'] = userx._id
+    if (certx && certx.allowCert) updatebody['Attended'] = (await cert.find({
+        'eventId': eventx._id
+    })).length
+
+    await user.findByIdAndUpdate(userId, {
+        "$pull": { 'joinedEvents': eventId }
+    })
+
+    await eventx.updateOne(updatebody)
+
+    if (!blockmode) return RESPONSE(res, 200, "User Removed")
     RESPONSE(res, 200, "User Blocked")
 }
 
@@ -233,12 +233,34 @@ module.exports.getOrgEvents = async (req, res) => {
     let orgId = req.logedinOrg.id
     let orgx = await org.findById(orgId).populate('orgEvents')
     if (orgx.length == 0) return RESPONSE(res, 400, "Org Not Found")
-    RESPONSE(res, 200, {"events":orgx.orgEvents})
+    orgx.orgEvents.forEach(async event => {
+        await autoEvent(req, res, event.id)
+    });
+    RESPONSE(res, 200, { "events": orgx.orgEvents })
 }
 
 module.exports.getParticularOrgEvents = async (req, res) => {
     let orgId = req.params.orgId
     let orgx = await org.findById(orgId).populate('orgEvents')
     if (orgx.length == 0) return RESPONSE(res, 400, "Org Not Found")
-    RESPONSE(res, 200, {"events":orgx.orgEvents})
+    RESPONSE(res, 200, { "events": orgx.orgEvents })
 }
+
+
+module.exports.search = async (req, res) => {
+
+    console.log(req.body)
+
+    let { eventId, fieldValue, lnum, fnum } = req.body
+    let eventx = await event.findById(eventId).populate("eventCerts")
+
+    let lists = [
+        getUsersInCerts(eventx.eventCerts),
+        eventx.eventMembers,
+        eventx.blackListed
+    ]
+
+    let userx = await searchFor(user, lists[lnum], userSearchFields[fnum], fieldValue)
+    return RESPONSE(res, 200, { 'members': userx })
+}
+

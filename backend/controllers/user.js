@@ -6,9 +6,9 @@ const event = require("../models/event")
 const cert = require("../models/cert")
 const token_collection = require("../models/token")
 const { hashSync, compareSync } = require('bcrypt')
-const { RESPONSE, deleteImages } = require('../utils/shared_funs')
+const { RESPONSE, deleteImages, getUsersInCerts, searchFor, userSearchFields, logx } = require('../utils/shared_funs')
 
-function userImages(req, userx = {},cert={}) {
+function userImages(req, userx = {}, cert = {}) {
     const profilePic = {
         fileName: req.profilePic,
         url: `${process.env.HOST}:${process.env.PORT}/uploads/users/${req.profilePic}`
@@ -19,14 +19,14 @@ function userImages(req, userx = {},cert={}) {
     const imagesToDelete = [
         path.join(`${__dirname}/..`, `/images/users/${userx.profilePic.fileName}`)
     ]
-    
-    if (Object.keys(cert).length == 0)  return { profilePic, imagesToDelete }
-    
-    const certToDelete=[
+
+    if (Object.keys(cert).length == 0) return { profilePic, imagesToDelete }
+
+    const certToDelete = [
         path.join(`${__dirname}/..`, `/public/certs/${cert.fileName}`)
     ]
 
-    return { profilePic, imagesToDelete ,certToDelete}
+    return { profilePic, imagesToDelete, certToDelete }
 }
 
 
@@ -48,7 +48,7 @@ module.exports.updateUser = async (req, res) => {
         password: hashSync(req.body.password, 12)
     })
     deleteImages(userImages(req, userx).imagesToDelete)
-    RESPONSE(res,200,"User Updated")
+    RESPONSE(res, 200, "User Updated")
 }
 
 
@@ -56,49 +56,50 @@ module.exports.deleteUser = async (req, res) => {
     let userId = req.logedinUser.id
     let userx = await user.findByIdAndDelete(userId)
 
-    if  (userx.length==0) return RESPONSE(res,400,"User Does Not Exist")
+    if (userx.length == 0) return RESPONSE(res, 400, "User Does Not Exist")
 
 
     // Remove User From all events 
-    let events=await event.find({
-        $or:[
-            {'eventMembers':userId},
-            {'blackListed':userId},
+    let events = await event.find({
+        $or: [
+            { 'eventMembers': userId },
+            { 'blackListed': userId },
         ]
     })
 
     events.forEach(async event => {
-        let certx=await (cert.findOne({'userId':userId,'eventId':event._id,'orgId':event.orgId})).deleteOne()
-        let certs=await cert.find({'eventId':event._id,'orgId':event.orgId})
+        let certx = await (cert.findOne({ 'userId': userId, 'eventId': event._id, 'orgId': event.orgId })).deleteOne()
+        let certs = await cert.find({ 'eventId': event._id, 'orgId': event.orgId })
         if (certx.allowCert) {
             await event.updateOne({
-                $inc:{Attended:-1},
-                $inc:{Attenders:certs.length},
-                $pull:{'eventMembers':userId},
-                $pull:{'eventCerts':userId},
-                $pull:{'blackListed':userId},
+                Attended: (await cert.find({
+                    'eventId': event._id
+                })).length,
+                $inc: { Attenders: certs.length },
+                $pull: { 'eventMembers': userId },
+                $pull: { 'eventCerts': userId },
+                $pull: { 'blackListed': userId },
             })
-        }else{
+        } else {
             await event.updateOne({
-                $inc:{Attenders:certs.length},
-                $pull:{'eventMembers':userId},
-                $pull:{'eventCerts':userId},
-                $pull:{'blackListed':userId},
+                $inc: { Attenders: certs.length },
+                $pull: { 'eventMembers': userId },
+                $pull: { 'eventCerts': userId },
+                $pull: { 'blackListed': userId },
             })
         }
-        deleteImages(userImages(req,user,certx).certToDelete)
-     });
+        deleteImages(userImages(req, user, certx).certToDelete)
+    });
 
 
     deleteImages(userImages(req, userx).imagesToDelete)
     await token_collection.deleteMany({ 'userId': userId })
-    RESPONSE(res,200,"User Deleted")
+    RESPONSE(res, 200, "User Deleted")
 }
 
 module.exports.getUser = async (req, res) => {
     let data = await user.findOne({ '_id': req.params.id })
     if (data.length == 0) return RESPONSE(res, 400, { error: 'User Not Found' })
-    console.log(data);
     RESPONSE(res, 200, data)
 }
 
@@ -110,8 +111,8 @@ module.exports.login = async (req, res) => {
 
     let loginUser = await user.findOne({ 'email': req.body.email })
 
-    if (!loginUser) return RESPONSE(res,400,"User Not Found")
-    if (!compareSync(req.body.password, loginUser.password)) return RESPONSE(res,400,"Incorrect Email or Password")
+    if (!loginUser) return RESPONSE(res, 400, "User Not Found")
+    if (!compareSync(req.body.password, loginUser.password)) return RESPONSE(res, 400, "Incorrect Email or Password")
 
 
     const AT = jwt.sign({
@@ -144,8 +145,8 @@ module.exports.logout = async (req, res) => {
         'RT': req.RT
     })
 
-    if (data.length == 0)  return RESPONSE(res, 400, "Not Logedin")
-    
+    if (data.length == 0) return RESPONSE(res, 400, "Not Logedin")
+
     await token_collection.deleteMany({
         'userId': req.logedinUser.id,
         'RT': req.RT
@@ -160,10 +161,10 @@ module.exports.AddUserToEvent = async (req, res) => {
     let eventId = req.params.eventId
     let eventx = await event.findById(eventId)
 
-    if (eventx.blackListed.includes(userId)) return RESPONSE(res,200,"User Is Blocked")
-    if (eventx.eventMembers.includes(userId)) return RESPONSE(res,200,"User Already Joined Event")
+    if (eventx.blackListed.includes(userId)) return RESPONSE(res, 200, "User Is Blocked")
+    if (eventx.eventMembers.includes(userId)) return RESPONSE(res, 200, "User Already Registred")
 
-    
+
     await event.findOneAndUpdate(eventId, {
         "$push": { eventMembers: userId },
     })
@@ -172,7 +173,7 @@ module.exports.AddUserToEvent = async (req, res) => {
         "$push": { joinedEvents: eventId }
     })
 
-    RESPONSE(res,200,"User Added To Event")
+    RESPONSE(res, 200, "Registred")
 }
 
 module.exports.RemoveUserFromEvent = async (req, res) => {
@@ -182,7 +183,7 @@ module.exports.RemoveUserFromEvent = async (req, res) => {
     let eventx = await event.findById(eventId)
     let userx = await user.findById(userId)
 
-    if (eventx.eventMembers.includes(userId) && userx.joinedEvents.includes(userId)) return RESPONSE(res,200,"User Is Not Event Member")
+    if (eventx.eventMembers.includes(userId) && userx.joinedEvents.includes(userId)) return RESPONSE(res, 200, "User Is Not Event Member")
 
     await eventx.updateOne({
         "$pull": { eventMembers: userId },
@@ -206,7 +207,7 @@ module.exports.getCertificate = async (req, res) => {
     let eventId = req.params.eventId
 
     let eventx = await event.findById(eventId).populate('eventCerts')
-    
+
     if (eventx.length == 0) return RESPONSE(res, 400, { 'error': "Event Not Found" })
 
     eventx.eventCerts.forEach(cert => {
@@ -217,6 +218,24 @@ module.exports.getCertificate = async (req, res) => {
 }
 
 
-module.exports.getJoinedEvents=async (req,res)=>{
-    return RESPONSE(res,200,{'events':(await user.findById(req.logedinUser._id).populate('joinedEvents')).joinedEvents})
+module.exports.getJoinedEvents = async (req, res) => {
+    return RESPONSE(res, 200, { 'events': (await user.findById(req.logedinUser._id).populate('joinedEvents')).joinedEvents })
 }
+
+module.exports.search = async (req, res) => {
+
+    console.log(req.body)
+
+    let { eventId, fieldValue, lnum, fnum } = req.body
+    let eventx = await event.findById(eventId).populate("eventCerts")
+
+    let lists = [
+        getUsersInCerts(eventx.eventCerts),
+        eventx.eventMembers,
+        eventx.blackListed
+    ]
+
+    let userx = await searchFor(user, lists[lnum], userSearchFields[fnum], fieldValue)
+    return RESPONSE(res, 200, { 'members': userx })
+}
+

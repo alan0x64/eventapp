@@ -6,28 +6,53 @@ const event = require("../models/event")
 const certPath = fireadmin.credential.cert(serviceAccount)
 var FCM = new fcm(certPath)
 
-module.exports.notficationSender =  async (req, res, next) =>  {
+module.exports.notficationSender = async (req, res, sendRes) => {
+    if (sendRes == null) sendRes = 1
     try {
-        let eventId=req.body.eventId
-        let eventx=await event.findById(eventId)
-        let message={
-            android:{
-                notification:{
-                    title:`A Event Has Started`,
-                    body:`${eventx.title} Has Started`,
-                    sound:"default"
-                },    
-            },
-            data:{
-              eventId:eventId, 
-              eventTitle:eventx.title
-            },
-        topic:eventx.id,
+        let eventId = req.body.eventId || req.params.eventId
+        let eventx = await event.findById(eventId)
+
+        notification = {
+            title: `A Event Has Started`,
+            body: `${eventx.title} Has Started`,
+            sound: "default"
         }
-        
-        FCM.send(message,()=>{})
-        RESPONSE(res,200,{'eventId':eventx.id,'eventTitle':eventx.title})
+
+        if (eventx.status == 2) {
+            notification['title'] = 'A Event Has Just Ended',
+                notification['body'] = `${eventx.title} Has Ended`
+        }
+
+
+        let message = {
+            android: { notification },
+            data: {
+                eventId: eventId,
+                eventTitle: eventx.title,
+                ...notification
+            },
+            topic: eventx.id,
+        }
+
+        FCM.send(message, () => { })
+        if (sendRes)
+            return RESPONSE(res, 200, 'Notification Send!')
     } catch (err) {
         logx(err);
+        if (sendRes)
+            return RESPONSE(res, 200, `Error while trying to send notification`)
+    }
+}
+
+
+module.exports.unsubscribeNotification = async (req, res, next) => {
+    try {
+        let topic = req.body.eventId
+        let token = req.body.devId
+        FCM.unsubscribeFromTopic(token, topic, () => { })
+        RESPONSE(res, 200, `Unsubscribed ${token} From ${topic}`)
+    } catch (err) {
+        logx(err);
+        RESPONSE(res, 200, `Error while trying to unsubscribed`)
     }
 }

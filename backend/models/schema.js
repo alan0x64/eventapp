@@ -96,7 +96,6 @@ const validEventSchema = joi.object({
     endDateTime: joi.string().required().error(new Error('Invalid End Date&Time')),
     minAttendanceTime: joi.number().min(0).default(0).error(new Error('Invalid Minimum Attendance Time')),
     seats: joi.number().min(1).default(1).error(new Error('Invalid Number Of Seats')),
-    onlyFields: joi.bool().required().error(new Error('Invalid ONLYFIELDS')),
 });
 
 const validCheckInOutSchema = joi.object({

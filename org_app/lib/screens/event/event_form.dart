@@ -16,11 +16,11 @@ import '../../widgets/textfield.dart';
 
 class EventForm extends StatefulWidget {
   Event eventdata;
-  String mainButtonText;
   bool createMod;
   bool editMode;
   bool hideinit;
   bool showReset;
+  bool showResetSelector;
   VoidCallback resetSelectors;
   VoidCallback resetForm;
   dynamic Function(String timeInMin) timeValidator;
@@ -28,10 +28,10 @@ class EventForm extends StatefulWidget {
   EventForm({
     super.key,
     this.eventdata = const Event(),
-    this.mainButtonText = "Save",
     this.createMod = true,
     this.hideinit = true,
     this.showReset = false,
+    this.showResetSelector = false,
     this.editMode = true,
     required this.resetSelectors,
     required this.resetForm,
@@ -52,7 +52,7 @@ class _EventFormState extends State<EventForm> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            if (widget.showReset)
+            if (widget.showResetSelector)
               ElevatedButton(
                   onPressed: widget.resetSelectors,
                   child: const Text(
@@ -98,12 +98,13 @@ class _EventFormState extends State<EventForm> {
                 child: const Text("Type Digital Signiture")),
           ],
         ),
-        ElevatedButton(
-            onPressed: widget.resetForm,
-            child: const Text(
-              "Reset Form",
-              style: TextStyle(fontSize: 14),
-            )),
+        if (widget.showReset)
+          ElevatedButton(
+              onPressed: widget.resetForm,
+              child: const Text(
+                "Reset Form",
+                style: TextStyle(fontSize: 14),
+              )),
         const SizedBox(
           height: 25,
         ),
@@ -154,34 +155,21 @@ class _EventFormState extends State<EventForm> {
                         borderRadius: BorderRadius.circular(8)),
                   ),
                   items: [
-                    DropdownMenuItem(value: 0, child: Text(Event.eventTypeList[0]),),
-                    DropdownMenuItem(value: 1, child: Text(Event.eventTypeList[1])),
-                  ]),
-              const SizedBox(
-                height: 25,
-              ),
-              const Text(
-                "Status",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              const SizedBox(
-                height: 7,
-              ),
-              FormBuilderDropdown(
-                  initialValue: widget.eventdata.status,
-                  name: 'status',
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8)),
-                  ),
-                  items: [
-                    DropdownMenuItem(value: 0, child: Text(Event.eventStatusList[0])),
+                    DropdownMenuItem(
+                      value: 0,
+                      child: Text(Event.eventTypeList[0]),
+                    ),
+                    DropdownMenuItem(
+                        value: 1, child: Text(Event.eventTypeList[1])),
                   ]),
               const SizedBox(
                 height: 25,
               ),
               AppDateTImePicker(
-                init: DateTime.tryParse(widget.eventdata.startDateTime),
+                init: getTimeInMin(widget.eventdata.startDateTime) <
+                        getTimeInMin(DateTime.now().toString())
+                    ? DateTime.now()
+                    : DateTime.tryParse(widget.eventdata.startDateTime),
                 hideinit: widget.hideinit,
                 ht: "Start Date And Time",
                 lt: "Start Date And Time",
@@ -192,7 +180,10 @@ class _EventFormState extends State<EventForm> {
                 height: 25,
               ),
               AppDateTImePicker(
-                init: DateTime.tryParse(widget.eventdata.endDateTime),
+                init: getTimeInMin(widget.eventdata.endDateTime) <
+                        getTimeInMin(DateTime.now().toString())
+                    ? DateTime.now()
+                    : DateTime.tryParse(widget.eventdata.endDateTime),
                 hideinit: widget.hideinit,
                 ht: "End Date And Time",
                 lt: "End Date And Time",
@@ -216,7 +207,7 @@ class _EventFormState extends State<EventForm> {
                     FormBuilderValidators.integer(),
                     FormBuilderValidators.min(0),
                     (p0) {
-                       return widget.timeValidator(p0 as String);
+                      return widget.timeValidator(p0 as String);
                     }
                   ]),
               const SizedBox(

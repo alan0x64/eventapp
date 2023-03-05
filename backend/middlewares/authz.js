@@ -18,7 +18,7 @@ module.exports.onlyUsers = catchFun(
 )
 
 module.exports.onlyOrgs = catchFun(
-    async function (req, res, next) {        
+    async function (req, res, next) {
         if (req.logedinUser) {
             res.sendStatus(401)
             return
@@ -40,7 +40,7 @@ module.exports.isOrgEventOwner = catchFun(
             next()
             return
         }
-        let eventId = req.params.eventId || req.body.eventId 
+        let eventId = req.params.eventId || req.body.eventId
         let orgx = await org.findById(req.logedinOrg.id)
         orgx.orgEvents.includes(eventId) ? next() : res.sendStatus(401)
     }

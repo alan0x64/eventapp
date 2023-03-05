@@ -1,28 +1,21 @@
-
 import 'package:flutter/material.dart';
 import 'package:org/utilities/shared.dart';
 
+import '../models/user.dart';
 import '../screens/users/user_view.dart';
 
 class UserCard extends StatelessWidget {
-  final String name;
-  final String email;
-  final String imageUrl;
-  final String userId;
-  final String phoneNumber;
+  final User user;
   final String eventId;
-  final bool blacklist ;
+  final bool showControl;
+  final bool blacklist;
 
-
-
-  const UserCard({super.key, 
-    required this.userId,
-    required this.name,
-    required this.email,
-    required this.phoneNumber,
-    required this.imageUrl,
+  const UserCard({
+    super.key,
+    required this.user,
     required this.eventId,
     this.blacklist=false,
+    this.showControl=true,
   });
 
   @override
@@ -37,11 +30,14 @@ class UserCard extends StatelessWidget {
         ),
         child: InkWell(
           onTap: () {
-            goto(context, UserProfilePage(
-              userId: userId, 
-              eventId: eventId,
-              blacklist: blacklist,
-              ));
+            goto(
+                context,
+                UserProfilePage(
+                  userId: user.id,
+                  eventId: eventId,
+                  blacklist: blacklist,
+                  showControl: showControl,
+                ));
           },
           child: Row(
             children: <Widget>[
@@ -49,7 +45,7 @@ class UserCard extends StatelessWidget {
                 margin: const EdgeInsets.all(16),
                 child: CircleAvatar(
                   radius: 30,
-                  backgroundImage: NetworkImage(imageUrl),
+                  backgroundImage: NetworkImage(user.profilePic),
                 ),
               ),
               Expanded(
@@ -58,8 +54,8 @@ class UserCard extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     Text(
-                      name,
-                      style:  const TextStyle(
+                      user.fullName,
+                      style: const TextStyle(
                         fontSize: 20,
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
@@ -67,14 +63,14 @@ class UserCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      email,
+                      user.email,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
                       ),
                     ),
                     Text(
-                      phoneNumber,
+                      user.phoneNumber,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,

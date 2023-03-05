@@ -3,12 +3,12 @@ const file = require("./file");
 
 const certificateSchema = new mongoose.Schema({
     checkInTime: {
-        type: Date,
-        default: new Date(0),
+        type: Number,
+        default: 0,
     },
     checkOutTime: {
-        type: Date,
-        default: new Date(0),
+        type: Number,
+        default: 0,
     },
     allowCert: {
         type: Boolean,

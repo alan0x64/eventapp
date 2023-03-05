@@ -61,6 +61,7 @@ dependencies:
   awesome_notifications: ^0.7.4+1
   mobile_scanner: ^3.0.0
   qr_code_scanner: ^1.0.1
+  search_page: ^2.3.0
 
 dev_dependencies:
   flutter_test:

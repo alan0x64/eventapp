@@ -1,30 +1,32 @@
 // ignore_for_file: use_build_context_synchronously
-
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:org/models/event.dart';
 import 'package:org/models/org.dart';
 import 'package:org/models/user.dart';
 import 'package:org/net/HTTP.dart';
+import 'package:org/utilities/notofocation.dart';
 import 'package:org/utilities/shared.dart';
 import 'package:org/widgets/dialog.dart';
 import 'package:org/widgets/future_builder.dart';
 
-import '../event/view_event.dart';
+import '../../models/cert.dart';
 
 class UserProfilePage extends StatefulWidget {
   final String userId;
   final String eventId;
   final bool blacklist;
+  final bool userview;
+  final bool showControl;
 
-  const UserProfilePage(
-      {
-      super.key,
-      required this.userId,
-      required this.eventId,
-      required this.blacklist
-      });
+  const UserProfilePage({
+    super.key,
+    required this.userId,
+    required this.eventId,
+    required this.blacklist,
+    this.userview = false,
+    this.showControl = true,
+  });
   @override
   State<UserProfilePage> createState() {
     return _UserProfilePageState();
@@ -37,6 +39,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    Console.log(widget.showControl);
     return BuildFuture(
       callback: () => getUser(widget.userId),
       mapper: (resData) => toUser(resData.data),
@@ -209,81 +212,106 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             width: 3,
                           ),
                           if (!widget.blacklist)
-                            Container(
-                              width: double.infinity,
-                              margin:
-                                  const EdgeInsets.symmetric(horizontal: 25),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                children: [
-                                  ElevatedButton(
-                                      onPressed: () async {
-                                        showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return CustomDialog(
-                                              bigText:
-                                                  "Sure Wanna Genrate Cetificate For this user ?",
-                                              smallerText:
-                                                  "This will be considered an exception for this user",
-                                              fun: () async {
-                                                Response res = await runFun(
-                                                  context,
-                                                  () => genUserCert(userx!.id,
-                                                      widget.eventId),
-                                                );
-                                                if (res.data['msg'] == null) {
-                                                  snackbar(context,
-                                                      "Somthing Went Wrong", 2);
-                                                }
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                ElevatedButton(
+                                    onPressed: () async {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return CustomDialog(
+                                            bigText:
+                                                "Sure Wanna Genrate Cetificate For this user ?",
+                                            smallerText:
+                                                "This will be considered an exception for this user",
+                                            fun: () async {
+                                              Response res = await runFun(
+                                                context,
+                                                () => genUserCert(
+                                                    userx!.id, widget.eventId),
+                                              );
+                                              if (res.data['msg'] == null) {
                                                 snackbar(context,
-                                                    res.data['msg'], 2);
-                                                Navigator.pop(context);
-                                                return Future.value(res);
-                                              },
-                                            );
-                                          },
-                                        );
-                                      },
-                                      child: const Text("Genrate Certificate")),
-                                  ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.red),
-                                      onPressed: () async {
-                                        showDialog(
-                                            context: context,
-                                            builder: (context) => CustomDialog(
-                                                  bigText:
-                                                      "You Sure Wanna Block This User?",
-                                                  smallerText:
-                                                      "Blokcing This User Will Remove Him From The Event",
-                                                  fun: () async {
-                                                    Response res = await runFun(
-                                                        context,
-                                                        () => blockUser(
-                                                            userx!.id,
-                                                            widget.eventId));
-                                                    snackbar(context,
-                                                        res.data['msg'], 3);
-                                                    if (res.statusCode == 200) {
-                                                      gotoClear(
-                                                          context,
-                                                          ViewEvent(
-                                                            eventId:
-                                                                widget.eventId,
-                                                          ));
-                                                    }
-                                                return Future.value(res);
-                                                  },
-                                                ));
-                                      },
-                                      child: const Text("Block")),
-                                ],
-                              ),
+                                                    "Somthing Went Wrong", 2);
+                                              }
+                                              snackbar(
+                                                  context, res.data['msg'], 2);
+                                              Navigator.pop(context);
+                                              return Future.value(res);
+                                            },
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: const Text("Genrate Certificate")),
+                              ],
+                            ),
+                          if (widget.showControl)
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            const Color.fromARGB(255, 206, 187, 17)),
+                                    onPressed: () async {
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) => CustomDialog(
+                                                bigText:
+                                                    "You Sure Wanna Remove This User?",
+                                                smallerText:
+                                                    "User will need to register again",
+                                                fun: () async {
+                                                  Response res = await runFun(
+                                                      context,
+                                                      () => removeUser(
+                                                          userx!.id,
+                                                          widget.eventId));
+                                                  snackbar(context,
+                                                      res.data['msg'], 3);
+                                                  if (res.statusCode == 200) {
+                                                    await unsubscribeFromTopic(
+                                                        widget.eventId);
+                                                    moveBack(context, 3);
+                                                  } else {
+                                                    Navigator.pop(context);
+                                                  }
+                                                  return Future.value(res);
+                                                },
+                                              ));
+                                    },
+                                    child: const Text("Remove User")),
+                                ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.red),
+                                    onPressed: () async {
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) => CustomDialog(
+                                                bigText:
+                                                    "You Sure Wanna Block This User?",
+                                                smallerText:
+                                                    "Blokcing This User Will Remove Him From The Event",
+                                                fun: () async {
+                                                  Response res = await runFun(
+                                                      context,
+                                                      () => blockUser(userx!.id,
+                                                          widget.eventId));
+                                                  snackbar(context,
+                                                      res.data['msg'], 3);
+                                                  if (res.statusCode == 200) {
+                                                    await unsubscribeFromTopic(
+                                                        widget.eventId);
+                                                    moveBack(context, 3);
+                                                  }
+                                                  return Future.value(res);
+                                                },
+                                              ));
+                                    },
+                                    child: const Text("Block")),
+                              ],
                             ),
                           if (widget.blacklist)
                             ElevatedButton(
@@ -305,17 +333,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                               snackbar(
                                                   context, res.data['msg'], 3);
                                               if (res.statusCode == 200) {
-                                                gotoClear(
-                                                    context,
-                                                    ViewEvent(
-                                                      eventId: widget.eventId,
-                                                    ));
+                                                moveBack(context, 3);
                                               }
-                                                return Future.value(res);
+                                              return Future.value(res);
                                             },
                                           ));
                                 },
-                                child: const Text("Unblocked"))
+                                child: const Text("Unblock"))
                         ]),
                   ]),
             ));

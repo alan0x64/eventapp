@@ -96,7 +96,6 @@ class _AddEventState extends State<AddEvent> {
                   margin: const EdgeInsets.all(5),
                   child: EventForm(
                     eventdata: mapEvent(widget.formdata),
-                    mainButtonText: "Create",
                     createMod: widget.createMod,
                     editMode: widget.editMode,
                     hideinit: widget.hideinit,
@@ -111,20 +110,7 @@ class _AddEventState extends State<AddEvent> {
                               provider.setEventLocation(LatLng(0, 0)));
                       setState(() {});
                     },
-                    timeValidator: (timeInMin) {
-                      DateTime start =
-                          _formKey.currentState!.fields['startDateTime']!.value;
-                      DateTime end =
-                          _formKey.currentState!.fields['endDateTime']!.value;
-                      if (int.parse(timeInMin) >
-                          ((end.millisecondsSinceEpoch -
-                                      start.millisecondsSinceEpoch) /
-                                  1000) /
-                              60) {
-                        return "Attendance Time Is Bigger Then Event Time";
-                      }
-                      return null;
-                    },
+                    timeValidator: (timeInMin) => validateAttendanceTime(timeInMin, _formKey),
                   ),
                 ),
                 const Text(
@@ -171,26 +157,15 @@ class _AddEventState extends State<AddEvent> {
                           create: true,
                           formdata: getEventFromForm(context, _formKey),
                           org_event_user: 1,
-                          location: getLocationString(context, 1),
                           formKey: _formKey,
                           setState: () => setState(() {}),
                           context: context,
                           requestHandler: (data, res) async {
-                            DateTime start = _formKey
-                                .currentState!.fields['startDateTime']!.value;
-                            DateTime end = _formKey
-                                .currentState!.fields['endDateTime']!.value;
-
-                            if (start.millisecondsSinceEpoch >=
-                                end.millisecondsSinceEpoch) {
-                              snackbar(
-                                  context,
-                                  "The start time should not be later than the end time, and the event time should not be earlier than the start time",
-                                  2);
-                              return Future.value(res);
-                            }
-
-                            Response resx = await multipartRequest(
+                            if (validateStartEnd(context, _formKey)) return Future.value(res);
+                            Response resx = await runFun(
+                              context,
+                              () async {
+                                return await multipartRequest(
                               data: data,
                               method: 'POST',
                               file: widget.eventPic,
@@ -200,6 +175,8 @@ class _AddEventState extends State<AddEvent> {
                               url: "$devServer/event/register",
                               addFields: (req, data) =>
                                   addEventFields(request: req, data: data),
+                            );
+                              },
                             );
                             if (resx.statusCode == 200) {
                               widget.eventPic = null;
@@ -211,6 +188,10 @@ class _AddEventState extends State<AddEvent> {
                               widget.formdata!.clear();
                               _formKey.currentState!.reset();
                             }
+                             snackbar(
+                                  context,
+                                  resx.data['msg'],
+                                  4);
                             return resx;
                           },
                         );

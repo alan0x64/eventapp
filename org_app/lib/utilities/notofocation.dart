@@ -20,9 +20,8 @@ Future<void> initlizeFirebase() async {
 
 Future<void> handleInApp() async {
   FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-    await sendLocalNotification(
-        body: "${message.data['eventTitle']} Has Started");
-     handleLocalNotification(message);
+    await sendLocalNotification(title: "${message.data['title']}", body: "${message.data['body']}");
+    handleLocalNotification(message);
     // return await notificationHandler(message);
   });
 }
@@ -60,14 +59,19 @@ Future<void> unsubscribeFromTopic(String topic) async {
       .then((value) => Console.log("Unsubscribed To $topic"));
 }
 
+Future<void> unsubscribeDeviceFromTopic(String topic) async {
+  Response res = await DELETE("$devServer/notify", 0, 'AT',
+      {"topic": topic, 'devId': await getToken(), "eventId": topic});
+  Console.log(res.data);
+}
+
 Future<String?> getToken() async {
   return await FirebaseMessaging.instance.getToken();
 }
 
-Future<void> notifySubscribers(String topic, String eventId) async {
-  Console.log({"topic": topic, "eventId": eventId});
-  await POST(
-      "$devServer/notify", 0, 'AT', {"topic": topic, "eventId": eventId});
+Future<void> notifySubscribers(String topic, {int isFinished = 0}) async {
+  await POST("$devServer/notify", 0, 'AT',
+      {"topic": topic, "eventId": topic, 'isFinished': isFinished});
 }
 
 Future<void> notificationHandler(RemoteMessage? message) async {
@@ -107,7 +111,7 @@ Future<void> sendLocalNotification(
           id: 1, channelKey: 'eventAlerts', title: title, body: body));
 }
 
-void handleLocalNotification(RemoteMessage? message) async{
+void handleLocalNotification(RemoteMessage? message) async {
   if (await checkOrRenewTokens() == false) return;
   if (message == null) return;
   if (message.data['eventId'].toString().isEmpty) {
