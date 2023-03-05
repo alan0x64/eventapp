@@ -34,10 +34,8 @@ class _ViewEventState extends State<ViewEvent> {
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
-      onRefresh:() async {
-        setState(() {
-          
-        });
+      onRefresh: () async {
+        setState(() {});
       },
       child: BuildFuture(
         callback: () async {
@@ -48,8 +46,8 @@ class _ViewEventState extends State<ViewEvent> {
         builder: (data) {
           Event eventdata = data;
           return Scaffold(
-            appBar:
-                buildAppBar(context, eventdata.title, button: const BackButton()),
+            appBar: buildAppBar(context, eventdata.title,
+                button: const BackButton()),
             body: ListView(
               physics: const BouncingScrollPhysics(),
               children: [
@@ -57,9 +55,15 @@ class _ViewEventState extends State<ViewEvent> {
                   children: [
                     buildcoverimage(null, eventdata.eventBackgroundPic),
                     if (eventdata.status != 2)
-                      buildEditIcon(Colors.blue,
-                          const EdgeInsets.fromLTRB(320, 155, 0, 0), false, (() {
-                        goto(context, EditEvent(eventId: eventdata.id,));
+                      buildEditIcon(
+                          Colors.blue,
+                          const EdgeInsets.fromLTRB(320, 155, 0, 0),
+                          false, (() {
+                        goto(
+                            context,
+                            EditEvent(
+                              eventId: eventdata.id,
+                            ));
                       })),
                   ],
                 ),
@@ -80,29 +84,30 @@ class _ViewEventState extends State<ViewEvent> {
                               ViewEventUser(
                                 eventId: eventdata.id,
                                 registred: true,
-                                showControl: eventdata.status == 2 ? false : true,
+                                showControl:
+                                    eventdata.status == 2 ? false : true,
                                 blacklist: false,
                               ));
                         },
                         child: const Text("Registred Users")),
-                        ElevatedButton(
-                          onPressed: () {
-                            goto(
-                                context,
-                                ViewEventUser(
-                                  eventId: eventdata.id,
-                                  blacklist: true,
-                                  showControl: false,
-                                ));
-                          },
-                          child: const Text("Blacklisted Users")),
+                    ElevatedButton(
+                        onPressed: () {
+                          goto(
+                              context,
+                              ViewEventUser(
+                                eventId: eventdata.id,
+                                blacklist: true,
+                                showControl: false,
+                              ));
+                        },
+                        child: const Text("Blacklisted Users")),
                   ],
                 ),
                 const SizedBox(
                   height: 3,
                 ),
                 Row(
-                  mainAxisAlignment:  MainAxisAlignment.spaceAround,   
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     ElevatedButton(
                         onPressed: () {
@@ -129,7 +134,8 @@ class _ViewEventState extends State<ViewEvent> {
                         xcolor: Event.eventStatusColorList[eventdata.status]),
                     buildViewInfo(
                         "EventType", Event.eventTypeList[eventdata.eventType],
-                        xcolor: Event.eventStatusColorList[eventdata.eventType]),
+                        xcolor:
+                            Event.eventStatusColorList[eventdata.eventType]),
                   ],
                 ),
                 const SizedBox(
@@ -191,7 +197,7 @@ class _ViewEventState extends State<ViewEvent> {
                               return CustomDialog(
                                 bigText: "Are You Sure Wanna Start The Event ?",
                                 smallerText:
-                                    "This Will Send Notidy All Users That This Event Started,This Action Cannot Be Undone",
+                                    "This action will notify all users that the event has started. Please note that changes to the event will be limited and irreversible",
                                 quit: false,
                                 fun: () async {
                                   Console.log(
@@ -201,10 +207,10 @@ class _ViewEventState extends State<ViewEvent> {
                                     res = await updateEventStatus(
                                         context, eventdata, 2);
                                   }
-    
+
                                   res = await updateEventStatus(
                                       context, eventdata, 1);
-    
+
                                   if (res.statusCode == 200) {
                                     await notifySubscribers(eventdata.id);
                                     Navigator.pop(context);
@@ -212,7 +218,7 @@ class _ViewEventState extends State<ViewEvent> {
                                     snackbar(context,
                                         "Event Started And Users Notified", 4);
                                   }
-    
+
                                   return await Future.value(Response());
                                 },
                               );
@@ -262,11 +268,12 @@ class _ViewEventState extends State<ViewEvent> {
                                           context, eventdata, 2);
                                       res = await runFun(
                                         context,
-                                        () async => await genCerts(eventdata.id),
+                                        () async =>
+                                            await genCerts(eventdata.id),
                                       );
                                       await notifySubscribers(eventdata.id,
                                           isFinished: 1);
-    
+
                                       Navigator.pop(context);
                                       if (res.statusCode == 200) {
                                         setState(() {});
@@ -320,10 +327,15 @@ class _ViewEventState extends State<ViewEvent> {
                 ),
                 ElevatedButton(
                     onPressed: () async {
-                       await updateEventStatus(
-                                          context, eventdata, 0);
+                     res= await updateEventStatus(context, eventdata, 0);
+                      snackbar(context, res.data['msg'], 2);
+                      setState(() {});
+                      return await Future.value();
+                    },
+                    child: const Text("Reset")),
+                ElevatedButton(
+                    onPressed: () async {
                       notifySubscribers(eventdata.id);
-                      // snackbar(context, res.data['msg'], 2);
                       return await Future.value();
                     },
                     child: const Text("notify")),

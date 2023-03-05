@@ -10,13 +10,14 @@ class EventFormImage extends StatefulWidget {
 
   final VoidCallback onClick;
   final bool isEdit;
+
   
   const EventFormImage({
     super.key, 
     required this.eventPicPath,
     required this.eventPic, 
     required this.onClick, 
-    required this.isEdit, 
+    required this.isEdit,
     });
 
   @override

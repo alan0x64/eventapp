@@ -21,6 +21,7 @@ class EventForm extends StatefulWidget {
   bool hideinit;
   bool showReset;
   bool showResetSelector;
+  int eventStatus;
   VoidCallback resetSelectors;
   VoidCallback resetForm;
   dynamic Function(String timeInMin) timeValidator;
@@ -33,6 +34,7 @@ class EventForm extends StatefulWidget {
     this.showReset = false,
     this.showResetSelector = false,
     this.editMode = true,
+    this.eventStatus=0,
     required this.resetSelectors,
     required this.resetForm,
     required this.timeValidator,
@@ -140,13 +142,16 @@ class _EventFormState extends State<EventForm> {
               const SizedBox(
                 height: 25,
               ),
+              if(widget.eventStatus==0)
               const Text(
                 "Event Type",
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
+              if(widget.eventStatus==0)
               const SizedBox(
                 height: 7,
               ),
+              if(widget.eventStatus==0)
               FormBuilderDropdown(
                   initialValue: widget.eventdata.eventType,
                   name: 'eventType',
@@ -165,6 +170,7 @@ class _EventFormState extends State<EventForm> {
               const SizedBox(
                 height: 25,
               ),
+              if(widget.eventStatus==0)
               AppDateTImePicker(
                 init: getTimeInMin(widget.eventdata.startDateTime) <
                         getTimeInMin(DateTime.now().toString())
@@ -176,9 +182,11 @@ class _EventFormState extends State<EventForm> {
                 name: 'startDateTime',
                 valis: [FormBuilderValidators.required()],
               ),
+              if(widget.eventStatus==0)
               const SizedBox(
                 height: 25,
               ),
+              if(widget.eventStatus==0)
               AppDateTImePicker(
                 init: getTimeInMin(widget.eventdata.endDateTime) <
                         getTimeInMin(DateTime.now().toString())
@@ -190,9 +198,11 @@ class _EventFormState extends State<EventForm> {
                 name: 'endDateTime',
                 valis: [FormBuilderValidators.required()],
               ),
+              if(widget.eventStatus==0)
               const SizedBox(
                 height: 25,
               ),
+              if(widget.eventStatus==0)
               AppTextbox(
                   name: 'minAttendanceTime',
                   lt: "Minium Attendance Time",
@@ -211,7 +221,7 @@ class _EventFormState extends State<EventForm> {
                     }
                   ]),
               const SizedBox(
-                height: 25,
+                height: 20,
               ),
               AppTextbox(
                   name: 'seats',

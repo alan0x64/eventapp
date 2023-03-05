@@ -7,8 +7,8 @@ const user = require("../models/user")
 const cert = require("../models/cert")
 const token_collection = require("../models/token")
 const { hashSync, compareSync } = require('bcrypt')
-const { RESPONSE, deleteImages, logx, userSearchFields, getUsersInCerts, searchFor } = require('../utils/shared_funs')
-const { deleteSingleEvent, autoEvent } = require("./event")
+const { RESPONSE, deleteImages, logx, userSearchFields, getUsersInCerts, searchFor,autoEvent } = require('../utils/shared_funs')
+const { deleteSingleEvent} = require("./event")
 
 
 function orgImages(req, orgx = {}) {
@@ -234,7 +234,7 @@ module.exports.getOrgEvents = async (req, res) => {
     let orgx = await org.findById(orgId).populate('orgEvents')
     if (orgx.length == 0) return RESPONSE(res, 400, "Org Not Found")
     orgx.orgEvents.forEach(async event => {
-        await autoEvent(req, res, event.id)
+        await autoEvent(req, res, event._id)
     });
     RESPONSE(res, 200, { "events": orgx.orgEvents })
 }

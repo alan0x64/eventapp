@@ -1,7 +1,8 @@
 const crypto = require("crypto");
 const fs = require('fs')
 const { ObjectId } = require('mongodb')
-const chalk = require("chalk")
+const chalk = require("chalk");
+const event = require("../models/event");
 
 
 const userSearchFields = [
@@ -162,6 +163,26 @@ function getUsersInCerts(certs) {
 }
 
 
+async function autoEvent(req,res,eventId){
+   let eventx = await event.findById(eventId)
+
+//    if (eventx.status != 1 && DateNowInMin() < toMin(eventx.endDateTime) && DateNowInMin() > toMin(eventx.startDateTime)) {
+//        await eventx.updateOne({
+//            'status': 1
+//        })
+//        notficationSender(req, res, 0)
+//    }
+
+//    if (eventx.status != 2 && DateNowInMin() > toMin(eventx.endDateTime)) {
+//        this.genCerts(req, res, 0)
+//        await eventx.updateOne({
+//            'status': 2
+//        })
+//        notficationSender(req, res, 0)
+//    }
+   return 
+}
+
 module.exports = {
     RESPONSE,
     validateObjectID,
@@ -176,5 +197,8 @@ module.exports = {
     userSearchFields,
     searchFor,
     getUsersInCerts,
-    toMin
+    toMin,
+    autoEvent
 }
+
+

@@ -6,7 +6,7 @@ const org = require("../models/org")
 const orgCon = require('../controllers/org')
 const cert = require("../models/cert")
 const PDF = require('pdf-lib').PDFDocument;
-const { deleteImages, DateNowInMin, attendedInMin, RESPONSE, logx, logError, toMin } = require('../utils/shared_funs');
+const { deleteImages, DateNowInMin, attendedInMin, RESPONSE, logx, logError, toMin ,autoEvent} = require('../utils/shared_funs');
 require("express")
 
 function eventImages(req, eventx = {}) {
@@ -80,14 +80,14 @@ module.exports.deleteEvent = async (req, res) => {
 module.exports.getEvent = async (req, res) => {
     let eventx = await event.findById(req.params.eventId)
     if (eventx.length == 0 || eventx == null) return RESPONSE(res, 400, "Event Does Not Exist")
-    await this.autoEvent(req,res,req.params.eventId || req.body.eventId )
+    await autoEvent(req,res,req.params.eventId || req.body.eventId )
     RESPONSE(res, 200, eventx)
 }
 
 module.exports.getEvents = async (req, res) => {
     let events=await event.find({})
     events.forEach( async event  =>  {
-        await this.autoEvent(req,res,event.id )
+        await autoEvent(req,res,event.id )
     });
     RESPONSE(res, 200, { "events": events  })
 }
@@ -415,24 +415,4 @@ module.exports.search = async (req, res) => {
 
     let userx = await searchFor(user, lists[lnum], userSearchFields[fnum], fieldValue)
     return RESPONSE(res, 200, { 'members': userx })
-}
-
-module.exports.autoEvent=async  function  (req,res,eventId)  {
-    let eventx = await event.findById(eventId)
-
-    // if (eventx.status != 1 && DateNowInMin() < toMin(eventx.endDateTime) && DateNowInMin() > toMin(eventx.startDateTime)) {
-    //     await eventx.updateOne({
-    //         'status': 1
-    //     })
-    //     notficationSender(req, res, 0)
-    // }
-
-    // if (eventx.status != 2 && DateNowInMin() > toMin(eventx.endDateTime)) {
-    //     this.genCerts(req, res, 0)
-    //     await eventx.updateOne({
-    //         'status': 2
-    //     })
-    //     notficationSender(req, res, 0)
-    // }
-    return 
 }

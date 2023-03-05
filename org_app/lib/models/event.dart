@@ -65,6 +65,9 @@ class Event {
 }
 
 Event toEvent(Map<String, dynamic> json) {
+  if (json['eventBackgroundPic'] == null) return Event();
+  if (json['sig'] == null) return Event();
+
   return Event(
     eventBackgroundPic: json['eventBackgroundPic']['url'],
     sig: json['sig']['url'],
@@ -92,9 +95,9 @@ Map<String, dynamic> eventToMap(Event event) {
     'title': event.title,
     'description': event.description,
     'eventType': event.eventType.toString(),
-    'startDateTime':event.startDateTime,
-    'endDateTime':event.endDateTime,
-    'minAttendanceTime':event.minAttendanceTime.toString(),
+    'startDateTime': event.startDateTime,
+    'endDateTime': event.endDateTime,
+    'minAttendanceTime': event.minAttendanceTime.toString(),
     'seats': event.seats.toString(),
     'location': event.location,
   };
@@ -139,7 +142,7 @@ Future<Response> deleteEvent(String eventId) async {
 http.MultipartRequest addEventFields(
     {required http.MultipartRequest request,
     required Map<String, dynamic> data,
-    bool onlyfields=false}) {
+    bool onlyfields = false}) {
   request.fields['title'] = data['title'];
   request.fields['description'] = data['description'];
   request.fields['seats'] = data['seats'].toString();
@@ -161,7 +164,6 @@ Future<dynamic> updateEventStatus(
         'startDateTime': eventdata.startDateTime,
         'endDateTime': eventdata.endDateTime,
         "status": status,
-        "onlyFields": true
       });
     },
   );

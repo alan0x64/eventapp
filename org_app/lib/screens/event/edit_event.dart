@@ -53,7 +53,6 @@ class _EditEventState extends State<EditEvent> {
     }
     super.initState();
   }
-   
 
   @override
   Widget build(BuildContext context) {
@@ -99,6 +98,7 @@ class _EditEventState extends State<EditEvent> {
                           createMod: false,
                           editMode: true,
                           hideinit: false,
+                          eventStatus: widget.event!.status,
                           showResetSelector: true,
                           showReset: false,
                           resetSelectors: () {
@@ -196,8 +196,11 @@ class _EditEventState extends State<EditEvent> {
                                       (provider) => provider
                                           .setEventLocation(LatLng(0, 0)));
                                   widget.formdata!.clear();
-                                snackbar(context, resx.data['msg'], 2);
+                                  moveBack(context, 1);
+                                  snackbar(context, "Chnages Saved", 2);
+                                  return;
                                 }
+                                  snackbar(context, resx.data['msg'], 2);
                               },
                               child: const Text(
                                 "Save",
