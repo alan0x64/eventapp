@@ -4,7 +4,12 @@ node_modules
 .env
 .*
 
-backend/images/*
+
+backend/images/orgs/background_images/*
+backend/images/orgs/org_images/*
+backend/images/events/*
+backend/images/users/*
+
 backend/public/*
 backend/config/*
 org_app/lib/env.dart

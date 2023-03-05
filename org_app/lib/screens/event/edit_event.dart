@@ -102,9 +102,15 @@ class _EditEventState extends State<EditEvent> {
                           showResetSelector: true,
                           showReset: false,
                           resetSelectors: () {
-                            widget.eventPic = null;
-                            widget.eventSig = null;
-                            setState(() {});
+                            if (widget.eventPic != null ||
+                                widget.eventSig != null) {
+                              widget.eventPic = null;
+                              widget.eventSig = null;
+                              setState(() {});
+                              return;
+                            }
+                            snackbar(
+                                context, "Nothing Is Selected To Reset", 2);
                           },
                           resetForm: () {},
                           timeValidator: (timeInMin) =>
@@ -200,7 +206,7 @@ class _EditEventState extends State<EditEvent> {
                                   snackbar(context, "Chnages Saved", 2);
                                   return;
                                 }
-                                  snackbar(context, resx.data['msg'], 2);
+                                snackbar(context, resx.data['msg'], 2);
                               },
                               child: const Text(
                                 "Save",

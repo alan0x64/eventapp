@@ -18,6 +18,8 @@ class UserProfilePage extends StatefulWidget {
   final bool blacklist;
   final bool userview;
   final bool showControl;
+  final bool showcertControl;
+
 
   const UserProfilePage({
     super.key,
@@ -26,6 +28,7 @@ class UserProfilePage extends StatefulWidget {
     required this.blacklist,
     this.userview = false,
     this.showControl = true,
+    this.showcertControl = false,
   });
   @override
   State<UserProfilePage> createState() {
@@ -215,6 +218,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
+                                if(widget.showcertControl && !widget.blacklist)
                                 ElevatedButton(
                                     onPressed: () async {
                                       showDialog(
@@ -247,7 +251,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                     child: const Text("Genrate Certificate")),
                               ],
                             ),
-                          if (widget.showControl)
+                          if (widget.showControl && !widget.blacklist)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
