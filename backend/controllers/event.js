@@ -6,7 +6,10 @@ const org = require("../models/org")
 const orgCon = require('../controllers/org')
 const cert = require("../models/cert")
 const PDF = require('pdf-lib').PDFDocument;
-const { deleteImages, DateNowInMin, attendedInMin, RESPONSE, logx, logError, toMin ,autoEvent} = require('../utils/shared_funs');
+const { deleteImages, DateNowInMin, attendedInMin, RESPONSE, logx, logError, toMin ,genCerts, userSearchFields, eventSearchFields, searchFor} = require('../utils/shared_funs');
+const autoEvent = require('../utils/auto');
+const {parseLatLon, isInsideCircle,}=require('./../utils/location')
+
 require("express")
 
 function eventImages(req, eventx = {}) {
@@ -85,11 +88,16 @@ module.exports.getEvent = async (req, res) => {
 }
 
 module.exports.getEvents = async (req, res) => {
+  
     let events=await event.find({})
-    events.forEach( async event  =>  {
-        await autoEvent(req,res,event.id )
-    });
-    RESPONSE(res, 200, { "events": events  })
+    let eventsNearUser=[]
+
+    for (const event of events) {
+        await autoEvent(req,res,event.id)
+        if (isInsideCircle(req,event.location)) eventsNearUser.push(event)
+    }
+
+    RESPONSE(res, 200, { "events": eventsNearUser  })
 }
 
 module.exports.getEventOwner = async (req, res) => {
@@ -200,74 +208,8 @@ module.exports.checkOut = async (req, res) => {
     RESPONSE(res, 200, "Checked Out")
 }
 
-module.exports.genCerts = async (req, res, sendRes) => {
-    if (sendRes == null) sendRes = 1
-    try {
-
-
-        let file = ""
-        let eventId = req.params.eventId
-        let eventx = await event.findById(eventId).populate('eventCerts')
-
-        //set paths
-        let certs = path.join(`${__dirname}/..`, `/public/certs`)
-        let sigs = path.join(`${__dirname}/..`, `/public/sigs`)
-
-        //read files
-        if (eventx.eventType == 0) {
-            file = fs.readFileSync(`${certs}/con.pdf`)
-        } else {
-            file = fs.readFileSync(`${certs}/sem.pdf`)
-        }
-
-        //check if user has 2 certs?
-        eventx.eventCerts.forEach(async currentCert => {
-            if (fs.existsSync(`${certs}/${currentCert.cert.fileName}`))
-                fs.unlink(`${certs}/${currentCert.cert.fileName}`, () => { })
-
-            if (
-                currentCert.eventId.toString() == eventx._id.toString() &&
-                currentCert.orgId.toString() == eventx.orgId.toString() &&
-                currentCert.allowCert
-            ) {
-
-                //load pdf and get page 
-                const pdf = await PDF.load(file)
-                const page = pdf.getPages()[0]
-
-                //load image 
-                const imageBuffer = fs.readFileSync(`${sigs}/${eventx.sig.fileName}`)
-
-                let userx = await user.findById(currentCert.userId)
-                let image
-
-                if (eventx.sig.fileName.substring(eventx.sig.fileName.indexOf('.') + 1) == 'jpg') {
-                    image = await pdf.embedJpg(imageBuffer)
-                } else if (eventx.sig.fileName.substring(eventx.sig.fileName.indexOf('.') + 1) == 'png') {
-                    image = await pdf.embedPng(imageBuffer)
-                }
-                else {
-                    return RESPONSE(res, 400, "The signature file either lacks a PNG or JPG extension, or it has a different extension")
-                }
-                //set text size
-                page.setFontSize(18)
-
-                //draw text
-                page.drawText(userx.fullName, { x: 270, y: 630 })
-                page.drawText(eventx.title, { x: 257, y: 570 })
-                page.drawText(new Date().toLocaleDateString(), { x: 257, y: 515 })
-
-                const { width, height } = image.scale(0.3);
-                page.drawImage(image, { x: 190, y: 410, width, height }, page)
-
-                //writeback to file system
-                fs.writeFileSync(`public/certs/${currentCert.cert.fileName}`, await pdf.save())
-            }
-        });
-        if (sendRes) RESPONSE(res, 200, "Certs Generated")
-    } catch (error) {
-        logError(error)
-    }
+module.exports.makeCerts = async (req, res) => {
+    await genCerts(req,res)   
 }
 
 
@@ -402,17 +344,38 @@ module.exports.removeUserFromEvent = async (req, res) => {
 
 module.exports.search = async (req, res) => {
 
-    console.log(req.body)
+    let { fieldValue,fnum } = req.body
+    let model,fieldToPopulate
+    let events=[]
+    let eventsNearUser=[]
 
-    let { eventId, fieldValue, lnum, fnum } = req.body
-    let eventx = await event.findById(eventId).populate("eventCerts")
 
-    let lists = [
-        getUsersInCerts(eventx.eventCerts),
-        eventx.eventMembers,
-        eventx.blackListed
-    ]
+    if (fnum>0) {
+        model=org
+        fieldToPopulate='orgEvents'
+    }else{
+        model=event
+        fieldToPopulate=''
+    }
+    
+    
+    let data = await searchFor(model,null,eventSearchFields[fnum], fieldValue,fieldToPopulate)
+    
 
-    let userx = await searchFor(user, lists[lnum], userSearchFields[fnum], fieldValue)
-    return RESPONSE(res, 200, { 'members': userx })
+    if (fnum>0) {
+        data.forEach(org => {
+            org.orgEvents.forEach(event => {
+                events.push(event)
+            });
+        });
+    }else{
+        events=data
+    }
+
+    for (const event of events) {
+        if (isInsideCircle(req,event.location)) eventsNearUser.push(event)
+    }
+
+    return RESPONSE(res, 200, { 'events': eventsNearUser })
 }
+

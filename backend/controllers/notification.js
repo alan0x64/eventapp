@@ -38,7 +38,7 @@ module.exports.notficationSender = async (req, res, sendRes) => {
         if (sendRes)
             return RESPONSE(res, 200, 'Notification Send!')
     } catch (err) {
-        logx(err);
+        console.log(err);
         if (sendRes)
             return RESPONSE(res, 200, `Error while trying to send notification`)
     }

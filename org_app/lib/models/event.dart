@@ -65,8 +65,8 @@ class Event {
 }
 
 Event toEvent(Map<String, dynamic> json) {
-  if (json['eventBackgroundPic'] == null) return Event();
-  if (json['sig'] == null) return Event();
+  if (json['eventBackgroundPic'] == null) return const Event();
+  if (json['sig'] == null) return const Event();
 
   return Event(
     eventBackgroundPic: json['eventBackgroundPic']['url'],

@@ -10,7 +10,6 @@ import 'package:org/screens/event/home.dart';
 import 'package:org/screens/org/org_sing_up.dart';
 import 'package:org/utilities/shared.dart';
 import 'package:org/widgets/textfield.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({
@@ -138,20 +137,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           child: const Text("Login")),
                     ],
                   ),
-                  const SizedBox(width: 5),
-                  ElevatedButton(
-                      onPressed: () async {
-                        try {
-                          !await launchUrl(
-                              Uri.parse('https://youtu.be/dDFqbVG-Hsk'));
-                        } catch (e) {
-                          String errorMessage =
-                              e.toString().split('\n').take(5).join('\n');
-                          snackbar(context, errorMessage, 2);
-                          Console.log(errorMessage);
-                        }
-                      },
-                      child: const Text("DO NOT TOUCH!!!"))
                 ],
               ),
             ),

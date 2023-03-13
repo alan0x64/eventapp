@@ -53,7 +53,7 @@ app.get('/RESET', async (req, res) => {
 
 //Error Handler
 app.use((err, req, res, next) => {
-    logError(err)
+    console.log(err)
     RESPONSE(res, 500, { error: err.message })
 })
 

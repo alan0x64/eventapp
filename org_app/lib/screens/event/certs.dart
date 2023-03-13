@@ -26,11 +26,13 @@ class _CertsViewState extends State<CertsView> {
         return Scaffold(
           appBar: buildAppBar(context, "Certs", button: const BackButton()),
           body: ListView.builder(
-              itemCount:certs.length,
+              itemCount: certs.length,
               itemBuilder: (context, index) {
                 Cert cert = certs[index];
+                if (cert.allowCert == false) return Container();
                 return CustomListItem(
-                  onT: () => launchUrlString(cert.cert,mode: LaunchMode.externalApplication),
+                  onT: () => launchUrlString(cert.cert,
+                      mode: LaunchMode.externalApplication),
                   imageUrl: cert.user.profilePic,
                   title: cert.user.fullName,
                   subtitle1: "Attended Minutes",

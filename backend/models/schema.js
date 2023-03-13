@@ -49,9 +49,9 @@ const validLoginSchema = joi.object({
 const validUserSchema = joi.object({
     fullName: joi.string().escapeHTML().required().error(new Error("Invalid FullName")),
     email: joi.string().escapeHTML().lowercase().email().required().error(new Error("Invalid Email")),
-    password: joi.string().escapeHTML().required().error(new Error("Invalid Password")),
+    password: joi.string().escapeHTML().error(new Error("Invalid Password")),
     phoneNumber: joi.number().required().error(new Error("Invalid PhoneNumber Or Phone Number Is Already In Use")),
-    date_of_birth: joi.date().min('1-1-1950').required().error(new Error("Invaild Data And Birth")),
+    date_of_birth: joi.string().required().error(new Error("Invaild Data And Birth")),
     university: joi.string().escapeHTML().default("None"),
     faculty: joi.string().escapeHTML().default("None"),
     department: joi.string().escapeHTML().default("None"),
@@ -84,6 +84,7 @@ const validUpdateOrgSchema = joi.object({
 
 const validPasswordSchema = joi.object({
     password: joi.string().escapeHTML().required().error(new Error('Invalid Password')),
+    newPassword:joi.string().escapeHTML().error(new Error('Invalid Password'))
 });
 
 const validEventSchema = joi.object({

@@ -206,6 +206,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                     Text(
                                       userx!.dateOfBirth.substring(0, 10),
                                     ),
+                                     const SizedBox(height: 10),
+                                    const Text(
+                                      'Bio',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 3),
+                                    Text(
+                                      userx!.bio,
+                                    ),
                                   ],
                                 ),
                               ),
@@ -214,11 +225,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           const SizedBox(
                             width: 3,
                           ),
-                          if (!widget.blacklist)
+                          if (widget.showControl && widget.blacklist==false)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                if(widget.showcertControl && !widget.blacklist)
                                 ElevatedButton(
                                     onPressed: () async {
                                       showDialog(
@@ -317,7 +327,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                     child: const Text("Block")),
                               ],
                             ),
-                          if (widget.blacklist)
+                          if (widget.blacklist && !widget.showControl)
                             ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                     backgroundColor: Colors.red),

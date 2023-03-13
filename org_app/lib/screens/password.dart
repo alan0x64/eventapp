@@ -101,7 +101,7 @@ class _UpdatePasswordState extends State<UpdatePassword> {
                       () async {
                         return await runFun(
                           context,
-                          () => updatePassword(data),
+                          () async => await updatePassword(data),
                         );
                       },
                     );

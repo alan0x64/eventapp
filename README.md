@@ -14,21 +14,14 @@
 #### Organization App
 
 ##### Bugs 
+- QR scan bug when check in and checking out
 - Fix Refresh on home Screen and etc..
-- Save Theme Presets
 - QR Screen Camera Buttons does not work
-- Ios Notification
-- save status when org updates
+- IOS Notification
+- Save Theme Presets
+- Save Org Edit Form State  
 
 #### User App
-- Login
-- SingUp
-- User Profile
-- Update Profile
-- Home Screen
-- Event View -Join -Scan
-- ??????
-- See events based on location
 
 
 

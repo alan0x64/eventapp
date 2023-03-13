@@ -78,16 +78,16 @@ class _StatusState extends State<Status> {
         return Scaffold(
           appBar: AppBar(
             title: const Text('Scan QRs'),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.flash_off),
-                onPressed: () =>
-                    controller != null ? controller!.toggleFlash() : null,
-              ),
-              IconButton(
-                  icon: const Icon(Icons.camera),
-                  onPressed: () =>
-                      controller != null ? controller!.flipCamera() : null),
+            actions: const [
+              // IconButton(
+              //   icon: const Icon(Icons.flash_off),
+              //   onPressed: () =>
+              //       controller != null ? controller!.toggleFlash() : null,
+              // ),
+              // IconButton(
+              //     icon: const Icon(Icons.camera),
+              //     onPressed: () =>
+              //         controller != null ? controller!.flipCamera() : null),
             ],
           ),
           body: Stack(children: [

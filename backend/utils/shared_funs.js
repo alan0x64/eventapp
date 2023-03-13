@@ -3,6 +3,9 @@ const fs = require('fs')
 const { ObjectId } = require('mongodb')
 const chalk = require("chalk");
 const event = require("../models/event");
+const path = require("path");
+const user = require("../models/user");
+const PDF = require('pdf-lib').PDFDocument;
 
 
 const userSearchFields = [
@@ -16,17 +19,10 @@ const userSearchFields = [
 
 const eventSearchFields = [
     'title',
-    'status',
-    'eventType',
-    'minAttendanceTime',
-    'seats',
-]
-
-const orgSearchFields = [
     'orgName',
     'email',
-    'org_type',
 ]
+
 
 
 
@@ -75,7 +71,7 @@ function catchFun(fun) {
         try {
             await fun(req, res, next)
         } catch (error) {
-            logError(error)
+            console.log(error)
             next(error)
         }
     }
@@ -144,14 +140,16 @@ const validateObjectID = (req, res, next) => {
     next()
 }
 
-async function searchFor(model, list, fieldName, fieldValue) {
+async function searchFor(model, list, fieldName, fieldValue,populateField) {
+    populateField=populateField==null?"":populateField
+
     let searchBody = {
         $and: [
             list != null ? { _id: { $in: list } } : {},
-            { [fieldName]: { $regex: new RegExp(fieldValue, 'i') } },
+            { [fieldName]: { $regex: new RegExp(`${fieldValue}`, 'i') } },
         ]
     }
-    return await model.find(searchBody)
+    return await model.find(searchBody).populate(populateField)
 }
 
 function getUsersInCerts(certs) {
@@ -163,26 +161,78 @@ function getUsersInCerts(certs) {
 }
 
 
-async function autoEvent(req,res,eventId){
-   let eventx = await event.findById(eventId)
 
-   if (eventx.status != 1 && DateNowInMin() < toMin(eventx.endDateTime) && DateNowInMin() > toMin(eventx.startDateTime)) {
-       await eventx.updateOne({
-           'status': 1
-       })
-       notficationSender(req, res, 0)
-   }
 
-   if (eventx.status != 2 && DateNowInMin() > toMin(eventx.endDateTime)) {
-       this.genCerts(req, res, 0)
-       await eventx.updateOne({
-           'status': 2
-       })
-       notficationSender(req, res, 0)
-   }
-   
-   return 
+async function genCerts(req,res,sendRes) {
+    if (sendRes == null) sendRes = 1
+
+    try {
+        let file = ""
+        let eventId = req.params.eventId
+        let eventx = await event.findById(eventId).populate('eventCerts')
+
+        //set paths
+        let certs = path.join(`${__dirname}/..`, `/public/certs`)
+        let sigs = path.join(`${__dirname}/..`, `/public/sigs`)
+
+        //read files
+        if (eventx.eventType == 0) {
+            file = fs.readFileSync(`${certs}/con.pdf`)
+        } else {
+            file = fs.readFileSync(`${certs}/sem.pdf`)
+        }
+
+        //check if user has 2 certs?
+        eventx.eventCerts.forEach(async currentCert => {
+            if (fs.existsSync(`${certs}/${currentCert.cert.fileName}`))
+                fs.unlink(`${certs}/${currentCert.cert.fileName}`, () => { })
+
+            if (
+                currentCert.eventId.toString() == eventx._id.toString() &&
+                currentCert.orgId.toString() == eventx.orgId.toString() &&
+                currentCert.allowCert
+            ) {
+
+                //load pdf and get page 
+                const pdf = await PDF.load(file)
+                const page = pdf.getPages()[0]
+
+                //load image 
+                const imageBuffer = fs.readFileSync(`${sigs}/${eventx.sig.fileName}`)
+
+                let userx = await user.findById(currentCert.userId)
+                let image
+
+                if (eventx.sig.fileName.substring(eventx.sig.fileName.indexOf('.') + 1) == 'jpg') {
+                    image = await pdf.embedJpg(imageBuffer)
+                } else if (eventx.sig.fileName.substring(eventx.sig.fileName.indexOf('.') + 1) == 'png') {
+                    image = await pdf.embedPng(imageBuffer)
+                }
+                else {
+                    return RESPONSE(res, 400, "The signature file either lacks a PNG or JPG extension, or it has a different extension")
+                }
+                //set text size
+                page.setFontSize(18)
+
+                //draw text
+                page.drawText(userx.fullName, { x: 270, y: 630 })
+                page.drawText(eventx.title, { x: 257, y: 570 })
+                page.drawText(new Date().toLocaleDateString(), { x: 257, y: 515 })
+
+                const { width, height } = image.scale(0.3);
+                page.drawImage(image, { x: 190, y: 410, width, height }, page)
+
+                //writeback to file system
+                fs.writeFileSync(`public/certs/${currentCert.cert.fileName}`, await pdf.save())
+            }
+        });
+        if (sendRes) RESPONSE(res, 200, "Certs Generated")
+    } catch (error) {
+        logError(error)
+    }
 }
+
+
 
 module.exports = {
     RESPONSE,
@@ -196,10 +246,11 @@ module.exports = {
     logx,
     logger,
     userSearchFields,
+    eventSearchFields,
     searchFor,
     getUsersInCerts,
     toMin,
-    autoEvent
+    genCerts
 }
 
 

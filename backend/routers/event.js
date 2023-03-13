@@ -10,13 +10,13 @@ const { handleAsync, validateObjectID, catchFun } = require('../utils/shared_fun
 
 
 //GET
-router.route('/').get(authJWT_AT,onlyUsers , handleAsync(event.getEvents))
+router.route('').get(authJWT_AT,onlyUsers , handleAsync(event.getEvents))
 router.route('/owner/:eventId').get(authJWT_AT,onlyUsers,handleAsync(event.getEventOwner))
 
 router.route('/info/:eventId').get(authJWT_AT,isOrgEventOwner,handleAsync(event.getEvent))
 router.route('/members/:eventId').get(authJWT_AT,isOrgEventOwner, handleAsync(event.getEventMembers))
 
-router.route('/certificate/:eventId').get(authJWT_AT,onlyOrgs,isOrgEventOwner, handleAsync(event.genCerts))
+router.route('/certificate/:eventId').get(authJWT_AT,onlyOrgs,isOrgEventOwner, handleAsync(event.makeCerts))
 
 router.route('/certificate/:userId/:eventId').get(authJWT_AT,onlyOrgs,isOrgEventOwner, handleAsync(event.genCert))
 

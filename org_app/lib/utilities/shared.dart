@@ -8,20 +8,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:org/models/org.dart';
-import 'package:org/net/HTTP.dart';
-import 'package:org/net/auth.dart';
-import 'package:org/screens/login.dart';
-import 'package:org/server.dart';
-import 'package:org/utilities/providers.dart';
-import 'package:org/widgets/dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:theme_provider/theme_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models/event.dart';
+import '../models/org.dart';
 import '../models/user.dart';
+import '../net/HTTP.dart';
+import '../net/auth.dart';
+import '../screens/login.dart';
+import '../server.dart';
+import '../widgets/dialog.dart';
+import 'providers.dart';
 
 typedef ResCallback = Future<Response> Function();
 typedef FORMKEY = GlobalKey<FormBuilderState>;
@@ -216,22 +216,6 @@ Map<String, dynamic> getEventFromForm(BuildContext context, FORMKEY formKey,
         formKey.currentState!.fields['minAttendanceTime']!.value.toString(),
     'seats': formKey.currentState!.fields['seats']!.value.toString(),
     'location': location,
-  };
-}
-
-Map<String, dynamic> getUserFromForm(
-  BuildContext context,
-  FORMKEY formKey,
-) {
-  return {
-    'orgName': formKey.currentState!.fields['name']!.value,
-    'email': formKey.currentState!.fields['email']!.value,
-    'phoneNumber': formKey.currentState!.fields['phoneNumber']!.value,
-    'bio': formKey.currentState!.fields['bio']!.value,
-    'org_type': formKey.currentState!.fields['org_type']!.value,
-    'website': formKey.currentState!.fields['website']!.value,
-    'socialMedia': formKey.currentState!.fields['socialMedia']!.value,
-    'location': getLocationString(context, 0),
   };
 }
 

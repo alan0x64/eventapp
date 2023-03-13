@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema({
     },
     date_of_birth: {
         //2022-12-27T00:00:00.000Z
-        type: Date,
+        type: String,
         required: [true, 'Invaild Age'],
     },
     university: {

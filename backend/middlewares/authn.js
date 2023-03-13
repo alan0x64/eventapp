@@ -54,7 +54,7 @@ module.exports.authJWT_AT = catchFun(
         let authHeader = req.headers['authorization']
         let token = authHeader && authHeader.split(' ')[1]
 
-        if (token == null) { return RESPONSE(res, 401) }
+        if (token == null) { console.log("No TOKENS"); return RESPONSE(res, 401) }
         jwt.verify(token, process.env.ACCESS_TOKEN, async (err, t) => {
             if (err) {
                 console.log(err);

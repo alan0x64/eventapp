@@ -7,8 +7,9 @@ const user = require("../models/user")
 const cert = require("../models/cert")
 const token_collection = require("../models/token")
 const { hashSync, compareSync } = require('bcrypt')
-const { RESPONSE, deleteImages, logx, userSearchFields, getUsersInCerts, searchFor,autoEvent } = require('../utils/shared_funs')
+const { RESPONSE, deleteImages, logx, userSearchFields, getUsersInCerts, searchFor} = require('../utils/shared_funs')
 const { deleteSingleEvent} = require("./event")
+const autoEvent = require("../utils/auto")
 
 
 function orgImages(req, orgx = {}) {
@@ -96,10 +97,9 @@ module.exports.updatePassword = async (req, res) => {
     let orgId = req.logedinOrg.id
     let orgx = await org.findById(orgId)
 
-    logx(req.body.cuurentPassword)
-    logx(req.body.newPassword)
-
-    if (!compareSync(req.body.cuurentPassword, orgx.password))
+    logx(req.body)
+    
+    if (!compareSync(req.body.password, orgx.password))
         return RESPONSE(res, 400, "Incorrect Current Password")
 
     await orgx.updateOne({

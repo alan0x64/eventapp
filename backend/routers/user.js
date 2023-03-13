@@ -4,7 +4,7 @@ const user = require('../controllers/user')
 const { authJWT_RT, authJWT_AT } = require("../middlewares/authn")
 const { userImageHandler } = require("../middlewares/file_handler")
 const { onlyUsers,onlyOrgs,isOrgEventOwner } = require("../middlewares/authz")
-const { validateUser, validateLogin } = require("../middlewares/validators");
+const { validateUser, validateLogin, validatePassword } = require("../middlewares/validators");
 const { handleAsync } = require('../utils/shared_funs');
 
 
@@ -16,13 +16,38 @@ router.route('/events').get(authJWT_AT, onlyUsers, handleAsync(user.getJoinedEve
 
 
 //POST
-router.route('/register').post(userImageHandler.single('profilePic'),validateUser, handleAsync(user.createUser))
+router.route('/register').post(
+    userImageHandler.single('profilePic'),validateUser, handleAsync(user.createUser))
+
 router.route('/login').post(validateLogin,handleAsync(user.login))
 router.route('/logout').post(authJWT_RT, onlyUsers, handleAsync(user.logout))
 router.route('/search').post(authJWT_AT, onlyOrgs,isOrgEventOwner, handleAsync(user.search))
 
 //PATCH
-router.route('/update').patch(authJWT_AT, onlyUsers, userImageHandler.single('profilePic'),validateUser, handleAsync(user.updateUser))
+router.route('/update').
+put(
+    authJWT_AT,
+    onlyUsers,
+    userImageHandler.single('profilePic'),
+    validateUser,
+    handleAsync(user.updateUser)
+    ).
+patch(
+    authJWT_AT,
+    onlyUsers,
+    validateUser,
+    handleAsync(user.updateUser)
+)
+
+
+
+router.route('/updatepassword').put(
+    authJWT_AT,
+    onlyUsers,
+    validatePassword,
+    handleAsync(user.updatePassword)
+)
+
 router.route('/join/:eventId').patch(authJWT_AT, onlyUsers, handleAsync(user.AddUserToEvent))
 
 //DELETE

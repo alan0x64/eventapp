@@ -1,16 +1,16 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
-import 'package:org/net/auth.dart';
-import 'package:org/screens/error.dart';
-import 'package:org/screens/event/home.dart';
-import 'package:org/screens/login.dart';
-import 'package:org/utilities/notofocation.dart';
-import 'package:org/utilities/providers.dart';
-import 'package:org/utilities/shared.dart';
 import 'package:provider/provider.dart';
 import 'package:theme_provider/theme_provider.dart';
 import './server.dart';
+import 'net/auth.dart';
+import 'screens/error.dart';
+import 'screens/event/home.dart';
+import 'screens/login.dart';
+import 'utilities/notofocation.dart';
+import 'utilities/providers.dart';
+import 'utilities/shared.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 

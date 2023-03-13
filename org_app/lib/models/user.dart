@@ -16,7 +16,7 @@ class User {
   final String id;
   final List<dynamic> joinedEvents;
 
- static List<String> userSearchFields = [
+  static List<String> userSearchFields = [
     'FullName',
     'Email',
     'University',

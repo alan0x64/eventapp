@@ -69,9 +69,9 @@ Future<String?> getToken() async {
   return await FirebaseMessaging.instance.getToken();
 }
 
-Future<void> notifySubscribers(String topic, {int isFinished = 0}) async {
+Future<void> notifySubscribers(String topic) async {
   await POST("$devServer/notify", 0, 'AT',
-      {"topic": topic, "eventId": topic, 'isFinished': isFinished});
+      {"eventId": topic, });
 }
 
 Future<void> notificationHandler(RemoteMessage? message) async {

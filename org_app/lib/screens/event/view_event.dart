@@ -271,8 +271,7 @@ class _ViewEventState extends State<ViewEvent> {
                                         () async =>
                                             await genCerts(eventdata.id),
                                       );
-                                      await notifySubscribers(eventdata.id,
-                                          isFinished: 1);
+                                      await notifySubscribers(eventdata.id);
 
                                       Navigator.pop(context);
                                       if (res.statusCode == 200) {
