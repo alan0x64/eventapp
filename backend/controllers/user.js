@@ -86,7 +86,7 @@ module.exports.deleteUser = async (req, res) => {
         ]
     })
 
-    events.forEach(async event => {
+    for (const event of events) {
         let certx = await (cert.findOne({ 'userId': userId, 'eventId': event._id, 'orgId': event.orgId })).deleteOne()
         let certs = await cert.find({ 'eventId': event._id, 'orgId': event.orgId })
         if (certx.allowCert) {
@@ -108,8 +108,7 @@ module.exports.deleteUser = async (req, res) => {
             })
         }
         deleteImages(userImages(req, user, certx).certToDelete)
-    });
-
+    }
 
     deleteImages(userImages(req, userx).imagesToDelete)
     await token_collection.deleteMany({ 'userId': userId })
@@ -244,14 +243,13 @@ module.exports.getCertificate = async (req, res) => {
     let eventx = await event.findById(eventId).populate('eventCerts')
 
     if (eventx.length == 0) return RESPONSE(res, 400, { 'error': "Event Not Found" })
-
-    eventx.eventCerts.forEach(cert => {
+   
+    for (const cert of eventx.eventCerts) {
         if (cert.userId.toString() == userId.toString()) {
-            console.log(cert.cert.url);
             return RESPONSE(res,200,cert.cert.url)
-            // res.download(`public/certs/${cert.cert.fileName}`, `${eventx.title}_certificate`)
         }
-    });
+    }
+
     RESPONSE(res,200,{'msg':0})
 }
 

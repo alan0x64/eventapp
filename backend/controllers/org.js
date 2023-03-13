@@ -84,9 +84,10 @@ module.exports.deleteOrg = async (req, res) => {
     let orgId = req.logedinOrg.id
     let orgx = await org.findByIdAndDelete(orgId)
 
-    orgx.orgEvents.forEach(eventId => {
-        deleteSingleEvent(req, eventId)
-    });
+
+    for (const eventId of orgx.orgEvents) {
+       await deleteSingleEvent(req, eventId)
+    }
 
     await token_collection.deleteMany({ 'orgId': orgId })
     deleteImages(orgImages(req, orgx).imagesToDelete)
@@ -233,9 +234,11 @@ module.exports.getOrgEvents = async (req, res) => {
     let orgId = req.logedinOrg.id
     let orgx = await org.findById(orgId).populate('orgEvents')
     if (orgx.length == 0) return RESPONSE(res, 400, "Org Not Found")
-    orgx.orgEvents.forEach(async event => {
-        await autoEvent(req, res, event._id)
-    });
+   
+   for (const event of orgx.orgEvents) {
+       await autoEvent(req, res, event._id)
+   }
+   
     RESPONSE(res, 200, { "events": orgx.orgEvents })
 }
 

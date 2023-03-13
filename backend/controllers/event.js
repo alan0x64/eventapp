@@ -300,11 +300,12 @@ module.exports.deleteSingleEvent = async function (req, id) {
         'joinedEvents': eventx._id
     })
 
-    users.forEach(async user => {
+    for (const user of users) {
         await user.updateOne({
             $pull: { 'joinedEvents': eventx._id }
         })
-    });
+    }
+
 
     await org.findByIdAndUpdate(eventx.orgId, {
         $pull: { 'orgEvents': eventx._id }
@@ -328,9 +329,9 @@ module.exports.getAttenders = async (req, res) => {
         }
     )
 
-    eventx.eventCerts.forEach(cert => {
+    for (const cert of eventx.eventCerts) {
         attenders.push(cert.userId)
-    });
+    }
 
     return RESPONSE(res, 200, { 'members': attenders })
 }
@@ -363,11 +364,11 @@ module.exports.search = async (req, res) => {
     
 
     if (fnum>0) {
-        data.forEach(org => {
+        for (const org of data) {
             org.orgEvents.forEach(event => {
                 events.push(event)
-            });
-        });
+            });            
+        }
     }else{
         events=data
     }
