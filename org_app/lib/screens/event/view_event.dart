@@ -121,7 +121,7 @@ class _ViewEventState extends State<ViewEvent> {
                               CertsView(
                                 eventId: eventdata.id,
                               )),
-                          child: const Text("Certs")),
+                          child: const Text("View Generated Certs")),
                   ],
                 ),
                 const SizedBox(
@@ -324,31 +324,31 @@ class _ViewEventState extends State<ViewEvent> {
                       },
                       child: const Text("Delete")),
                 ),
-                ElevatedButton(
-                    onPressed: () async {
-                     res= await updateEventStatus(context, eventdata, 0);
-                      snackbar(context, res.data['msg'], 2);
-                      setState(() {});
-                      return await Future.value();
-                    },
-                    child: const Text("Reset")),
-                ElevatedButton(
-                    onPressed: () async {
-                      notifySubscribers(eventdata.id);
-                      return await Future.value();
-                    },
-                    child: const Text("notify")),
-                ElevatedButton(
-                    onPressed: () {
-                      unsubscribeDeviceFromTopic(eventdata.id);
-                      // unsubscribeFromTopic(eventdata.id);
-                    },
-                    child: const Text("unsub")),
-                ElevatedButton(
-                    onPressed: () {
-                      subscribeToTopic(eventdata.id);
-                    },
-                    child: const Text("SUb")),
+                // ElevatedButton(
+                //     onPressed: () async {
+                //      res= await updateEventStatus(context, eventdata, 0);
+                //       snackbar(context, res.data['msg'], 2);
+                //       setState(() {});
+                //       return await Future.value();
+                //     },
+                //     child: const Text("Reset")),
+                // ElevatedButton(
+                //     onPressed: () async {
+                //       notifySubscribers(eventdata.id);
+                //       return await Future.value();
+                //     },
+                //     child: const Text("notify")),
+                // ElevatedButton(
+                //     onPressed: () {
+                //       unsubscribeDeviceFromTopic(eventdata.id);
+                //       // unsubscribeFromTopic(eventdata.id);
+                //     },
+                //     child: const Text("unsub")),
+                // ElevatedButton(
+                //     onPressed: () {
+                //       subscribeToTopic(eventdata.id);
+                //     },
+                //     child: const Text("SUb")),
               ],
             ),
           );

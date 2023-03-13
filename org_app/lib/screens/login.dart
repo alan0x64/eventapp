@@ -61,18 +61,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 40),
                   AppTextbox(
-                    init: "kpop2@org.com",
                     name: "email",
                     ht: "Email",
                     lt: "Email",
                     valis: [
                       FormBuilderValidators.required(),
-                      // FormBuilderValidators.email()
+                      FormBuilderValidators.email()
                     ],
                   ),
                   const SizedBox(height: 20),
                   AppTextbox(
-                      init: "kpopkpop",
                       name: "password",
                       lt: "Password",
                       ml: 1,
