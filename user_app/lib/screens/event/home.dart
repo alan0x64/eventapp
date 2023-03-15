@@ -1,5 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:EventLink/widgets/status_filter.dart';
+import 'package:EventLink/widgets/type_filter.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -20,6 +22,9 @@ class Home extends StatefulWidget {
 }
 
 class HomeState extends State<Home> {
+  int selectedStatus = -1;
+  int selectedType = -1;
+
 
   LatLng x = LatLng(0, 0);
   List<dynamic>? events;
@@ -33,28 +38,65 @@ class HomeState extends State<Home> {
     try {
       return Screen(
           ab: buildAppBar(context, title,
-              search: true, searchWidget: eventSearchWidget()),
+              search: true, searchWidget: eventSearchWidget(() {
+              setState(() {
+                
+              });
+              },)),
           builder: (x) {
-            return BuildFuture(
-              callback: () async {
-                if (widget.joinView) {
-                  return getJoinedEvents();
-                } else {
-                  return getEvents();
-                }
-              },
-              mapper: (resdata) => mapObjs(resdata.data['events'], toEvent),
-              builder: (data) {
-                events = data;
-                return ListView.builder(
-                  physics: const BouncingScrollPhysics(),
-                  itemCount: events?.length,
-                  itemBuilder: (context, index) {
-                    Event eventx = events![index];
-                    return EventCard(eventx: eventx,);
+            return Column(
+              children: [
+                StatusFilter(
+                  selectedbutton: selectedStatus,
+                  state: (selectbutton) {
+                    selectedStatus = selectbutton;
+                    setState(() {});
                   },
-                );
-              },
+                ),
+                TypeFilter(
+                  selectedbutton: selectedType,
+                  state: (selectbutton) {
+                    selectedType = selectbutton;
+                    setState(() {
+                      
+                    });
+                  },
+                ),
+                BuildFuture(
+                  callback: () async {
+                    if (widget.joinView) {
+                      return getJoinedEvents();
+                    } else {
+                      return getEvents(selectedStatus,selectedType);
+                    }
+                  },
+                  mapper: (resdata) => mapObjs(resdata.data['events'], toEvent),
+                  builder: (data) {
+                    events = data;
+                    return Expanded(
+                        flex: 8,
+                        child: ListView.builder(
+                          physics: const BouncingScrollPhysics(),
+                          itemCount: events?.length,
+                          itemBuilder: (context, index) {
+                            Event eventx = events![index];
+                            if (events!.length!=0) {
+                              return EventCard(
+                                eventx: eventx,
+                              );
+                            } else {
+                              return Container(
+                                margin: const EdgeInsets.all(100),
+                                child: const Center(
+                                  child: Text("No Events"),
+                                ),
+                              );
+                            }
+                          },
+                        ));
+                  },
+                )
+              ],
             );
           });
     } catch (e) {

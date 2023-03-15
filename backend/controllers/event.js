@@ -6,9 +6,9 @@ const org = require("../models/org")
 const orgCon = require('../controllers/org')
 const cert = require("../models/cert")
 const PDF = require('pdf-lib').PDFDocument;
-const { deleteImages, DateNowInMin, attendedInMin, RESPONSE, logx, logError, toMin ,genCerts, userSearchFields, eventSearchFields, searchFor} = require('../utils/shared_funs');
+const { deleteImages, DateNowInMin, attendedInMin, RESPONSE, logx, logError, toMin, genCerts, userSearchFields, eventSearchFields, searchFor, filterBody } = require('../utils/shared_funs');
 const autoEvent = require('../utils/auto');
-const {parseLatLon, isInsideCircle,}=require('./../utils/location')
+const { parseLatLon, isInsideCircle, } = require('./../utils/location')
 
 require("express")
 
@@ -42,7 +42,7 @@ module.exports.createEvent = async (req, res) => {
         eventBackgroundPic: eventImages(req).eventBackgroundPic,
         sig: eventImages(req).sig,
         orgId: orgId,
-        status:0
+        status: 0
     }).save()
 
     await org.findByIdAndUpdate(orgId, {
@@ -54,18 +54,18 @@ module.exports.createEvent = async (req, res) => {
 
 module.exports.updateEvent = async (req, res) => {
     let orgId = req.logedinOrg.id
-    let eventx=await event.findById(req.params.eventId)
-    let eventimage = eventImages(req,eventx)
+    let eventx = await event.findById(req.params.eventId)
+    let eventimage = eventImages(req, eventx)
     let body = { ...req.body, orgId: orgId, }
 
-    if (req.method=="PUT") {
+    if (req.method == "PUT") {
         if (req.eventPic) {
             body.eventBackgroundPic = eventimage.eventBackgroundPic,
-            deleteImages([eventimage.imagesToDelete[0]])
-            
-        }else{
+                deleteImages([eventimage.imagesToDelete[0]])
+
+        } else {
             body.sig = eventimage.sig,
-            deleteImages([eventimage.imagesToDelete[1]])
+                deleteImages([eventimage.imagesToDelete[1]])
         }
     }
 
@@ -83,21 +83,29 @@ module.exports.deleteEvent = async (req, res) => {
 module.exports.getEvent = async (req, res) => {
     let eventx = await event.findById(req.params.eventId)
     if (eventx.length == 0 || eventx == null) return RESPONSE(res, 400, "Event Does Not Exist")
-    await autoEvent(req,res,req.params.eventId || req.body.eventId )
+    await autoEvent(req, res, req.params.eventId || req.body.eventId)
     RESPONSE(res, 200, eventx)
 }
 
 module.exports.getEvents = async (req, res) => {
-  
-    let events=await event.find({})
-    let eventsNearUser=[]
+
+    let type = req.query.type
+    let status = req.query.status
+    let eventsNearUser = []
+    let events = await event.find({
+        $and: [
+            status != -1 ? { status: status } : {},
+            type != -1 ? { eventType: type } : {},
+        ],
+    }
+    )
 
     for (const event of events) {
-        await autoEvent(req,res,event.id)
-        if (isInsideCircle(req,event.location)) eventsNearUser.push(event)
+        await autoEvent(req, res, event.id)
+        if (isInsideCircle(req, event.location)) eventsNearUser.push(event)
     }
 
-    RESPONSE(res, 200, { "events": eventsNearUser  })
+    RESPONSE(res, 200, { "events": eventsNearUser })
 }
 
 module.exports.getEventOwner = async (req, res) => {
@@ -209,7 +217,7 @@ module.exports.checkOut = async (req, res) => {
 }
 
 module.exports.makeCerts = async (req, res) => {
-    await genCerts(req,res)   
+    await genCerts(req, res)
 }
 
 
@@ -345,36 +353,39 @@ module.exports.removeUserFromEvent = async (req, res) => {
 
 module.exports.search = async (req, res) => {
 
-    let { fieldValue,fnum } = req.body
-    let model,fieldToPopulate
-    let events=[]
-    let eventsNearUser=[]
+    let { fieldValue, fnum } = req.body
+    let model, fieldToPopulate
+    let events = []
+    let eventsNearUser = []
+    let status = req.query.status
+    let type = req.query.type
 
 
-    if (fnum>0) {
-        model=org
-        fieldToPopulate='orgEvents'
-    }else{
-        model=event
-        fieldToPopulate=''
+
+    if (fnum > 0) {
+        model = org
+        fieldToPopulate = 'orgEvents'
+    } else {
+        model = event
+        fieldToPopulate = ''
     }
-    
-    
-    let data = await searchFor(model,null,eventSearchFields[fnum], fieldValue,fieldToPopulate)
-    
 
-    if (fnum>0) {
+
+    let data = await searchFor(model, null, eventSearchFields[fnum], fieldValue, fieldToPopulate, status, type)
+
+
+    if (fnum > 0) {
         for (const org of data) {
             org.orgEvents.forEach(event => {
                 events.push(event)
-            });            
+            });
         }
-    }else{
-        events=data
+    } else {
+        events = data
     }
 
     for (const event of events) {
-        if (isInsideCircle(req,event.location)) eventsNearUser.push(event)
+        if (isInsideCircle(req, event.location)) eventsNearUser.push(event)
     }
 
     return RESPONSE(res, 200, { 'events': eventsNearUser })

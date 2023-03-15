@@ -140,14 +140,19 @@ const validateObjectID = (req, res, next) => {
     next()
 }
 
-async function searchFor(model, list, fieldName, fieldValue,populateField) {
+async function searchFor(model, list, fieldName, fieldValue,populateField,status,type) {
+
     populateField=populateField==null?"":populateField
+    status=status==null?-1:status
+    type=type==null?-1:type
 
     let searchBody = {
         $and: [
             list != null ? { _id: { $in: list } } : {},
+            status != -1 ? {status: status } : {},
+            type != -1 ? {eventType: type } : {},
             { [fieldName]: { $regex: new RegExp(`${fieldValue}`, 'i') } },
-        ]
+        ],
     }
     return await model.find(searchBody).populate(populateField)
 }
@@ -233,7 +238,6 @@ async function genCerts(req,res,sendRes) {
 }
 
 
-
 module.exports = {
     RESPONSE,
     validateObjectID,
@@ -250,7 +254,7 @@ module.exports = {
     searchFor,
     getUsersInCerts,
     toMin,
-    genCerts
+    genCerts,
 }
 
 

@@ -73,6 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   AppTextbox(
                       name: "password",
                       lt: "Password",
+                      ht: "Password",
                       ml: 1,
                       ob: true,
                       valis: [

@@ -1,14 +1,21 @@
+import 'package:EventLink/widgets/status_filter.dart';
+import 'package:EventLink/widgets/type_filter.dart';
 import 'package:flutter/material.dart';
 
 import '../utilities/shared.dart';
 
 class Search extends SearchDelegate {
-  final Widget Function(String query, int selectedCategory) body;
+  final Widget Function(String query, int selectedCategory,int selectedStatus,int selectedType) body;
   final List<String> categories;
+  VoidCallback? setState;
+
   int selectedCategory;
+  int selectedStatus = -1;
+  int selectedType = -1;
 
   Search({
     required this.body,
+    this.setState,
     this.categories = const [],
     this.selectedCategory = 0,
   });
@@ -31,7 +38,11 @@ class Search extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-    return body(query, selectedCategory);
+    return Column(
+      children: [
+        body(query, selectedCategory,selectedStatus,selectedType),
+      ],
+    );
   }
 
   @override
@@ -61,9 +72,11 @@ class Search extends SearchDelegate {
                       ),
                     ),
                     onPressed: () {
-                      setState(() {
-                      selectedCategory = index;
-                      },);
+                      setState(
+                        () {
+                          selectedCategory = index;
+                        },
+                      );
                     },
                     child: Text(categories[index]
                         // ,style: TextStyle(color: Colors.white)
@@ -73,9 +86,27 @@ class Search extends SearchDelegate {
               },
             ),
           ),
+           StatusFilter(
+            selectedbutton: selectedStatus,
+            state: (selectbutton) {
+              selectedStatus = selectbutton;
+              setState(
+                () {},
+              );
+            },
+          ),
+          TypeFilter(
+            selectedbutton: selectedType,
+            state: (selectbutton) {
+              selectedType = selectbutton;
+              setState(
+                () {},
+              );
+            },
+          ),
           Expanded(
             flex: 2,
-            child: body(query, selectedCategory),
+            child: body(query, selectedCategory,selectedStatus,selectedType),
           ),
         ],
       ),

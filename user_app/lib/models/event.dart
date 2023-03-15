@@ -128,12 +128,12 @@ Future<Response> getBlacklistMembers(String eventId) async {
   return await GET('$devServer/event/blacklist/$eventId', 0, 'AT');
 }
 
-Future<Response> getEvents() async {
+Future<Response> getEvents(int status, int type) async {
   var pos = await userLocation();
-  //&radius=10
-  Console.log(pos);
   return await GET(
-      '$devServer/event?lat=${pos.latitude}&lon=${pos.longitude}', 0, 'AT');
+      '$devServer/event?lat=${pos.latitude}&lon=${pos.longitude}&status=$status&type=$type',
+      0,
+      'AT');
 }
 
 //POST
@@ -155,10 +155,12 @@ Future<Response> deleteEvent(String eventId) async {
   return await DELETE('$devServer/event/delete/$eventId', 0, 'AT', {});
 }
 
-Future<Response> searchEvents(dynamic value, {int fnum = 0}) async {
+Future<Response> searchEvents(dynamic value, int status, int type,
+    {int fnum = 0}) async {
   var pos = await userLocation();
+
   return await POST(
-      '$devServer/event/search?lat=${pos.latitude}&lon=${pos.longitude}',
+      '$devServer/event/search?lat=${pos.latitude}&lon=${pos.longitude}&status=$status&type=$type',
       0,
       'AT',
       {"fnum": fnum, "fieldValue": value});
