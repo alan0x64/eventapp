@@ -35,11 +35,11 @@ jobs:
         run: flutter build apk --release
         # working-directory: org_app
 
-      - name: Retrieve APK
-        uses: actions/upload-artifact@v3
-        with:
-          name: EventLinkManger
-          path: ${{gihtub.workspace}}/org_app/build/app/outputs/flutter-apk/app-release.apk
+      # - name: Retrieve APK
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: EventLinkManger
+      #     path: ${{gihtub.workspace}}/org_app/build/app/outputs/flutter-apk/app-release.apk
 
 
       # - name: Create Release
