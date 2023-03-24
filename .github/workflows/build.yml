@@ -14,20 +14,6 @@ env:
 
 jobs:
 
-  PRINT:
-      runs-on: ubuntu-latest
-
-      steps:
-      - name: Print DEVPRODUCTIONIP
-        run: echo ${{ github.workspace }}
-      
-      - name: Print AUTHPRODUCTIONIP
-        run: echo ${{ env.authproductionIP }}
-        
-      - name: Print Google-Services File
-        run: echo "${{ env.GOOGLE_SERVICES_FILE }}"
-      
-
   Build-EventLink:
       runs-on: ubuntu-latest
 
