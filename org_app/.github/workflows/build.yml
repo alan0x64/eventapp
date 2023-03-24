@@ -36,10 +36,12 @@ jobs:
         # working-directory: org_app
 
       - name: Retrieve APK
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: EventLinkManger
           path: build/app/outputs/flutter-apk/app-release.apk
+          working-directory: org_app
+
 
       # - name: Create Release
       #   uses: actions/create-release@v1
