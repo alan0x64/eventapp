@@ -2,7 +2,7 @@ node_modules
 .vscode
 .gitignore
 .env
-.*
+
 
 
 backend/images/orgs/background_images/*

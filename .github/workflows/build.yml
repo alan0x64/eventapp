@@ -1,0 +1,70 @@
+name: Build APKs
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+    
+jobs:
+  Build_EventLinkManger:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2.10.0
+        with:
+          channel: 'stable'
+
+      - name: Install App dependencies
+        run: flutter pub get
+        working-directory: org_app
+
+      - name: Build APK
+        run: flutter build apk --release
+        working-directory: org_app
+
+      - name: Retrieve APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: EventLinkManger
+          path: org_app/build/app/outputs/flutter-apk/app-release.apk
+          
+  Build_EventLink:
+      runs-on: ubuntu-latest
+
+      steps:
+        - uses: actions/checkout@v3
+
+        - name: Set up Flutter
+          uses: subosito/flutter-action@v2.10.0
+          with:
+            channel: 'stable'
+
+        - name: Install App dependencies
+          run: flutter pub get
+          working-directory: user_app
+
+        - name: Build APK
+          run: flutter build apk --release
+          working-directory: user_app
+
+        - name: Retrieve APK
+          uses: actions/upload-artifact@v3
+          with:
+            name: EventLinkManger
+            path: user_app/build/app/outputs/flutter-apk/app-release.apk
+
+      # - name: Create Release
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.PAT }}
+      #   with:
+      #     tag_name: v1.0.1 
+      #     release_name: Release v1.0.1  
+      #     draft: true
+      #     prerelease: true
