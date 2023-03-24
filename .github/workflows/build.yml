@@ -63,9 +63,8 @@ jobs:
       - name: Retrieve APK
         uses: actions/upload-artifact@v3
         with:
-          name: EventLink.apk
+          name: EventLink
           path: user_app/build/app/outputs/flutter-apk/app-release.apk
-          zip-artifact: false
 
 
 
@@ -104,9 +103,8 @@ jobs:
       - name: Retrieve APK
         uses: actions/upload-artifact@v3
         with:
-          name: EventLinkManger.apk
+          name: EventLinkManger
           path: org_app/build/app/outputs/flutter-apk/app-release.apk
-          zip-artifact: false
 
 
 
