@@ -11,6 +11,8 @@ import 'screens/login.dart';
 import 'utilities/notofocation.dart';
 import 'utilities/providers.dart';
 import 'utilities/shared.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -34,6 +36,8 @@ void main() async {
   await handleBackground();
   await handleForeground();
   await handleInApp();
+  await dotenv.load(fileName: ".env");
+
 
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.dumpErrorToConsole(

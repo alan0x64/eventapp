@@ -1,15 +1,16 @@
 // ALL
 import 'dart:io';
-import './env.dart';
+
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 String devServer = "";
 String authServer = "";
 
-void host(bool production) {
+void host(bool production) async {
   // Production Server
   if (production == true) {
-    devServer = devproductionIP;
-    authServer = authproductionIP;
+    devServer = dotenv.get('devproductionIP');
+    authServer = dotenv.get('authproductionIP');
     return;
   }
   // Android EMU
