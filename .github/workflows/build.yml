@@ -24,7 +24,7 @@ jobs:
         run: echo ${{ vars.AUTHPRODUCTIONIP }}
         
       - name: Print Google-Services File
-        run: echo ${{ vars.GOOGLE_SERVICES_FILE }}
+        run: echo "${{ vars.GOOGLE_SERVICES_FILE }}"
       
 
       
@@ -48,7 +48,7 @@ jobs:
           channel: 'stable'
 
       - name: Create Google-Services File
-        run: echo ${{ vars.GOOGLE_SERVICES_FILE }} > user_app/android/app/google-services.json
+        run: echo "${{ vars.GOOGLE_SERVICES_FILE }}" > user_app/android/app/google-services.json
 
       - name: Install App dependencies
         run: flutter pub get
@@ -84,7 +84,7 @@ jobs:
           channel: 'stable'
 
       - name: Create Google-Services File
-        run: echo ${{ vars.GOOGLE_SERVICES_FILE }} > org_app/android/app/google-services.json
+        run: echo "${{ vars.GOOGLE_SERVICES_FILE }}" > org_app/android/app/google-services.json
 
       - name: Install App dependencies
         run: flutter pub get
