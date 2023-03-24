@@ -52,15 +52,6 @@ void main() async {
     child: Phoenix(
       child: ThemeProvider(
         themes: [
-          // AppTheme(
-          //     id: "custom_orange_theme",
-          //     data: ThemeData(
-          //       brightness: Brightness.light,
-          //       primaryColor: Color.fromARGB(255, 211, 137, 27),
-          //       colorScheme: ColorScheme.fromSwatch()
-          //           .copyWith(secondary: Colors.deepOrange),
-          //     ),
-          //     description: ""),
           AppTheme.dark(),
           AppTheme.light(),
 
