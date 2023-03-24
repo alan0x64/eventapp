@@ -1,5 +1,5 @@
 # EventApp
-<p> App For Hosting Events  </p>  
+<p> App For Hosting Events </p>  
 
 ## Todos 
 - Test On Ios 
