@@ -17,14 +17,15 @@ jobs:
       runs-on: ubuntu-latest
 
       steps:
-      - name: Print Google-Services File
-        run: echo ${{ vars.GOOGLE_SERVICES_FILE }}
-      
       - name: Print DEVPRODUCTIONIP
         run: echo ${{ vars.DEVPRODUCTIONIP }}
       
       - name: Print AUTHPRODUCTIONIP
         run: echo ${{ vars.AUTHPRODUCTIONIP }}
+        
+      - name: Print Google-Services File
+        run: echo ${{ vars.GOOGLE_SERVICES_FILE }}
+      
 
       
 
