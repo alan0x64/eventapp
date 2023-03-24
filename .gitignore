@@ -12,5 +12,9 @@ backend/images/users/*
 
 backend/public/*
 backend/config/*
+
 org_app/lib/env.dart
-org_app/android/google-services.json
+org_app/android/app/google-services.json
+
+user_app/lib/env.dart
+user_app/android/app/google-services.json

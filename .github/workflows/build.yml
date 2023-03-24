@@ -7,9 +7,12 @@ on:
   push:
     branches:
       - master
-    
+env:
+  devproductionIP: http://18.168.59.10:3000
+  authproductionIP: http://18.168.59.10:8000/RT
+
 jobs:          
-  Build_EventLink:
+  Build-EventLink:
       runs-on: ubuntu-latest
 
       steps:
@@ -38,11 +41,11 @@ jobs:
       - name: Retrieve APK
         uses: actions/upload-artifact@v3
         with:
-          name: EventLink
+          name: EventLink.apk
           path: user_app/build/app/outputs/flutter-apk/app-release.apk
 
 
-  Build_EventLinkManger:
+  Build-EventLink-Manger:
     runs-on: ubuntu-latest
 
     steps:
@@ -71,7 +74,7 @@ jobs:
       - name: Retrieve APK
         uses: actions/upload-artifact@v3
         with:
-          name: EventLinkManger
+          name: EventLinkManger.apk
           path: org_app/build/app/outputs/flutter-apk/app-release.apk
 
 
