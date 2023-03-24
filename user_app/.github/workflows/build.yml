@@ -36,7 +36,7 @@ jobs:
         # working-directory: user_app
 
       - name: Retrieve APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: EventLinkManger
           path: build/app/outputs/flutter-apk/app-release.apk
