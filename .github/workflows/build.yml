@@ -19,7 +19,7 @@ jobs:
 
       steps:
       - name: Print DEVPRODUCTIONIP
-        run: echo ${{ env.devproductionIP }}
+        run: echo ${{ github.workspace }}
       
       - name: Print AUTHPRODUCTIONIP
         run: echo ${{ env.authproductionIP }}
@@ -65,6 +65,8 @@ jobs:
         with:
           name: EventLink.apk
           path: user_app/build/app/outputs/flutter-apk/app-release.apk
+          zip-artifact: false
+
 
 
   Build-EventLink-Manger:
@@ -104,6 +106,8 @@ jobs:
         with:
           name: EventLinkManger.apk
           path: org_app/build/app/outputs/flutter-apk/app-release.apk
+          zip-artifact: false
+
 
 
       # - name: Create Release
