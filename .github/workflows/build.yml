@@ -8,10 +8,26 @@ on:
     branches:
       - master
 env:
-  devproductionIP: http://18.168.59.10:3000
-  authproductionIP: http://18.168.59.10:8000/RT
+  devproductionIP: ${{ env.DEVPRODUCTIONIP }}
+  authproductionIP: ${{ env.AUTHPRODUCTIONIP }}
 
-jobs:          
+jobs:
+
+  PRINT:
+      runs-on: ubuntu-latest
+
+      steps:
+      - name: Print Google-Services File
+        run: cat user_app/android/app/google-services.json
+      
+      - name: Print DEVPRODUCTIONIP
+        run: echo ${{ env.DEVPRODUCTIONIP }}
+      
+      - name: Print AUTHPRODUCTIONIP
+        run: echo ${{ env.AUTHPRODUCTIONIP }}
+
+      
+
   Build-EventLink:
       runs-on: ubuntu-latest
 
@@ -29,6 +45,9 @@ jobs:
         uses: subosito/flutter-action@v2.10.0
         with:
           channel: 'stable'
+
+      - name: Create Google-Services File
+        run: echo ${{ env.GOOGLE_SERVICES_FILE }} > user_app/android/app/google-services.json
 
       - name: Install App dependencies
         run: flutter pub get
@@ -62,6 +81,9 @@ jobs:
         uses: subosito/flutter-action@v2.10.0
         with:
           channel: 'stable'
+
+      - name: Create Google-Services File
+        run: echo ${{ env.GOOGLE_SERVICES_FILE }} > org_app/android/app/google-services.json
 
       - name: Install App dependencies
         run: flutter pub get
