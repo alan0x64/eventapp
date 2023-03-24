@@ -10,6 +10,7 @@ on:
 env:
   devproductionIP: ${{ vars.DEVPRODUCTIONIP }}
   authproductionIP: ${{ vars.AUTHPRODUCTIONIP }}
+  GOOGLE_SERVICES_FILE: ${{ vars.GOOGLE_SERVICES_FILE }}
 
 jobs:
 
@@ -18,13 +19,13 @@ jobs:
 
       steps:
       - name: Print DEVPRODUCTIONIP
-        run: echo ${{ vars.DEVPRODUCTIONIP }}
+        run: echo ${{ env.devproductionIP }}
       
       - name: Print AUTHPRODUCTIONIP
-        run: echo ${{ vars.AUTHPRODUCTIONIP }}
+        run: echo ${{ env.authproductionIP }}
         
       - name: Print Google-Services File
-        run: echo "${{ vars.GOOGLE_SERVICES_FILE }}"
+        run: echo "${{ env.GOOGLE_SERVICES_FILE }}"
       
 
   Build-EventLink:
@@ -46,10 +47,10 @@ jobs:
           channel: 'stable'
 
       - name: Create Google-Services File
-        run: echo "${{ vars.GOOGLE_SERVICES_FILE }}" > user_app/android/app/google-services.json
+        run: echo "${{ env.GOOGLE_SERVICES_FILE }}" > user_app/android/app/google-services.json
 
       - name: Create ENV File
-        run: echo "devproductionIP=${{ vars.DEVPRODUCTIONIP }} authproductionIP=${{ vars.AUTHPRODUCTIONIP }}" > user_app/.env
+        run: echo "devproductionIP=${{ env.devproductionIP }} authproductionIP=${{ env.authproductionIP }}" > user_app/.env
 
       - name: Install App dependencies
         run: flutter pub get
@@ -85,10 +86,10 @@ jobs:
           channel: 'stable'
 
       - name: Create Google-Services File
-        run: echo "${{ vars.GOOGLE_SERVICES_FILE }}" > org_app/android/app/google-services.json
+        run: echo "${{ env.GOOGLE_SERVICES_FILE }}" > org_app/android/app/google-services.json
 
       - name: Create ENV File
-        run: echo "devproductionIP=${{ vars.DEVPRODUCTIONIP }} authproductionIP=${{ vars.AUTHPRODUCTIONIP }}" > org_app/.env
+        run: echo "devproductionIP=${{ env.devproductionIP }} authproductionIP=${{ env.authproductionIP }}" > org_app/.env
 
       - name: Install App dependencies
         run: flutter pub get
