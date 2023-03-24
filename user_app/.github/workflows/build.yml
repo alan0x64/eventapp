@@ -39,8 +39,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: EventLinkManger
-          path: build/app/outputs/flutter-apk/app-release.apk
-          working-directory: user_app
+          path: user_app/build/app/outputs/flutter-apk/app-release.apk
 
 
       # - name: Create Release
