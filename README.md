@@ -2,7 +2,7 @@
 <p> App For Hosting Events </p>  
 
 ## Todos 
-- Test On Ios 
+- Test On Ios  
 - Remove SingUp In Org App 
 
 ### Back-End
