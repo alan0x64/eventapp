@@ -47,7 +47,7 @@ jobs:
           channel: 'stable'
 
       - name: Create Google-Services File
-        run: echo "${{ env.GOOGLE_SERVICES_FILE }}" > user_app/android/app/google-services.json
+        run: echo '${{ env.GOOGLE_SERVICES_FILE }}' > user_app/android/app/google-services.json
 
       - name: Create ENV File
         run: echo "devproductionIP=${{ env.devproductionIP }} authproductionIP=${{ env.authproductionIP }}" > user_app/.env
@@ -86,7 +86,7 @@ jobs:
           channel: 'stable'
 
       - name: Create Google-Services File
-        run: echo "${{ env.GOOGLE_SERVICES_FILE }}" > org_app/android/app/google-services.json
+        run: echo '${{ env.GOOGLE_SERVICES_FILE }}' > org_app/android/app/google-services.json
 
       - name: Create ENV File
         run: echo "devproductionIP=${{ env.devproductionIP }} authproductionIP=${{ env.authproductionIP }}" > org_app/.env
