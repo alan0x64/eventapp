@@ -8,8 +8,8 @@ on:
     branches:
       - master
 env:
-  devproductionIP: ${{ env.DEVPRODUCTIONIP }}
-  authproductionIP: ${{ env.AUTHPRODUCTIONIP }}
+  devproductionIP: ${{ vars.DEVPRODUCTIONIP }}
+  authproductionIP: ${{ vars.AUTHPRODUCTIONIP }}
 
 jobs:
 
@@ -21,10 +21,10 @@ jobs:
         run: cat user_app/android/app/google-services.json
       
       - name: Print DEVPRODUCTIONIP
-        run: echo ${{ env.DEVPRODUCTIONIP }}
+        run: echo ${{ vars.DEVPRODUCTIONIP }}
       
       - name: Print AUTHPRODUCTIONIP
-        run: echo ${{ env.AUTHPRODUCTIONIP }}
+        run: echo ${{ vars.AUTHPRODUCTIONIP }}
 
       
 
@@ -47,7 +47,7 @@ jobs:
           channel: 'stable'
 
       - name: Create Google-Services File
-        run: echo ${{ env.GOOGLE_SERVICES_FILE }} > user_app/android/app/google-services.json
+        run: echo ${{ vars.GOOGLE_SERVICES_FILE }} > user_app/android/app/google-services.json
 
       - name: Install App dependencies
         run: flutter pub get
@@ -83,7 +83,7 @@ jobs:
           channel: 'stable'
 
       - name: Create Google-Services File
-        run: echo ${{ env.GOOGLE_SERVICES_FILE }} > org_app/android/app/google-services.json
+        run: echo ${{ vars.GOOGLE_SERVICES_FILE }} > org_app/android/app/google-services.json
 
       - name: Install App dependencies
         run: flutter pub get
