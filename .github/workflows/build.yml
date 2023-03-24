@@ -18,7 +18,7 @@ jobs:
 
       steps:
       - name: Print Google-Services File
-        run: cat user_app/android/app/google-services.json
+        run: echo ${{ vars.GOOGLE_SERVICES_FILE }}
       
       - name: Print DEVPRODUCTIONIP
         run: echo ${{ vars.DEVPRODUCTIONIP }}
