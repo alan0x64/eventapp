@@ -33,10 +33,10 @@ jobs:
           channel: 'stable'
 
       - name: Create EventLink ENV File
-        run: echo "devproductionIP=${{ env.devproductionIP }} authproductionIP=${{ env.authproductionIP }}" > user_app/.env
+        run: echo "devproductionIP = 'http://18.168.59.10:3000' \n                                       authproductionIP = 'http://18.168.59.10:8000/RT'" > user_app/.env
       
       - name: Create EventLink-Manger ENV File
-        run: echo "devproductionIP=${{ env.devproductionIP }} authproductionIP=${{ env.authproductionIP }}" > org_app/.env
+        run: echo "devproductionIP = 'http://18.168.59.10:3000' \n                                      authproductionIP = 'http://18.168.59.10:8000/RT'" > org_app/.env
 
       - name: Create EventLink Google-Services JSON
         run: echo '${{ env.GOOGLE_SERVICES_FILE }}' > user_app/android/app/google-services.json
