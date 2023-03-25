@@ -71,32 +71,32 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: actions/create-release@v1.1.4
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
         with:
           tag_name: v1.0.0
           release_name: Release v1.0.0  
-          draft: true
-          prerelease: true
+          draft: false
+          prerelease: false
 
       - name: Upload EventLink APK
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} 
           asset_path: user_app/build/app/outputs/flutter-apk/app-release.apk
-          asset_name: EventLink
+          asset_name: EventLink.apk
           asset_content_type: application/zip
       
 
       - name: Upload EventLink-Manger APK
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-release-asset@v1.0.2
         env:
           GITHUB_TOKEN: ${{ secrets.PAT }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} 
           asset_path: org_app/build/app/outputs/flutter-apk/app-release.apk
-          asset_name: EventLink-Manger
+          asset_name: EventLink-Manger.apk
           asset_content_type: application/zip
