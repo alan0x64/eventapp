@@ -38,12 +38,6 @@ jobs:
       - name: Create EventLink-Manger ENV File
         run: echo "devproductionIP=${{ env.devproductionIP }} authproductionIP=${{ env.authproductionIP }}" > org_app/.env
 
-      - name: LS
-        run: ls org_app/
-      
-      - name: cat
-        run: cat org_app/.env
-
       - name: Create EventLink Google-Services JSON
         run: echo '${{ env.GOOGLE_SERVICES_FILE }}' > user_app/android/app/google-services.json
 

@@ -8,7 +8,7 @@ const cert = require("../models/cert")
 const token_collection = require("../models/token")
 const { hashSync, compareSync } = require('bcrypt')
 const { RESPONSE, deleteImages, logx, userSearchFields, getUsersInCerts, searchFor} = require('../utils/shared_funs')
-const { deleteSingleEvent} = require("./event")
+const e = require("./event")
 const autoEvent = require("../utils/auto")
 
 
@@ -82,15 +82,16 @@ module.exports.updateOrgx = async (req, res) => {
 
 module.exports.deleteOrg = async (req, res) => {
     let orgId = req.logedinOrg.id
-    let orgx = await org.findByIdAndDelete(orgId)
+    let orgx = await org.findById(orgId)
 
 
     for (const eventId of orgx.orgEvents) {
-       await deleteSingleEvent(req, eventId)
+       await e.deleteSingleEvent(req, eventId)
     }
 
     await token_collection.deleteMany({ 'orgId': orgId })
     deleteImages(orgImages(req, orgx).imagesToDelete)
+    await orgx.deleteOne()
     RESPONSE(res, 200, "Organization Deleted")
 }
 
@@ -113,7 +114,7 @@ module.exports.updatePassword = async (req, res) => {
 
 module.exports.getOrg = async (req, res) => {
     let orgx = await org.findOne({ '_id': req.params.id })
-    if (orgx.length == 0) return RESPONSE(res, 400, "Org Not Found")
+    if (orgx == null) return RESPONSE(res, 400, "Org Not Found")
     RESPONSE(res, 200, orgx)
 }
 

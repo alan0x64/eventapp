@@ -4,6 +4,7 @@ const { DateNowInMin, toMin, genCerts } = require("./shared_funs")
 
 async function autoEvent(req,res,eventId){
     let eventx = await event.findById(eventId)
+    req.body.eventId=eventId
     
     if (eventx.status != 1 && eventx.status != 2  && DateNowInMin() < toMin(eventx.endDateTime) && DateNowInMin() > toMin(eventx.startDateTime)) {
         await eventx.updateOne({

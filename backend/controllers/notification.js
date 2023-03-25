@@ -9,12 +9,12 @@ var FCM = new fcm(certPath)
 module.exports.notficationSender = async (req, res, sendRes) => {
     if (sendRes == null) sendRes = 1
     try {
-        let eventId = req.body.eventId || req.params.eventId
+        let eventId = req.body.eventId??req.params.eventId
         let eventx = await event.findById(eventId)
 
         notification = {
             title: `A Event Has Started`,
-            body: `${eventx.title} Has Started`,
+            body: `${eventx.title??"Some Event"} Has Started`,
             sound: "default"
         }
 

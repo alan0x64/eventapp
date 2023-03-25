@@ -314,7 +314,6 @@ module.exports.deleteSingleEvent = async function (req, id) {
         })
     }
 
-
     await org.findByIdAndUpdate(eventx.orgId, {
         $pull: { 'orgEvents': eventx._id }
     })
