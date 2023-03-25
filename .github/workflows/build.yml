@@ -32,8 +32,11 @@ jobs:
         with:
           channel: 'stable'
 
-      - name: Create ENV File
-        run: echo "devproductionIP=${{ env.devproductionIP }} authproductionIP=${{ env.authproductionIP }}" > .env
+      - name: Create EventLink ENV File
+        run: echo "devproductionIP=${{ env.devproductionIP }} authproductionIP=${{ env.authproductionIP }}" > user_app/.env
+      
+      - name: Create EventLink-Manger ENV File
+        run: echo "devproductionIP=${{ env.devproductionIP }} authproductionIP=${{ env.authproductionIP }}" > org_app/.env
 
       - name: Create EventLink Google-Services JSON
         run: echo '${{ env.GOOGLE_SERVICES_FILE }}' > user_app/android/app/google-services.json

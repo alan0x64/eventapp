@@ -15,12 +15,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-// DotEnv dotenv = DotEnv() is automatically called during import.
-// If you want to load multiple dotenv files or name your dotenv object differently, you can do the following and import the singleton into the relavant files:
-// DotEnv another_dotenv = DotEnv()
-
-
 void main() async {
+  await dotenv.load(fileName: ".env");
   host(kReleaseMode);
   WidgetsFlutterBinding.ensureInitialized();
   await intilizeLocalNotification();
@@ -28,8 +24,6 @@ void main() async {
   await handleBackground();
   await handleForeground();
   await handleInApp();
-  await dotenv.load(fileName: ".env");
-
 
   FlutterError.onError = (FlutterErrorDetails details) {
     FlutterError.dumpErrorToConsole(

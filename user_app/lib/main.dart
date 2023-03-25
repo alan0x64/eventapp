@@ -16,19 +16,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-//   factory AppTheme.orange({String? id}) {
-//   return AppTheme(
-//     data: ThemeData(
-//       brightness: Brightness.light,
-//       primaryColor: Colors.orange,
-//       accentColor: Colors.deepOrange,
-//     ),
-//     id: id ?? "default_orange_theme",
-//     description: "Custom Default Orange Theme",
-//   );
-// }
-
 void main() async {
+  await dotenv.load(fileName: ".env");
   host(kReleaseMode);
   WidgetsFlutterBinding.ensureInitialized();
   await intilizeLocalNotification();
@@ -36,7 +25,6 @@ void main() async {
   await handleBackground();
   await handleForeground();
   await handleInApp();
-  await dotenv.load(fileName: ".env");
 
 
   FlutterError.onError = (FlutterErrorDetails details) {
