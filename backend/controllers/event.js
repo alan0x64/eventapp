@@ -6,7 +6,7 @@ const org = require("../models/org")
 const orgCon = require('../controllers/org')
 const cert = require("../models/cert")
 const PDF = require('pdf-lib').PDFDocument;
-const { deleteImages, DateNowInMin, attendedInMin, RESPONSE, logx, logError, toMin, genCerts, userSearchFields, eventSearchFields, searchFor, filterBody } = require('../utils/shared_funs');
+const { deleteImages, DateNowInMin, attendedInMin, RESPONSE, logx, logError, toMin, genCerts, userSearchFields, eventSearchFields, searchFor, filterBody, getCertAttendance } = require('../utils/shared_funs');
 const autoEvent = require('../utils/auto');
 const { parseLatLon, isInsideCircle, } = require('./../utils/location')
 
@@ -168,18 +168,21 @@ module.exports.checkIn = async (req, res) => {
         }
     }).save()
 
+
+
     await eventx.updateOne({
-        Attenders: (await cert.find({})).length,
+        Attenders: (await getCertAttendance(eventx._id)).length,
         "$push": { 'eventCerts': certx._id }
     })
 
-    RESPONSE(res, 200, "User Checked In")
+    RESPONSE(res, 200, `Checked In ${userx.fullName} `)
 }
 
 module.exports.checkOut = async (req, res) => {
     let eventId = req.body.eventId
     let userId = req.body.userId
     let eventx = await event.findById(eventId)
+    let userx = await user.findById(userId)
     let checkOutTime = DateNowInMin()
 
     if (eventx.length == 0) return RESPONSE(res, 400, "Event Does Not Exist")
@@ -201,19 +204,16 @@ module.exports.checkOut = async (req, res) => {
         'attendedMins': attendedMins,
         'allowCert': allowCert
     }
+
     console.log(updatebody);
 
+    await certx.updateOne(updatebody)
 
-    let xxx = await certx.updateOne({ ...updatebody })
-
-    console.log(xxx);
     await eventx.updateOne({
-        'Attended': (await cert.find({
-            'eventId': eventx._id
-        })).length
+        'Attended': (await getCertAttendance(eventId, 1)).length,
     })
 
-    RESPONSE(res, 200, "Checked Out")
+    RESPONSE(res, 200, `Checked Out ${userx.fullName} `)
 }
 
 module.exports.makeCerts = async (req, res) => {
@@ -246,7 +246,24 @@ module.exports.genCert = async (req, res) => {
 
 
         if (certx == null) {
-            return RESPONSE(res, 400, "User Is Not Checked In")
+            let newCertName = Date.now() + '.pdf'
+            certx = await new cert({
+                userId: userId,
+                eventId: eventx._id,
+                orgId: eventx.orgId,
+                checkInTime: 0,
+                checkOutTime: 0,
+                allowCert: true,
+                attendedMins: 0,
+                cert: {
+                    fileName: newCertName,
+                    url: `${process.env.HOST}:${process.env.PORT}/uploads/certs/${newCertName}`,
+                }
+            }).save()
+
+            await eventx.updateOne({
+                $push: { 'eventCerts': certx._id }
+            })
         }
 
         //read files
@@ -337,7 +354,30 @@ module.exports.getAttenders = async (req, res) => {
     )
 
     for (const cert of eventx.eventCerts) {
-        attenders.push(cert.userId)
+        if (cert.checkInTime != 0) {
+            attenders.push(cert.userId)
+        }
+    }
+
+    return RESPONSE(res, 200, { 'members': attenders })
+}
+
+module.exports.getAttended = async (req, res) => {
+    let attenders = []
+    let eventId = req.params.eventId
+    let eventx = await event.findById(eventId).populate(
+        {
+            path: 'eventCerts',
+            populate: {
+                path: 'userId'
+            }
+        }
+    )
+
+    for (const cert of eventx.eventCerts) {
+        if (cert.checkInTime != 0 && cert.checkOutTime != 0) {
+            attenders.push(cert.userId)
+        }
     }
 
     return RESPONSE(res, 200, { 'members': attenders })

@@ -1,4 +1,4 @@
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously, must_be_immutable
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:org/models/event.dart';
@@ -16,19 +16,13 @@ class UserProfilePage extends StatefulWidget {
   final String userId;
   final String eventId;
   final bool blacklist;
-  final bool userview;
-  final bool showControl;
-  final bool showcertControl;
+  late int eventStatus;
 
-
-  const UserProfilePage({
+  UserProfilePage({
     super.key,
     required this.userId,
     required this.eventId,
     required this.blacklist,
-    this.userview = false,
-    this.showControl = true,
-    this.showcertControl = false,
   });
   @override
   State<UserProfilePage> createState() {
@@ -39,14 +33,19 @@ class UserProfilePage extends StatefulWidget {
 class _UserProfilePageState extends State<UserProfilePage> {
   bool isDarkMode = false;
   User? userx;
+  Event event = const Event();
 
   @override
   Widget build(BuildContext context) {
-    Console.log(widget.showControl);
     return BuildFuture(
-      callback: () => getUser(widget.userId),
+      callback: () async {
+        event = toEvent((await getEventInfo(widget.eventId)).data);
+        return getUser(widget.userId);
+      },
       mapper: (resData) => toUser(resData.data),
       builder: (data) {
+        Console.log(event.status);
+        widget.eventStatus = event.status;
         userx = data;
         String fullName = userx!.fullName;
         return Scaffold(
@@ -206,7 +205,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                     Text(
                                       userx!.dateOfBirth.substring(0, 10),
                                     ),
-                                     const SizedBox(height: 10),
+                                    const SizedBox(height: 10),
                                     const Text(
                                       'Bio',
                                       style: TextStyle(
@@ -225,7 +224,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           const SizedBox(
                             width: 3,
                           ),
-                          if (widget.showControl && widget.blacklist==false)
+                          if (widget.eventStatus != 0 &&
+                              widget.blacklist == false)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -261,14 +261,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                     child: const Text("Genrate Certificate")),
                               ],
                             ),
-                          if (widget.showControl && !widget.blacklist)
+                          if (widget.eventStatus != 2 &&
+                              widget.blacklist == false)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
                                 ElevatedButton(
                                     style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                            const Color.fromARGB(255, 206, 187, 17)),
+                                        backgroundColor: const Color.fromARGB(255, 6, 107, 28)),
                                     onPressed: () async {
                                       showDialog(
                                           context: context,
@@ -299,7 +299,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                     child: const Text("Remove User")),
                                 ElevatedButton(
                                     style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.red),
+                                        backgroundColor: const Color.fromARGB(255, 128, 19, 11)),
                                     onPressed: () async {
                                       showDialog(
                                           context: context,
@@ -327,10 +327,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                     child: const Text("Block")),
                               ],
                             ),
-                          if (widget.blacklist && !widget.showControl)
+                          if (widget.blacklist == true &&
+                              widget.eventStatus != 2)
                             ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red),
+                                    backgroundColor: const Color.fromARGB(255, 172, 27, 17)),
                                 onPressed: () async {
                                   showDialog(
                                       context: context,

@@ -116,6 +116,11 @@ Future<Response> getAttenders(String eventId) async {
   return await GET('$devServer/event/attenders/$eventId', 0, 'AT');
 }
 
+Future<Response> getAttended(String eventId) async {
+  return await GET('$devServer/event/attended/$eventId', 0, 'AT');
+}
+
+
 Future<Response> getBlacklistMembers(String eventId) async {
   return await GET('$devServer/event/blacklist/$eventId', 0, 'AT');
 }
@@ -139,10 +144,19 @@ Future<Response> deleteEvent(String eventId) async {
   return await DELETE('$devServer/event/delete/$eventId', 0, 'AT', {});
 }
 
-http.MultipartRequest addEventFields(
-    {required http.MultipartRequest request,
-    required Map<String, dynamic> data,
-    bool onlyfields = false}) {
+http.MultipartRequest addEventFields({
+  required http.MultipartRequest request,
+  required Map<String, dynamic> data,
+  bool ispartialUpdate = false,
+}) {
+  if (ispartialUpdate) {
+    request.fields['title'] = data['title'];
+    request.fields['description'] = data['description'];
+    request.fields['seats'] = data['seats'].toString();
+    request.fields['location'] = data['location'].toString();
+    return request;
+  }
+
   request.fields['title'] = data['title'];
   request.fields['description'] = data['description'];
   request.fields['seats'] = data['seats'].toString();

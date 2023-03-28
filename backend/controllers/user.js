@@ -6,7 +6,7 @@ const event = require("../models/event")
 const cert = require("../models/cert")
 const token_collection = require("../models/token")
 const { hashSync, compareSync } = require('bcrypt')
-const { RESPONSE, deleteImages, getUsersInCerts, searchFor, userSearchFields, logx, genCerts } = require('../utils/shared_funs')
+const { RESPONSE, deleteImages, getUsersInCerts, searchFor, userSearchFields, logx, genCerts, getCertAttendance } = require('../utils/shared_funs')
 
 function userImages(req, userx = {}, cert = {}) {
     const profilePic = {
@@ -75,7 +75,7 @@ module.exports.deleteUser = async (req, res) => {
     let userId = req.logedinUser.id
     let userx = await user.findByIdAndDelete(userId)
 
-    if (userx.length == 0) return RESPONSE(res, 400, "User Does Not Exist")
+    if (userx == 0) return RESPONSE(res, 400, "User Does Not Exist")
 
 
     // Remove User From all events 
@@ -88,22 +88,22 @@ module.exports.deleteUser = async (req, res) => {
 
     for (const event of events) {
         let certx = await (cert.findOne({ 'userId': userId, 'eventId': event._id, 'orgId': event.orgId })).deleteOne()
-        let certs = await cert.find({ 'eventId': event._id, 'orgId': event.orgId })
+
+        attenders=(await getCertAttendance(event._id)).length
+
         if (certx.allowCert) {
             await event.updateOne({
-                Attended: (await cert.find({
-                    'eventId': event._id
-                })).length,
-                $inc: { Attenders: certs.length },
+                Attended: (await getCertAttendance(event._id,1)).length,
+                Attenders: attenders,
                 $pull: { 'eventMembers': userId },
-                $pull: { 'eventCerts': userId },
+                $pull: { 'eventCerts': certx._id },
                 $pull: { 'blackListed': userId },
             })
         } else {
             await event.updateOne({
-                $inc: { Attenders: certs.length },
+                Attenders:attenders,
                 $pull: { 'eventMembers': userId },
-                $pull: { 'eventCerts': userId },
+                $pull: { 'eventCerts': certx._id },
                 $pull: { 'blackListed': userId },
             })
         }
@@ -264,11 +264,12 @@ module.exports.search = async (req, res) => {
     let eventx = await event.findById(eventId).populate("eventCerts")
 
     let lists = [
-        getUsersInCerts(eventx.eventCerts),
+        getUsersInCerts(await getCertAttendance(eventId)),
         eventx.eventMembers,
-        eventx.blackListed
+        eventx.blackListed,
+        getUsersInCerts(await getCertAttendance(eventId,0))
     ]
-
+    
     let userx = await searchFor(user, lists[lnum], userSearchFields[fnum], fieldValue,null)
     return RESPONSE(res, 200, { 'members': userx })
 }

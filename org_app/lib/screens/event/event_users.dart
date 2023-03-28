@@ -13,6 +13,8 @@ class ViewEventUser extends StatefulWidget {
   final bool blacklist;
   final bool registred;
   final bool showControl;
+  final bool attended;
+
 
   const ViewEventUser({
     super.key,
@@ -20,6 +22,8 @@ class ViewEventUser extends StatefulWidget {
     this.blacklist = false,
     this.registred = false,
     this.showControl = true,
+    this.attended = false,
+
   });
 
   @override
@@ -44,6 +48,10 @@ class _ViewEventUser extends State<ViewEventUser> {
       screenTitle = 'Registred Users';
       lnum = 1;
       cb = () async => await getEventMembers(widget.eventId);
+    }else if (widget.attended) {
+      screenTitle = 'Attended Users';
+      lnum = 3;
+      cb = () async => await getAttended(widget.eventId);
     }
 
     return BuildFuture(
@@ -67,11 +75,14 @@ class _ViewEventUser extends State<ViewEventUser> {
             itemCount: data?.length,
             itemBuilder: (context, index) {
               User userx = data![index];
-              return UserCard(
-                eventId: widget.eventId,
-                user: userx,
-                blacklist: widget.blacklist,
-                showControl: widget.showControl,
+              return Container(
+                padding: const EdgeInsets.only(top: 5),
+                child: UserCard(
+                  eventId: widget.eventId,
+                  user: userx,
+                  blacklist: widget.blacklist,
+                  // showControl: widget.showControl,
+                ),
               );
             },
           ),

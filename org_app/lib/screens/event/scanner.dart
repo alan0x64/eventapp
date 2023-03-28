@@ -19,8 +19,9 @@ import 'event_users.dart';
 class Status extends StatefulWidget {
   final String eventId;
   final List<String> scanStatus = ['Check In', 'Check Out'];
+  final int scanMode;
 
-  Status({Key? key, required this.eventId}) : super(key: key);
+  Status({Key? key, required this.eventId,required this.scanMode}) : super(key: key);
 
   @override
   State<Status> createState() => _StatusState();
@@ -39,9 +40,9 @@ class _StatusState extends State<Status> {
 
   Future<dynamic> getId() async {
     while (userId == null) {
-      await Future.delayed(const Duration(
-          milliseconds: 5)); // wait for 100 milliseconds before checking again
+      await Future.delayed(const Duration(milliseconds: 10));
     }
+
     return userId;
   }
 
@@ -63,7 +64,7 @@ class _StatusState extends State<Status> {
   @override
   Widget build(BuildContext context) {
     bool failed = false;
-    String st = widget.scanStatus[scan];
+    String st = widget.scanStatus[widget.scanMode];
     if (ThemeProvider.themeOf(context).id == "default_dark_theme") {
       boxColor = const Color.fromARGB(255, 226, 225, 225);
       textColor = const Color.fromARGB(255, 19, 18, 18);
@@ -236,7 +237,7 @@ class _StatusState extends State<Status> {
                           ElevatedButton(
                               style: ElevatedButton.styleFrom(
                                 backgroundColor:
-                                    const Color.fromARGB(255, 187, 10, 69),
+                                    const Color.fromARGB(255, 168, 105, 10),
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 20,
                                   vertical: 10,
@@ -250,25 +251,24 @@ class _StatusState extends State<Status> {
                                     ));
                               },
                               child: const Text("See Attenders")),
-                          ElevatedButton(
-                            onPressed: () {
-                              scan == 0 ? scan = 1 : scan = 0;
-                              setState(() {});
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  const Color.fromARGB(255, 168, 150, 44),
-                              textStyle: const TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.normal,
+                               ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    const Color.fromARGB(255, 59, 7, 155),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 10,
+                                ),
                               ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 20,
-                                vertical: 10,
-                              ),
-                            ),
-                            child: const Text("Toggle Scan Status"),
-                          ),
+                              onPressed: () {
+                                goto(
+                                    context,
+                                    ViewEventUser(
+                                      attended:true,
+                                      eventId: eventdata.id,
+                                    ));
+                              },
+                              child: const Text("See Attended")),
                         ],
                       ),
                     ],
@@ -284,13 +284,13 @@ class _StatusState extends State<Status> {
                     future: QRCheckin(
                       context,
                       widget.eventId,
-                      scan,
+                      widget.scanMode,
                       () async {
                         return await getId();
                       },
                     ),
-                    builder:
-                        (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                    builder: (BuildContext context,
+                        AsyncSnapshot<dynamic> snapshot) {
                       if (snapshot.connectionState == ConnectionState.done &&
                           snapshot.hasData) {
                         if (Response.errorStatus
@@ -306,7 +306,8 @@ class _StatusState extends State<Status> {
                           child: MessageDialog(
                         showButtonThree: snapshot.hasData ? true : false,
                         cupertino: true,
-                        message: snapshot.data.data['msg'] ?? "Somthing Went Wrong",
+                        message:
+                            snapshot.data.data['msg'] ?? "Somthing Went Wrong",
                         buttonOneText: "Scan Again",
                         buttonTwoText: "Go Back To Event",
                         buttonThreeText: 'View Scanned User',
@@ -324,7 +325,6 @@ class _StatusState extends State<Status> {
                                 userId: userId as String,
                                 blacklist: false,
                                 eventId: widget.eventId,
-                                showControl: !failed,
                               ));
                         },
                         icon: Indicator(failed: failed),

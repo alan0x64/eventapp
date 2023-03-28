@@ -40,7 +40,7 @@ class _EditEventState extends State<EditEvent> {
         : widget.eventSig = await picker.pickImage(source: ImageSource.gallery);
     getdataFromNetwork = false;
     setState(() {});
-    return getEventFromForm(context, _formKey);
+    return getEventFromForm(context, _formKey, status: widget.event!.status);
   }
 
   @override
@@ -145,7 +145,8 @@ class _EditEventState extends State<EditEvent> {
                           child: ElevatedButton(
                               onPressed: () async {
                                 Response resx = Response();
-                                if (validateStartEnd(context, _formKey)) {
+                                if (widget.event!.status == 0 &&
+                                    validateStartEnd(context, _formKey)) {
                                   return Future.value();
                                 }
 
@@ -157,20 +158,22 @@ class _EditEventState extends State<EditEvent> {
                                       return await updateEvent(
                                           widget.eventId,
                                           getEventFromForm(context, _formKey,
-                                              location:
-                                                  widget.event!.location));
+                                              location: widget.event!.location,
+                                              status: widget.event!.status));
                                     },
                                   );
                                 } else {
                                   FormRequestHandler(
                                       formdata: getEventFromForm(
                                           context, _formKey,
+                                          status: widget.event!.status,
                                           location: widget.event!.location),
                                       org_event_user: 1,
                                       formKey: _formKey,
                                       setState: () => setState(() {}),
                                       context: context,
                                       requestHandler: (data, res) async {
+                                        Console.log(data);
                                         resx = await runFun(
                                           context,
                                           () async {
@@ -183,11 +186,20 @@ class _EditEventState extends State<EditEvent> {
                                               filefield1: "eventBackgroundPic",
                                               url:
                                                   "$devServer/event/update/${widget.eventId}",
-                                              addFields: (req, data) =>
-                                                  addEventFields(
-                                                request: req,
-                                                data: data,
-                                              ),
+                                              addFields: (req, data) {
+                                                if (widget.event!.status == 1) {
+                                                  return addEventFields(
+                                                    ispartialUpdate: true,
+                                                    request: req,
+                                                    data: data,
+                                                  );
+                                                } else {
+                                                  return addEventFields(
+                                                    request: req,
+                                                    data: data,
+                                                  );
+                                                }
+                                              },
                                             );
                                           },
                                         );
@@ -197,10 +209,12 @@ class _EditEventState extends State<EditEvent> {
                                 if (resx.statusCode == 200) {
                                   widget.eventPic = null;
                                   widget.eventSig = null;
+                                  
                                   getFromProvider<LocationProvider>(
                                       context,
                                       (provider) => provider
                                           .setEventLocation(LatLng(0, 0)));
+
                                   widget.formdata!.clear();
                                   moveBack(context, 1);
                                   snackbar(context, "Chnages Saved", 2);

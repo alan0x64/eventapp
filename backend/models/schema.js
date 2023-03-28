@@ -93,8 +93,8 @@ const validEventSchema = joi.object({
     location: joi.string().escapeHTML().default('None'),
     status: joi.number().valid(0, 1, 2).default(0).error(new Error('Invalid Event Status')),
     eventType: joi.number().valid(0, 1).default(0).error(new Error('Invalid Event Type')),
-    startDateTime: joi.string().required().error(new Error('Invalid Start Date&Time')),
-    endDateTime: joi.string().required().error(new Error('Invalid End Date&Time')),
+    startDateTime: joi.string().error(new Error('Invalid Start Date&Time')),
+    endDateTime: joi.string().error(new Error('Invalid End Date&Time')),
     minAttendanceTime: joi.number().min(0).default(0).error(new Error('Invalid Minimum Attendance Time')),
     seats: joi.number().min(1).default(1).error(new Error('Invalid Number Of Seats')),
 });

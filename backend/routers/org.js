@@ -17,7 +17,6 @@ router.route('/events/:orgId').get(authJWT_AT, onlyUsers, handleAsync(org.getPar
 //POST
 router.route('/login').post(validateLogin, handleAsync(org.login))
 router.route('/logout').post(authJWT_RT, onlyOrgs, handleAsync(org.logout))
-router.route('/search').post(authJWT_AT,onlyUsers , handleAsync(org.search))
 router.route('/:userId/:eventId')
 .post(authJWT_AT, onlyOrgs, isOrgEventOwner, handleAsync(org.BLUser))
     .delete(authJWT_AT, onlyOrgs, isOrgEventOwner, handleAsync(org.UBLUser))

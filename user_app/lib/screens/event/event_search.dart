@@ -1,5 +1,3 @@
-import 'package:EventLink/widgets/status_filter.dart';
-import 'package:EventLink/widgets/type_filter.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/event.dart';

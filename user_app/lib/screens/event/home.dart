@@ -80,7 +80,7 @@ class HomeState extends State<Home> {
                           itemCount: events?.length,
                           itemBuilder: (context, index) {
                             Event eventx = events![index];
-                            if (events!.length!=0) {
+                            if (events!.isNotEmpty) {
                               return EventCard(
                                 eventx: eventx,
                               );

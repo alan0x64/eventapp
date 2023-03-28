@@ -25,6 +25,9 @@ router.route('/blacklist/:eventId').get(authJWT_AT,onlyOrgs,isOrgEventOwner, han
 
 router.route('/attenders/:eventId').get(authJWT_AT,onlyOrgs,isOrgEventOwner, handleAsync(event.getAttenders))
 
+router.route('/attended/:eventId').get(authJWT_AT,onlyOrgs,isOrgEventOwner, handleAsync(event.getAttended))
+
+
 router.route('/certs/:eventId').get(authJWT_AT,onlyOrgs,isOrgEventOwner,handleAsync(event.getEventCerts))
 
 
@@ -45,7 +48,7 @@ router.route('/checkout').patch(
     onlyOrgs,
     isOrgEventOwner,
     validateCheckInOut,
-    validateObjectID,
+    catchFun(validateObjectID),
     handleAsync(event.checkOut)
     )
 

@@ -199,9 +199,18 @@ Map<String, dynamic> getOrgFromForm(
 }
 
 Map<String, dynamic> getEventFromForm(BuildContext context, FORMKEY formKey,
-    {String location = ''}) {
+    {String location = '', int status = 0}) {
   if (location.isEmpty || getLocationString(context, 1) != "0.0,0.0") {
     location = getLocationString(context, 1);
+  }
+
+  if (status == 1) {
+    return {
+      'title': formKey.currentState!.fields['title']!.value,
+      'description': formKey.currentState!.fields['description']!.value,
+      'seats': formKey.currentState!.fields['seats']!.value.toString(),
+      'location': location,
+    };
   }
 
   return {
@@ -543,7 +552,10 @@ bool didFieldsChange(
     }
   }
 
-  if (org_event_user != 2) if (object.location !=getLocationString(context, org_event_user)) return true;
+  if (org_event_user != 2 &&
+      object.location != getLocationString(context, org_event_user)) {
+    return true;
+  }
 
   return false;
 }

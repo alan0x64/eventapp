@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
 import '../utilities/shared.dart';
 
 class TypeFilter extends StatefulWidget {
-  int selectedbutton;
-  void Function(int selectbutton) state;
-
-  TypeFilter({super.key, required this.selectedbutton, required this.state});
+  final int selectedbutton;
+  final void Function(int selectbutton) state;
+  
+  const  TypeFilter({super.key, required this.selectedbutton, required this.state});
 
   @override
   State<TypeFilter> createState() => _TypeFilterState();

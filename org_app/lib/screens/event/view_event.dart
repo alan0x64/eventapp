@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:org/models/event.dart';
 import 'package:org/models/org.dart';
@@ -9,6 +10,7 @@ import 'package:org/screens/event/scanner.dart';
 import 'package:org/utilities/shared.dart';
 import 'package:org/widgets/dialog.dart';
 import 'package:org/widgets/future_builder.dart';
+import 'package:org/widgets/message_dialog.dart';
 
 import '../../models/cert.dart';
 import '../../utilities/notofocation.dart';
@@ -240,11 +242,50 @@ class _ViewEventState extends State<ViewEvent> {
                           margin: const EdgeInsets.all(5),
                           child: ElevatedButton(
                               onPressed: () {
-                                goto(
-                                    context,
-                                    Status(
-                                      eventId: eventdata.id,
-                                    ));
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return Stack(
+                                      children: [
+                                        ModalBarrier(
+                                            dismissible: false,
+                                            color:
+                                                Colors.black.withOpacity(0.5)),
+                                        MessageDialog(
+                                          showButtonThree: true,
+                                          cupertino: true,
+                                          message: "QR Scan Mode",
+                                          buttonOneText: "CheckIn Mode",
+                                          buttonTwoText: "CheckOut Mode",
+                                          buttonThreeText: 'Cancel',
+                                          buttonOne: () {
+                                            moveBack(context, 1);
+
+                                            goto(
+                                                context,
+                                                Status(
+                                                  scanMode: 0,
+                                                    eventId: widget.eventId));
+                                          },
+                                          buttonTwo: () {
+                                            moveBack(context, 1);
+                                                                                        goto(
+                                                context,
+                                                Status(
+                                                  scanMode: 1,
+                                                    eventId: widget.eventId)
+                                                    );
+
+                                          },
+                                          buttonThree: () {
+                                            moveBack(context, 1);
+                                          },
+                                          icon: const Icon(Icons.qr_code),
+                                        )
+                                      ],
+                                    );
+                                  },
+                                );
                               },
                               child: const Text(
                                 "Scan QRs",
@@ -324,31 +365,22 @@ class _ViewEventState extends State<ViewEvent> {
                       },
                       child: const Text("Delete")),
                 ),
-                // ElevatedButton(
-                //     onPressed: () async {
-                //      res= await updateEventStatus(context, eventdata, 0);
-                //       snackbar(context, res.data['msg'], 2);
-                //       setState(() {});
-                //       return await Future.value();
-                //     },
-                //     child: const Text("Reset")),
-                // ElevatedButton(
-                //     onPressed: () async {
-                //       notifySubscribers(eventdata.id);
-                //       return await Future.value();
-                //     },
-                //     child: const Text("notify")),
-                // ElevatedButton(
-                //     onPressed: () {
-                //       unsubscribeDeviceFromTopic(eventdata.id);
-                //       // unsubscribeFromTopic(eventdata.id);
-                //     },
-                //     child: const Text("unsub")),
-                // ElevatedButton(
-                //     onPressed: () {
-                //       subscribeToTopic(eventdata.id);
-                //     },
-                //     child: const Text("SUb")),
+                if(kDebugMode)
+                ElevatedButton(
+                    onPressed: () async {
+                      res = await updateEventStatus(context, eventdata, 0);
+                      snackbar(context, res.data['msg'], 2);
+                      setState(() {});
+                      return await Future.value();
+                    },
+                    child: const Text("Reset")),
+                if(kDebugMode)
+                ElevatedButton(
+                    onPressed: () async {
+                      notifySubscribers(eventdata.id);
+                      return await Future.value();
+                    },
+                    child: const Text("notify")),
               ],
             ),
           );

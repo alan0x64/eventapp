@@ -5,6 +5,7 @@ const chalk = require("chalk");
 const event = require("../models/event");
 const path = require("path");
 const user = require("../models/user");
+const cert = require("../models/cert");
 const PDF = require('pdf-lib').PDFDocument;
 
 
@@ -43,7 +44,7 @@ function RESPONSE(res, code, data) {
             status: status,
             statusCode: code,
             timestamp: new Date().toISOString(),
-            data:data,
+            data: data,
         }
     )
     return
@@ -82,7 +83,7 @@ function DateNowInMin() {
 }
 
 function toMin(date) {
-    return Date.parse(date)/60000 
+    return Date.parse(date) / 60000
 }
 
 function attendedInMin(checkin, checkout) {
@@ -105,12 +106,12 @@ function logger(req, res, next) {
 
     const start = Date.now()
     const time = new Date()
-    
+
     const formattedDate = `${time.getFullYear()}-${(time.getMonth() + 1).toString().padStart(2, '0')}-${time.getDate().toString().padStart(2, '0')}`;
     const formattedTime = `${time.getHours().toString().padStart(2, '0')}:${time.getMinutes().toString().padStart(2, '0')}:${time.getSeconds().toString().padStart(2, '0')}`;
     const formattedDateTime = `${formattedDate} ${formattedTime}`;
 
-url = req.url
+    url = req.url
     res.on('finish', () => {
         let x = (Date.now() - start);
         let color = 'white';
@@ -140,17 +141,17 @@ const validateObjectID = (req, res, next) => {
     next()
 }
 
-async function searchFor(model, list, fieldName, fieldValue,populateField,status,type) {
+async function searchFor(model, list, fieldName, fieldValue, populateField, status, type) {
 
-    populateField=populateField==null?"":populateField
-    status=status==null?-1:status
-    type=type==null?-1:type
+    populateField = populateField == null ? "" : populateField
+    status = status == null ? -1 : status
+    type = type == null ? -1 : type
 
     let searchBody = {
         $and: [
             list != null ? { _id: { $in: list } } : {},
-            status != -1 ? {status: status } : {},
-            type != -1 ? {eventType: type } : {},
+            status != -1 ? { status: status } : {},
+            type != -1 ? { eventType: type } : {},
             { [fieldName]: { $regex: new RegExp(`${fieldValue}`, 'i') } },
         ],
     }
@@ -168,7 +169,7 @@ function getUsersInCerts(certs) {
 
 
 
-async function genCerts(req,res,sendRes) {
+async function genCerts(req, res, sendRes) {
     if (sendRes == null) sendRes = 1
 
     try {
@@ -238,6 +239,62 @@ async function genCerts(req,res,sendRes) {
 }
 
 
+async function getCertAttendance(eventId, mode) {
+
+    // Attended
+    if (mode == 0) {
+        return (await cert.find({
+            eventId: eventId,
+            $and: [
+                { checkInTime: { $ne: 0 } },
+                { checkOutTime: { $ne: 0 } }
+            ]
+        }).populate('userId'))
+
+        // let x=await cert.findById(eventId)
+        // // checkInTime: { $ne: 0 } ,
+        // // checkOutTime: { $ne: 0 } 
+        
+        // let a=[]
+
+
+        // for ( cert of x) {
+        //     console.log(cert);
+
+        //     if (cert.checkInTime!=0 && cert.checkOutTime!=0 ) {
+        //         a.push(cert)
+        //     }
+
+                
+        // }
+
+        // return a
+
+    }
+
+
+    // Attended &  Cert
+    if (mode == 1) {
+        return (await cert.find(
+            {
+                eventId: eventId,
+                allowCert: true,
+                $and: [
+                    { checkInTime: { $ne: 0 } },
+                    {checkOutTime: { $ne: 0 }}
+                ]
+            }))
+    }
+
+    // Attenders
+    return (await cert.find({
+        eventId: eventId,
+        checkInTime: { $ne: 0 }
+    }))
+
+}
+
+
 module.exports = {
     RESPONSE,
     validateObjectID,
@@ -255,6 +312,7 @@ module.exports = {
     getUsersInCerts,
     toMin,
     genCerts,
+    getCertAttendance
 }
 
 

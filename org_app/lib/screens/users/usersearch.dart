@@ -34,7 +34,6 @@ SearchDelegate userSearch(int lnum,{
                 eventId: eventId,
                 user: userx,
                 blacklist: blacklist,
-                showControl: showControl,
               );
             },
           );

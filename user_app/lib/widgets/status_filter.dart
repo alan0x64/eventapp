@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
 import '../utilities/shared.dart';
 
 class StatusFilter extends StatefulWidget {
-  int selectedbutton;
-  void Function(int selectbutton) state;
+  final int selectedbutton;
+  final void Function(int selectbutton) state;
 
-  StatusFilter({super.key, required this.selectedbutton, required this.state});
+  const StatusFilter({super.key, required this.selectedbutton, required this.state});
 
   @override
   State<StatusFilter> createState() => _StatusFilterState();
@@ -18,7 +16,7 @@ class _StatusFilterState extends State<StatusFilter> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.all(5),
+      margin: const EdgeInsets.all(5),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [

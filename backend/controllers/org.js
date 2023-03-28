@@ -7,7 +7,7 @@ const user = require("../models/user")
 const cert = require("../models/cert")
 const token_collection = require("../models/token")
 const { hashSync, compareSync } = require('bcrypt')
-const { RESPONSE, deleteImages, logx, userSearchFields, getUsersInCerts, searchFor} = require('../utils/shared_funs')
+const { RESPONSE, deleteImages, logx, userSearchFields, getUsersInCerts, searchFor, getCertAttendance} = require('../utils/shared_funs')
 const e = require("./event")
 const autoEvent = require("../utils/auto")
 
@@ -197,15 +197,13 @@ module.exports.BLUser = async (req, res, blockmode) => {
 
     updatebody = {
         "$pull": { 'eventMembers': userx._id },
-        Attenders: certs.length,
         "$push": {},
+        Attenders:(await getCertAttendance(eventx._id)).length,
     }
 
     if (certx) updatebody["$pull"]['eventCerts'] = certx._id
     if (blockmode) updatebody["$push"]['blackListed'] = userx._id
-    if (certx && certx.allowCert) updatebody['Attended'] = (await cert.find({
-        'eventId': eventx._id
-    })).length
+    if (certx && certx.allowCert) updatebody['Attended'] = (await getCertAttendance(eventx._id,1)).length
 
     await user.findByIdAndUpdate(userId, {
         "$pull": { 'joinedEvents': eventId }
@@ -251,20 +249,4 @@ module.exports.getParticularOrgEvents = async (req, res) => {
 }
 
 
-module.exports.search = async (req, res) => {
-
-    console.log(req.body)
-
-    let { eventId, fieldValue, lnum, fnum } = req.body
-    let eventx = await event.findById(eventId).populate("eventCerts")
-
-    let lists = [
-        getUsersInCerts(eventx.eventCerts),
-        eventx.eventMembers,
-        eventx.blackListed
-    ]
-
-    let userx = await searchFor(user, lists[lnum], userSearchFields[fnum], fieldValue)
-    return RESPONSE(res, 200, { 'members': userx })
-}
 
