@@ -333,6 +333,7 @@ class _ViewEventState extends State<ViewEvent> {
                       ),
                     ],
                   ),
+                  if(eventdata.status!=1)
                 Container(
                   height: 40,
                   width: double.infinity,

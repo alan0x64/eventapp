@@ -185,8 +185,8 @@ module.exports.checkOut = async (req, res) => {
     let userx = await user.findById(userId)
     let checkOutTime = DateNowInMin()
 
-    if (eventx.length == 0) return RESPONSE(res, 400, "Event Does Not Exist")
-    if (eventx.blackListed.includes(userId)) return RESPONSE(res, 400, "User Is Blocked")
+    if (eventx == null) return RESPONSE(res, 400, "CheckOut Failed\nEvent Does Not Exist")
+    if (eventx.blackListed.includes(userId)) return RESPONSE(res, 400, "CheckOut Failed\nUser Is Blocked")
 
     let certx = await cert.findOne({
         userId: userId,
@@ -194,10 +194,13 @@ module.exports.checkOut = async (req, res) => {
         orgId: eventx.orgId,
     })
 
-    if (!certx || certx.length == 0 || checkOutTime < certx.checkInTime) return RESPONSE(res, 400, "User Must Check In First")
+    if (!certx || certx.length == 0 || checkOutTime < certx.checkInTime) return RESPONSE(res, 400, "CheckOut Failed \nUser Must Check In First")
 
     let attendedMins = attendedInMin(checkOutTime, certx.checkInTime)
     let allowCert = attendedMins >= eventx.minAttendanceTime
+    let allowed="Forbidden"
+    let fullName = userx.fullName;
+let capitalizedFullName = fullName.charAt(0).toUpperCase() + fullName.slice(1);
 
     let updatebody = {
         'checkOutTime': checkOutTime,
@@ -205,7 +208,6 @@ module.exports.checkOut = async (req, res) => {
         'allowCert': allowCert
     }
 
-    console.log(updatebody);
 
     await certx.updateOne(updatebody)
 
@@ -213,7 +215,11 @@ module.exports.checkOut = async (req, res) => {
         'Attended': (await getCertAttendance(eventId, 1)).length,
     })
 
-    RESPONSE(res, 200, `Checked Out ${userx.fullName} `)
+    if (certx.allowCert) {
+        allowed='Eligible'
+    }
+
+    RESPONSE(res, 200, ` CheckOut Successful\n User : ${capitalizedFullName} \n Details recorded : \n\n Certification : ${allowed} \n Attended : ${certx.attendedMins} Minutes`)
 }
 
 module.exports.makeCerts = async (req, res) => {

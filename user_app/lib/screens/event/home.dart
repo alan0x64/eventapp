@@ -25,7 +25,6 @@ class HomeState extends State<Home> {
   int selectedStatus = -1;
   int selectedType = -1;
 
-
   LatLng x = LatLng(0, 0);
   List<dynamic>? events;
   @override
@@ -37,12 +36,12 @@ class HomeState extends State<Home> {
 
     try {
       return Screen(
-          ab: buildAppBar(context, title,
-              search: true, searchWidget: eventSearchWidget(() {
-              setState(() {
-                
-              });
-              },)),
+          ab: buildAppBar(context, title, search: true,
+              searchWidget: eventSearchWidget(
+            () {
+              setState(() {});
+            },
+          )),
           builder: (x) {
             return Column(
               children: [
@@ -57,9 +56,7 @@ class HomeState extends State<Home> {
                   selectedbutton: selectedType,
                   state: (selectbutton) {
                     selectedType = selectbutton;
-                    setState(() {
-                      
-                    });
+                    setState(() {});
                   },
                 ),
                 BuildFuture(
@@ -67,7 +64,7 @@ class HomeState extends State<Home> {
                     if (widget.joinView) {
                       return getJoinedEvents();
                     } else {
-                      return getEvents(selectedStatus,selectedType);
+                      return getEvents(selectedStatus, selectedType);
                     }
                   },
                   mapper: (resdata) => mapObjs(resdata.data['events'], toEvent),
@@ -75,25 +72,29 @@ class HomeState extends State<Home> {
                     events = data;
                     return Expanded(
                         flex: 8,
-                        child: ListView.builder(
-                          physics: const BouncingScrollPhysics(),
-                          itemCount: events?.length,
-                          itemBuilder: (context, index) {
-                            Event eventx = events![index];
-                            if (events!.isNotEmpty) {
-                              return EventCard(
-                                eventx: eventx,
-                              );
-                            } else {
-                              return Container(
-                                margin: const EdgeInsets.all(100),
-                                child: const Center(
-                                  child: Text("No Events"),
-                                ),
-                              );
-                            }
-                          },
-                        ));
+                        child: GridView.builder(
+                            physics: const BouncingScrollPhysics(),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              childAspectRatio: 0.75,
+                            ),
+                            itemCount: events?.length,
+                            itemBuilder: (context, index) {
+                              Event eventx = events![index];
+                              if (events!.isNotEmpty) {
+                                return EventCard(
+                                  eventx: eventx,
+                                );
+                              } else {
+                                return Container(
+                                  margin: const EdgeInsets.all(100),
+                                  child: const Center(
+                                    child: Text("No Events"),
+                                  ),
+                                );
+                              }
+                            }));
                   },
                 )
               ],

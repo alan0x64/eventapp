@@ -124,6 +124,7 @@ class _EventFormState extends State<EventForm> {
                   valis: [
                     FormBuilderValidators.required(),
                     FormBuilderValidators.minLength(3),
+                    FormBuilderValidators.maxLength(20),
                   ]),
               const SizedBox(
                 height: 25,

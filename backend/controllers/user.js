@@ -238,14 +238,13 @@ module.exports.RemoveUserFromEvent = async (req, res) => {
 module.exports.getCertificate = async (req, res) => {
     let userId = req.logedinUser._id
     let eventId = req.params.eventId
+    let eventx = await event.findById(eventId)
     
-
-    let eventx = await event.findById(eventId).populate('eventCerts')
-
-    if (eventx.length == 0) return RESPONSE(res, 400, { 'error': "Event Not Found" })
+    if (eventx == null) return RESPONSE(res, 400, { 'msg': "Event Not Found" })
+    let certs = await getCertAttendance(eventId,1)
    
-    for (const cert of eventx.eventCerts) {
-        if (cert.userId.toString() == userId.toString()) {
+    for (const cert of certs) {
+        if (cert.userId.toString() == userId.toString() && cert.eventId.toString() == eventId.toString()) {
             return RESPONSE(res,200,cert.cert.url)
         }
     }
