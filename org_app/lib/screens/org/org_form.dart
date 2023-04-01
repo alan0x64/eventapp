@@ -7,6 +7,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:org/screens/map.dart';
 import 'package:org/utilities/providers.dart';
 import 'package:org/utilities/shared.dart';
+import 'package:org/widgets/button.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/org.dart';
@@ -42,33 +43,37 @@ class _OrgFormState extends State<OrgForm> {
     List orgtypes = ['Organization', 'University', 'Company'];
     return Column(
       children: [
-        Container(
-          margin: const EdgeInsets.all(15),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              if (widget.showReset)
-                ElevatedButton(
-                    onPressed: widget.resetSelectors,
-                    child: const Text(
-                      "Reset Image Selection",
-                      style: TextStyle(fontSize: 14),
-                    )),
-              ElevatedButton(
-                  onPressed: () {
-                    goto(context, Mapx(
-                      setLocationButton: (setLocationButton) {
-                        Provider.of<LocationProvider>(context, listen: false)
-                            .setOrgLocation(setLocationButton as LatLng);
-                      },
-                    ));
-                  },
-                  child: const Text(
-                    "Set Headquarters",
-                    style: TextStyle(fontSize: 14),
-                  )),
-            ],
+        const SizedBox(
+          height: 15,
+        ),
+        if (widget.showReset)
+          SizedBox(
+            width: MediaQuery.of(context).size.width,
+            child: Button(
+              color: Colors.cyan,
+              text: "Reset Image Selection",
+              cb: () async {
+                widget.resetSelectors;
+              },
+            ),
           ),
+        SizedBox(
+          width: MediaQuery.of(context).size.width,
+          child: Button(
+            color: const Color.fromARGB(255, 73, 73, 204),
+            text: "Set Headquarters",
+            cb: () async {
+              goto(context, Mapx(
+                setLocationButton: (setLocationButton) {
+                  Provider.of<LocationProvider>(context, listen: false)
+                      .setOrgLocation(setLocationButton as LatLng);
+                },
+              ));
+            },
+          ),
+        ),
+        const SizedBox(
+          height: 20,
         ),
         AppTextbox(
             name: 'name',
@@ -199,16 +204,15 @@ class _OrgFormState extends State<OrgForm> {
             const SizedBox(
               height: 15,
             ),
-            Container(
-              height: 45,
-              width: double.infinity,
-              margin: const EdgeInsets.fromLTRB(0, 10, 0, 1),
-              child: ElevatedButton(
-                  onPressed: widget.mainButton,
-                  child: Text(
-                    widget.mainButtonText,
-                    style: const TextStyle(fontSize: 14),
-                  )),
+            SizedBox(
+              width: MediaQuery.of(context).size.width,
+              child: Button(
+                color: Colors.lime,
+                text: widget.mainButtonText,
+                cb: ()async {
+                  widget.mainButton();
+                },
+              ),
             )
           ],
         )

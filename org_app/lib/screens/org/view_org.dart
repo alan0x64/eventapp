@@ -5,6 +5,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:org/models/org.dart';
 import 'package:org/screens/org/edit_org.dart';
 import 'package:org/utilities/shared.dart';
+import 'package:org/widgets/button.dart';
 import 'package:org/widgets/future_builder.dart';
 import 'package:org/widgets/profile_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -19,6 +20,8 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   List orgtypes = ['Organization', 'University', 'Company'];
+List<IconData> orgTypeIcons = [  Icons.group,  Icons.school,  Icons.business];
+
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
@@ -50,77 +53,91 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     },
                   ),
                   const SizedBox(
-                    height: 24,
+                    height: 15,
                   ),
-                  buildTitle(widget.orgdata.orgName, widget.orgdata.email),
+                  buildTitle(icon: Icons.email,widget.orgdata.orgName, widget.orgdata.email,context),
                   const SizedBox(
-                    height: 30,
+                    height: 5,
+                  ),
+                   Button(
+                    color: const Color.fromARGB(255, 27, 118, 221),
+                    text:"Open Website" , cb: () async {
+                     try {
+                          String website = widget.orgdata.website;
+                          launchUrl(Uri.parse("https://$website"),
+                              mode: LaunchMode.externalApplication);
+                        } catch (e) {
+                          Console.logError(e.toString());
+                          snackbar(context, "Error Opping Website", 2);
+                        }
+                  },),
+                
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Column(
+                    children: [
+                      buildViewInfo(
+                        titleicon: Icons.phone_android,
+                            context: context,
+                        "Phone Number", widget.orgdata.phoneNumber),
+                         const SizedBox(
+                    height: 13,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      Container(
-                        margin: const EdgeInsets.all(5),
-                        child: ElevatedButton(
-                            child: const Text(
-                              "View Headquarters On Mapps",
-                              style: TextStyle(fontSize: 15),
-                            ),
-                            onPressed: () async {
-                              Console.log(widget.orgdata.location.toString());
-                              try {
-                                showOnMap(context, widget.orgdata.location);
-                              } catch (e) {
-                                Console.log(widget.orgdata.location.toString());
-                                Console.logError(e.toString());
-                                snackbar(context, "Error Opping Mapps", 2);
-                              }
-                            }),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.all(5),
-                        child: ElevatedButton(
-                            child: const Text(
-                              "Open Website",
-                              style: TextStyle(fontSize: 15),
-                            ),
-                            onPressed: () async {
-                              try {
-                                String website = widget.orgdata.website;
-                                launchUrl(Uri.parse("https://$website"),
-                                    mode: LaunchMode.externalApplication);
-                              } catch (e) {
-                                Console.logError(e.toString());
-                                snackbar(context, "Error Opping Website", 2);
-                              }
-                            }),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  buildViewInfo("Phone Number", widget.orgdata.phoneNumber),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  buildViewInfo("Website", widget.orgdata.website),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  buildViewInfo("Soical Media", widget.orgdata.socialMedia),
-                  const SizedBox(
-                    height: 30,
+                      buildViewInfo(
+                        titleicon: Icons.web,
+                            context: context,
+                        "Website", widget.orgdata.website),
+                         const SizedBox(
+                    height: 13,
                   ),
                   buildViewInfo(
+                        titleicon: Icons.chat,
+                        context: context,
+                    "Soical Media", widget.orgdata.socialMedia),
+                    ],
+                  ),
+                                 
+                  const SizedBox(
+                    height: 13,
+                  ),
+                  buildViewInfo(
+                    icon: orgTypeIcons[widget.orgdata.orgtype],
+                        context: context,
                       "Organization Type", orgtypes[widget.orgdata.orgtype]),
                   const SizedBox(
-                    height: 30,
+                    height: 10,
                   ),
-                  buildViewInfo("Bio", widget.orgdata.bio),
+                   SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                     child: Button(
+                      color: const Color.fromARGB(255, 234, 195, 37),
+                      text:'View Headquarters On Mapps', cb: ()async {
+                       try {
+                            showOnMap(context, widget.orgdata.location);
+                          } catch (e) {
+                            Console.log(widget.orgdata.location.toString());
+                            Console.logError(e.toString());
+                            snackbar(context, "Error Opping Mapps", 2);
+                          }
+                                     },),
+                   ),
+                    const SizedBox(
+                    height: 10,
+                  ),
+                  buildViewInfo(
+                      titleicon: Icons.description,
+                        context: context,
+                    "Bio", widget.orgdata.bio),
                   const SizedBox(
-                    height: 30,
+                    height: 13,
                   ),
+                    ],
+                  ),
+                 
                 ],
               ),
             ),

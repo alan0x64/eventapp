@@ -2,7 +2,6 @@
 
 import 'dart:async';
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -20,7 +19,6 @@ import '../net/HTTP.dart';
 import '../net/auth.dart';
 import '../screens/login.dart';
 import '../server.dart';
-import '../widgets/dialog.dart';
 import 'providers.dart';
 
 typedef ResCallback = Future<Response> Function();
@@ -99,7 +97,8 @@ AppBar buildAppBar(BuildContext context, String title,
     bool search = false,
     SearchDelegate? searchWidget}) {
   return AppBar(
-    title: Text(title),
+    backgroundColor: getTheme(context)==0?Colors.black:const Color.fromARGB(255, 236, 233, 233),
+    title: Text(title,style: TextStyle(color: getTheme(context)==0?Colors.white:Colors.black )),
     leading: button,
     elevation: 0,
     actions: [
@@ -108,32 +107,32 @@ AppBar buildAppBar(BuildContext context, String title,
             onPressed: () {
               showSearch(context: context, delegate: searchWidget!);
             },
-            icon: const Icon(Icons.search)),
-      IconButton(
-        icon: const Icon(CupertinoIcons.moon_stars),
-        onPressed: () {
-          try {
-            if (showdialog) {
-              showDialog(
-                  context: context,
-                  builder: (context) => CustomDialog(
-                        bigText: "Sure Wanna Change Theme?",
-                        smallerText: "All Unsaved Chnages Will Be Lost!",
-                        quit: false,
-                        fun: () async {
-                          ThemeProvider.controllerOf(context).nextTheme();
-                          Navigator.pop(context);
-                          return await Future.value(Response());
-                        },
-                      ));
-            } else {
-              ThemeProvider.controllerOf(context).nextTheme();
-            }
-          } catch (e) {
-            Console.log(e);
-          }
-        },
-      )
+            icon: Icon(Icons.search,color:getTheme(context)==0?Colors.white:Colors.black ) ,),
+      // IconButton(
+      //   icon: Icon(CupertinoIcons.moon_stars,color:getTheme(context)==0?Colors.white:Colors.black ),
+      //   onPressed: () {
+      //     try {
+      //       if (showdialog) {
+      //         showDialog(
+      //             context: context,
+      //             builder: (context) => CustomDialog(
+      //                   bigText: "Sure Wanna Change Theme?",
+      //                   smallerText: "All Unsaved Chnages Will Be Lost!",
+      //                   quit: false,
+      //                   fun: () async {
+      //                     ThemeProvider.controllerOf(context).nextTheme();
+      //                     Navigator.pop(context);
+      //                     return await Future.value(Response());
+      //                   },
+      //                 ));
+      //       } else {
+      //         ThemeProvider.controllerOf(context).nextTheme();
+      //       }
+      //     } catch (e) {
+      //       Console.log(e);
+      //     }
+      //   },
+      // )
     ],
   );
 }
@@ -425,44 +424,84 @@ Event mapEvent(Map<String, dynamic>? data) {
       endDateTime: endDateTime);
 }
 
-buildTitle(
-  String textOne,
-  String textTwo,
-) {
-  return Column(
-    children: [
-      Text(
-        textOne,
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-      ),
-      const SizedBox(
-        height: 4,
-      ),
-      Text(
-        textTwo,
-        style: const TextStyle(color: Colors.grey),
-      )
-    ],
+buildTitle(String textOne, String textTwo,
+    BuildContext context,{IconData? icon,}) {
+  return Container(
+    margin: const EdgeInsets.all(5),
+    width: 30,
+    padding: const EdgeInsets.symmetric(horizontal: 35, vertical: 5),
+    decoration: BoxDecoration(
+      color: getTheme(context) == 1
+          ? const Color.fromARGB(255, 214, 209, 209)
+          : const Color.fromARGB(255, 14, 14, 15),
+      borderRadius: BorderRadius.circular(15),
+    ),
+    child: Column(
+      children: [
+        Text(
+          textOne,
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+        ),
+        const SizedBox(
+          height: 4,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (icon != null) Icon(icon),
+            if (icon != null) const SizedBox(width: 5),
+            Text(
+              textTwo,
+              style: TextStyle(
+                  color: getTheme(context) == 1
+                      ? const Color.fromARGB(255, 84, 80, 80)
+                      : Colors.grey),
+            ),
+          ],
+        )
+      ],
+    ),
   );
 }
 
-Widget buildViewInfo(String name, dynamic text, {Color? xcolor}) {
+
+Widget buildViewInfo(String name, dynamic text,
+    {Color? xcolor,
+    IconData? icon,
+    IconData? titleicon,
+    BuildContext? context}) {
   return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 48),
+    padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 8),
+    decoration: BoxDecoration(
+      color: getTheme(context) == 1
+          ? const Color.fromARGB(255, 214, 209, 209)
+          : const Color.fromARGB(255, 14, 14, 15),
+      borderRadius: BorderRadius.circular(15),
+    ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          name,
-          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        Row(
+          children: [
+            if (titleicon != null) Icon(titleicon, color: xcolor),
+            if (titleicon != null) const SizedBox(width: 5),
+            Text(
+              name,
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+          ],
         ),
-        const SizedBox(
-          height: 16,
+        const SizedBox(height: 5),
+        Row(
+          children: [
+            Text(
+              text.toString(),
+              style: TextStyle(color: xcolor, fontSize: 18, height: 1.4),
+            ),
+            if (icon != null) const SizedBox(width: 10),
+            if (icon != null) Icon(icon, color: xcolor),
+          ],
         ),
-        Text(
-          text.toString(),
-          style: TextStyle(color: xcolor, fontSize: 18, height: 1.4),
-        )
       ],
     ),
   );

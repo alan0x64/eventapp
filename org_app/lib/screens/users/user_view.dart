@@ -11,6 +11,7 @@ import 'package:org/widgets/dialog.dart';
 import 'package:org/widgets/future_builder.dart';
 
 import '../../models/cert.dart';
+import '../../widgets/button.dart';
 
 class UserProfilePage extends StatefulWidget {
   final String userId;
@@ -229,9 +230,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                ElevatedButton(
-                                    onPressed: () async {
-                                      showDialog(
+                                Button(
+                                  color: Colors.lightBlue,
+                                  text:"Genrate Certificate" , cb:() async {
+                                   showDialog(
                                         context: context,
                                         builder: (context) {
                                           return CustomDialog(
@@ -257,8 +259,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                           );
                                         },
                                       );
-                                    },
-                                    child: const Text("Genrate Certificate")),
+                                }, ),
                               ],
                             ),
                           if (widget.eventStatus != 2 &&
@@ -266,10 +267,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: [
-                                ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color.fromARGB(255, 6, 107, 28)),
-                                    onPressed: () async {
+                                Button(
+                                  color: const Color.fromARGB(255, 6, 107, 28),
+                                  text: "Remove User",
+                                  cb: ()async {
                                       showDialog(
                                           context: context,
                                           builder: (context) => CustomDialog(
@@ -295,13 +296,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                   return Future.value(res);
                                                 },
                                               ));
-                                    },
-                                    child: const Text("Remove User")),
-                                ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color.fromARGB(255, 128, 19, 11)),
-                                    onPressed: () async {
-                                      showDialog(
+                                  },
+                                ),
+                                Button(
+                                  text:"Block" , 
+                                color: const Color.fromARGB(255, 128, 19, 11),
+                                cb: () async{
+                                   showDialog(
                                           context: context,
                                           builder: (context) => CustomDialog(
                                                 bigText:
@@ -323,17 +324,16 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                                   return Future.value(res);
                                                 },
                                               ));
-                                    },
-                                    child: const Text("Block")),
+                                },),
                               ],
                             ),
                           if (widget.blacklist == true &&
                               widget.eventStatus != 2)
-                            ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color.fromARGB(255, 172, 27, 17)),
-                                onPressed: () async {
-                                  showDialog(
+                              Button(
+                                color: const Color.fromARGB(255, 172, 27, 17),
+                                text: "Unblock",
+                                cb: () async{
+                                 showDialog(
                                       context: context,
                                       builder: (context) => CustomDialog(
                                             bigText:
@@ -353,8 +353,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                               return Future.value(res);
                                             },
                                           ));
-                                },
-                                child: const Text("Unblock"))
+                              },)
                         ]),
                   ]),
             ));

@@ -1,5 +1,6 @@
 // ignore_for_file: must_be_immutable
 
+import 'package:EventLink/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 
@@ -37,20 +38,10 @@ class _UserFormState extends State<UserForm> {
   Widget build(BuildContext context) {
     return Column(
       children: [
+        if (widget.showReset)
         Container(
           margin: const EdgeInsets.all(15),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              if (widget.showReset)
-                ElevatedButton(
-                    onPressed: widget.resetSelectors,
-                    child: const Text(
-                      "Reset Image Selection",
-                      style: TextStyle(fontSize: 14),
-                    )),
-            ],
-          ),
+          child: Button(text:"Reset Image Selection" , cb: widget.resetSelectors),
         ),
         AppTextbox(
             name: 'fullName',
@@ -184,21 +175,16 @@ class _UserFormState extends State<UserForm> {
               FormBuilderValidators.min(0),
             ]),
         const SizedBox(
-          height: 25,
-        ),
-        const SizedBox(
-          height: 15,
+          height:10,
         ),
         Container(
-          height: 45,
           width: double.infinity,
           margin: const EdgeInsets.fromLTRB(0, 10, 0, 1),
-          child: ElevatedButton(
-              onPressed: widget.mainButton,
-              child: Text(
-                widget.mainButtonText,
-                style: const TextStyle(fontSize: 14),
-              )),
+          child:Button(
+            color: Colors.lightBlueAccent,
+            text:widget.mainButtonText ,
+            cb:widget.mainButton,
+          )
         )
       ],
     );

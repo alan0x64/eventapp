@@ -58,7 +58,7 @@ class UserDrawer extends StatelessWidget {
       ),
       ListTile(
         leading: const Icon(
-          Icons.check_box_outline_blank,
+          Icons.event_available,
         ),
         title: const Text('Registred Events'),
         onTap: () {
@@ -75,9 +75,6 @@ class UserDrawer extends StatelessWidget {
           goto(context, const Settings());
         },
       ),
-      const ListTile(),
-      const ListTile(),
-      const ListTile(),
     ],
   ),
 );

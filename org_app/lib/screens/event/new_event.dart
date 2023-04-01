@@ -9,6 +9,7 @@ import 'package:org/screens/event/event_form.dart';
 import 'package:org/screens/event/event_form_header.dart';
 import 'package:org/server.dart';
 import 'package:org/utilities/shared.dart';
+import 'package:org/widgets/button.dart';
 import 'package:org/widgets/screen.dart';
 
 import '../../net/HTTP.dart';
@@ -65,13 +66,7 @@ class _AddEventState extends State<AddEvent> {
             child: FormBuilder(
               key: _formKey,
               child: Column(children: [
-                if (widget.eventPic == null)
-                  TextButton(
-                      onPressed: () async {
-                        widget.formdata =
-                            await pickImageAndaveState(widget.formdata, 0);
-                      },
-                      child: const Text("Choose Event Picture")),
+                
                 if (widget.eventPic != null)
                   EventFormImage(
                       eventPic: widget.eventPic,
@@ -81,16 +76,23 @@ class _AddEventState extends State<AddEvent> {
                             await pickImageAndaveState(widget.formdata, 0);
                       },
                       isEdit: widget.editMode),
+                  if (widget.eventPic == null)
                 const SizedBox(
-                  height: 3,
+                  height: 15,
                 ),
-                if (widget.eventPic != null)
+                // if (widget.eventPic != null)
                   const Text(
                     "Event Picture",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
-                const SizedBox(
-                  height: 25,
+                  if (widget.eventPic == null)
+                Container(
+                    width: double.infinity,
+                        margin: const EdgeInsets.all(10),
+                  child: Button(text: "Choose Event Picture", cb: ()async {
+                                            widget.formdata =
+                              await pickImageAndaveState(widget.formdata, 0);
+                  },),
                 ),
                 Container(
                   margin: const EdgeInsets.all(5),
@@ -118,12 +120,17 @@ class _AddEventState extends State<AddEvent> {
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
                 if (widget.eventSig == null)
-                  TextButton(
-                      onPressed: () async {
-                        widget.formdata =
+                const SizedBox(
+                  height: 10,
+                ),
+                if (widget.eventSig == null)
+                Button(
+                  color: Colors.white,
+                  text: "Choose Digital Signiture",
+                   cb: ()async {
+                                          widget.formdata =
                             await pickImageAndaveState(widget.formdata, 1);
-                      },
-                      child: const Text("Choose Digital Signiture")),
+                },),
                 const SizedBox(
                   height: 15,
                 ),
@@ -137,17 +144,15 @@ class _AddEventState extends State<AddEvent> {
                       },
                       isEdit: widget.editMode),
                 const SizedBox(
-                  height: 15,
-                ),
-                const SizedBox(
                   height: 25,
                 ),
                 Container(
-                  height: 45,
-                  width: double.infinity,
-                  margin: const EdgeInsets.all(10),
-                  child: ElevatedButton(
-                      onPressed: () {
+                    width: double.infinity,
+                        margin: const EdgeInsets.all(10),
+                  child: Button(
+                    color: Colors.blue,
+                    text: "Create",
+                    cb: ()async {
                         if (widget.eventPic == null ||
                             widget.eventSig == null) {
                           return snackbar(
@@ -195,11 +200,8 @@ class _AddEventState extends State<AddEvent> {
                             return resx;
                           },
                         );
-                      },
-                      child: const Text(
-                        "Create",
-                        style: TextStyle(fontSize: 14),
-                      )),
+                    },
+                  ),
                 )
               ]),
             ));

@@ -1,5 +1,6 @@
 // ignore_for_file: must_be_immutable
 
+import 'package:EventLink/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
@@ -21,6 +22,8 @@ class OrgView extends StatefulWidget {
 
 class _OrgViewState extends State<OrgView> {
   List orgtypes = ['Organization', 'University', 'Company'];
+  List<IconData> orgTypeIcons = [Icons.group, Icons.school, Icons.business];
+
   @override
   Widget build(BuildContext context) {
     return RefreshIndicator(
@@ -52,74 +55,90 @@ class _OrgViewState extends State<OrgView> {
                   const SizedBox(
                     height: 24,
                   ),
-                  buildTitle(widget.orgdata.orgName, widget.orgdata.email),
+                  buildTitle(
+                      icon: Icons.email,
+                      widget.orgdata.orgName,
+                      widget.orgdata.email,
+                      context),
                   const SizedBox(
-                    height: 30,
+                    height: 10,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.all(5),
-                        child: ElevatedButton(
-                            child: const Text(
-                              "View Headquarters On Mapps",
-                              style: TextStyle(fontSize: 15),
+                  Button(
+                    color: Colors.blueAccent,
+                    text: 'Open Website',
+                    cb: () {
+                      String website = widget.orgdata.website;
+                      launchUrl(Uri.parse("https://$website"),
+                          mode: LaunchMode.externalApplication);
+                    },
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    margin: const EdgeInsets.all(5),
+                    child: Column(
+                      children: [
+                        buildViewInfo(
+                            titleicon: Icons.phone_android,
+                            context: context,
+                            "Phone Number",
+                            widget.orgdata.phoneNumber),
+                        const SizedBox(
+                          height: 13,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            buildViewInfo(
+                                titleicon: Icons.web,
+                                context: context,
+                                "Website",
+                                widget.orgdata.website),
+                            const SizedBox(
+                              height: 13,
                             ),
-                            onPressed: () async {
-                              Console.log(widget.orgdata.location.toString());
-                              try {
-                                showOnMap(context, widget.orgdata.location);
-                              } catch (e) {
-                                Console.log(widget.orgdata.location.toString());
-                                Console.logError(e.toString());
-                                snackbar(context, "Error Opping Mapps", 2);
-                              }
-                            }),
-                      ),
-                      Container(
-                        margin: const EdgeInsets.all(5),
-                        child: ElevatedButton(
-                            child: const Text(
-                              "Open Website",
-                              style: TextStyle(fontSize: 15),
-                            ),
-                            onPressed: () async {
-                              try {
-                                String website = widget.orgdata.website;
-                                launchUrl(Uri.parse("https://$website"),
-                                    mode: LaunchMode.externalApplication);
-                              } catch (e) {
-                                Console.logError(e.toString());
-                                snackbar(context, "Error Opping Website", 2);
-                              }
-                            }),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  buildViewInfo("Phone Number", widget.orgdata.phoneNumber),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  buildViewInfo("Website", widget.orgdata.website),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  buildViewInfo("Soical Media", widget.orgdata.socialMedia),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  buildViewInfo(
-                      "Organization Type", orgtypes[widget.orgdata.orgtype]),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  buildViewInfo("Bio", widget.orgdata.bio),
-                  const SizedBox(
-                    height: 30,
+                            buildViewInfo(
+                                titleicon: Icons.chat,
+                                context: context,
+                                "Soical Media",
+                                widget.orgdata.socialMedia),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 13,
+                        ),
+                        buildViewInfo(
+                            icon: orgTypeIcons[widget.orgdata.orgtype],
+                            context: context,
+                            "Organization Type",
+                            orgtypes[widget.orgdata.orgtype]),
+                        const SizedBox(
+                          height: 13,
+                        ),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          child: Button(
+                            color: Colors.deepOrange,
+                            text: 'View Headquarters On Mapps',
+                            cb: () {
+                              showOnMap(context, widget.orgdata.location);
+                            },
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        buildViewInfo(
+                            titleicon: Icons.description,
+                            context: context,
+                            "Bio",
+                            widget.orgdata.bio),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

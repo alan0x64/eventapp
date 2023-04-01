@@ -9,6 +9,7 @@ import 'package:org/net/HTTP.dart';
 import 'package:org/net/auth.dart';
 import 'package:org/screens/login.dart';
 import 'package:org/utilities/shared.dart';
+import 'package:org/widgets/button.dart';
 import 'package:org/widgets/textfield.dart';
 
 class UpdatePassword extends StatefulWidget {
@@ -85,32 +86,34 @@ class _UpdatePasswordState extends State<UpdatePassword> {
                   ],
                 ),
                 const SizedBox(height: 30.0),
-                ElevatedButton(
-                  child: const Text('Save Password'),
-                  onPressed: () async {
+                Container(
+                  width: double.infinity,
+                  child: Button(
+                    color: Colors.blueAccent,
+                    text: "Save Password", cb: ()async {
                     if (!_formKey.currentState!.validate()) return;
-                    Map<String, dynamic> data = {
-                      "cuurentPassword": _formKey
-                          .currentState!.fields['currentPassword']!.value,
-                      "newPassword":
-                          _formKey.currentState!.fields['newPassword']!.value,
-                    };
-
-                    Response res = await runFun(
-                      context,
-                      () async {
-                        return await runFun(
-                          context,
-                          () async => await updatePassword(data),
-                        );
-                      },
-                    );
-
-                    logout();
-                    clearTokens();
-                    gotoClear(context, const LoginScreen());
-                    snackbar(context, res.data['msg'], 2);
-                  },
+                      Map<String, dynamic> data = {
+                        "cuurentPassword": _formKey
+                            .currentState!.fields['currentPassword']!.value,
+                        "newPassword":
+                            _formKey.currentState!.fields['newPassword']!.value,
+                      };
+                
+                      Response res = await runFun(
+                        context,
+                        () async {
+                          return await runFun(
+                            context,
+                            () async => await updatePassword(data),
+                          );
+                        },
+                      );
+                
+                      logout();
+                      clearTokens();
+                      gotoClear(context, const LoginScreen());
+                      snackbar(context, res.data['msg'], 2);
+                  },),
                 ),
               ],
             ),

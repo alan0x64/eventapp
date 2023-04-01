@@ -38,9 +38,13 @@ class Event {
     Colors.red
   ];
   static List<String> eventStatusList = ['Upcoming', 'Open', 'Passed'];
+  static List<IconData> eventStatusIconsList = [Icons.upcoming,Icons.open_with_rounded, Icons.donut_large_rounded];
+
 
   static List<String> eventTypeList = ['Conference', 'Seminar'];
+  static List<IconData> eventTypeIconsList = [Icons.event_note,Icons.school_rounded];
   static List<Color> eventTypeColorList = [Colors.blue, Colors.green];
+
 
   const Event({
     this.id = "",

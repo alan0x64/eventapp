@@ -9,6 +9,7 @@ import 'package:org/screens/event/event_form.dart';
 import 'package:org/screens/event/event_form_header.dart';
 import 'package:org/server.dart';
 import 'package:org/utilities/shared.dart';
+import 'package:org/widgets/button.dart';
 import 'package:org/widgets/future_builder.dart';
 
 import '../../net/HTTP.dart';
@@ -135,21 +136,16 @@ class _EditEventState extends State<EditEvent> {
                         const SizedBox(
                           height: 15,
                         ),
-                        const SizedBox(
-                          height: 25,
-                        ),
                         Container(
-                          height: 45,
-                          width: double.infinity,
-                          margin: const EdgeInsets.all(10),
-                          child: ElevatedButton(
-                              onPressed: () async {
-                                Response resx = Response();
+                        width: double.infinity,
+                        margin: const EdgeInsets.all(10),
+                          child: Button(cb: ()async {
+                             Response resx = Response();
                                 if (widget.event!.status == 0 &&
                                     validateStartEnd(context, _formKey)) {
                                   return Future.value();
                                 }
-
+                                                
                                 if (widget.eventPic == null &&
                                     widget.eventSig == null) {
                                   resx = await runFun(
@@ -214,18 +210,14 @@ class _EditEventState extends State<EditEvent> {
                                       context,
                                       (provider) => provider
                                           .setEventLocation(LatLng(0, 0)));
-
+                                                
                                   widget.formdata!.clear();
                                   moveBack(context, 1);
                                   snackbar(context, "Chnages Saved", 2);
                                   return;
                                 }
                                 snackbar(context, resx.data['msg'], 2);
-                              },
-                              child: const Text(
-                                "Save",
-                                style: TextStyle(fontSize: 14),
-                              )),
+                          },text: "Save",color: Colors.lightBlueAccent),
                         )
                       ]),
                     ),

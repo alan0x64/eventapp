@@ -1,6 +1,7 @@
 
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:EventLink/widgets/button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
@@ -84,33 +85,35 @@ class _UpdatePasswordState extends State<UpdatePassword> {
                     })
                   ],
                 ),
-                const SizedBox(height: 30.0),
-                ElevatedButton(
-                  child: const Text('Save Password'),
-                  onPressed: () async {
-                    if (!_formKey.currentState!.validate()) return;
-                    Map<String, dynamic> data = {
-                      "password": _formKey
-                          .currentState!.fields['currentPassword']!.value,
-                      "newPassword":
-                          _formKey.currentState!.fields['newPassword']!.value,
-                    };
-
-                    Response res = await runFun(
-                      context,
-                      () async {
-                        return await runFun(
-                          context,
-                          () => updatePassword(data),
-                        );
-                      },
-                    );
-
-                    logout();
-                    clearTokens();
-                    gotoClear(context, const LoginScreen());
-                    snackbar(context, res.data['msg'], 2);
-                  },
+                const SizedBox(height: 40.0),
+                Container(
+                  width: double.infinity,
+                  child: Button(
+                    color: Colors.lightBlue,
+                    text: 'Save Password', cb: () async{
+                     if (!_formKey.currentState!.validate()) return;
+                      Map<String, dynamic> data = {
+                        "password": _formKey
+                            .currentState!.fields['currentPassword']!.value,
+                        "newPassword":
+                            _formKey.currentState!.fields['newPassword']!.value,
+                      };
+                
+                      Response res = await runFun(
+                        context,
+                        () async {
+                          return await runFun(
+                            context,
+                            () => updatePassword(data),
+                          );
+                        },
+                      );
+                
+                      logout();
+                      clearTokens();
+                      gotoClear(context, const LoginScreen());
+                      snackbar(context, res.data['msg'], 2);
+                  },),
                 ),
               ],
             ),

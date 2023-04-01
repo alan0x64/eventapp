@@ -15,7 +15,11 @@ class Search extends SearchDelegate {
   @override
   List<Widget>? buildActions(BuildContext context) {
     return [
-      IconButton(onPressed: () {}, icon: const Icon(Icons.clear)),
+      IconButton(
+          onPressed: () {
+            query = '';
+          },
+          icon: const Icon(Icons.clear)),
     ];
   }
 
@@ -60,9 +64,11 @@ class Search extends SearchDelegate {
                       ),
                     ),
                     onPressed: () {
-                      setState(() {
-                      selectedCategory = index;
-                      },);
+                      setState(
+                        () {
+                          selectedCategory = index;
+                        },
+                      );
                     },
                     child: Text(categories[index]
                         // ,style: TextStyle(color: Colors.white)

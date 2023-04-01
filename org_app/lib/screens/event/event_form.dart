@@ -8,6 +8,7 @@ import 'package:org/models/event.dart';
 import 'package:org/screens/map.dart';
 import 'package:org/utilities/providers.dart';
 import 'package:org/utilities/shared.dart';
+import 'package:org/widgets/button.dart';
 import 'package:org/widgets/date_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -34,7 +35,7 @@ class EventForm extends StatefulWidget {
     this.showReset = false,
     this.showResetSelector = false,
     this.editMode = true,
-    this.eventStatus=0,
+    this.eventStatus = 0,
     required this.resetSelectors,
     required this.resetForm,
     required this.timeValidator,
@@ -51,64 +52,26 @@ class _EventFormState extends State<EventForm> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            if (widget.showResetSelector)
-              ElevatedButton(
-                  onPressed: widget.resetSelectors,
-                  child: const Text(
-                    "Reset Image Selection",
-                    style: TextStyle(fontSize: 14),
-                  )),
-            ElevatedButton(
-                onPressed: () {
-                  goto(context, Mapx(
-                    setLocationButton: (setLocation) {
-                      Provider.of<LocationProvider>(context, listen: false)
-                          .setEventLocation(setLocation as LatLng);
-                    },
-                  ));
-                },
-                child: const Text(
-                  "Set Event Location",
-                  style: TextStyle(fontSize: 14),
-                )),
-          ],
-        ),
-        const SizedBox(
-          height: 5,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            ElevatedButton(
-                onPressed: () {
-                  launchUrl(
-                      Uri.parse(
-                          'https://signaturely.com/online-signature/draw/'),
-                      mode: LaunchMode.externalApplication);
-                },
-                child: const Text("Draw Digital Signiture")),
-            ElevatedButton(
-                onPressed: () {
-                  launchUrl(
-                      Uri.parse(
-                          'https://signaturely.com/online-signature/type/'),
-                      mode: LaunchMode.externalApplication);
-                },
-                child: const Text("Type Digital Signiture")),
-          ],
-        ),
+        if (widget.showResetSelector)
+          SizedBox(
+            width: MediaQuery.of(context).size.width,
+            child: Button(
+              text: "Reset Image Selection",
+              cb: () async {
+                widget.resetSelectors();
+              },
+              color: Colors.redAccent,
+            ),
+          ),
         if (widget.showReset)
-          ElevatedButton(
-              onPressed: widget.resetForm,
-              child: const Text(
-                "Reset Form",
-                style: TextStyle(fontSize: 14),
-              )),
+          Button(
+            text: "Reset Form",
+            cb: () async {
+              widget.resetForm();
+            },
+          ),
         const SizedBox(
-          height: 25,
+          height: 10,
         ),
         Container(
           margin: const EdgeInsets.all(15),
@@ -127,7 +90,25 @@ class _EventFormState extends State<EventForm> {
                     FormBuilderValidators.maxLength(20),
                   ]),
               const SizedBox(
-                height: 25,
+                height: 15,
+              ),
+              SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: Button(
+                  color: Colors.purpleAccent,
+                  text: "Set Event Location",
+                  cb: () async {
+                    goto(context, Mapx(
+                      setLocationButton: (setLocation) {
+                        Provider.of<LocationProvider>(context, listen: false)
+                            .setEventLocation(setLocation as LatLng);
+                      },
+                    ));
+                  },
+                ),
+              ),
+              const SizedBox(
+                height: 15,
               ),
               AppTextbox(
                   name: 'description',
@@ -143,86 +124,86 @@ class _EventFormState extends State<EventForm> {
               const SizedBox(
                 height: 25,
               ),
-              if(widget.eventStatus==0)
-              const Text(
-                "Event Type",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              if(widget.eventStatus==0)
-              const SizedBox(
-                height: 7,
-              ),
-              if(widget.eventStatus==0)
-              FormBuilderDropdown(
-                  initialValue: widget.eventdata.eventType,
-                  name: 'eventType',
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8)),
-                  ),
-                  items: [
-                    DropdownMenuItem(
-                      value: 0,
-                      child: Text(Event.eventTypeList[0]),
+              if (widget.eventStatus == 0)
+                const Text(
+                  "Event Type",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+              if (widget.eventStatus == 0)
+                const SizedBox(
+                  height: 7,
+                ),
+              if (widget.eventStatus == 0)
+                FormBuilderDropdown(
+                    initialValue: widget.eventdata.eventType,
+                    name: 'eventType',
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8)),
                     ),
-                    DropdownMenuItem(
-                        value: 1, child: Text(Event.eventTypeList[1])),
-                  ]),
+                    items: [
+                      DropdownMenuItem(
+                        value: 0,
+                        child: Text(Event.eventTypeList[0]),
+                      ),
+                      DropdownMenuItem(
+                          value: 1, child: Text(Event.eventTypeList[1])),
+                    ]),
               const SizedBox(
                 height: 25,
               ),
-              if(widget.eventStatus==0)
-              AppDateTImePicker(
-                init: getTimeInMin(widget.eventdata.startDateTime) <
-                        getTimeInMin(DateTime.now().toString())
-                    ? DateTime.now()
-                    : DateTime.tryParse(widget.eventdata.startDateTime),
-                hideinit: widget.hideinit,
-                ht: "Start Date And Time",
-                lt: "Start Date And Time",
-                name: 'startDateTime',
-                valis: [FormBuilderValidators.required()],
-              ),
-              if(widget.eventStatus==0)
-              const SizedBox(
-                height: 25,
-              ),
-              if(widget.eventStatus==0)
-              AppDateTImePicker(
-                init: getTimeInMin(widget.eventdata.endDateTime) <
-                        getTimeInMin(DateTime.now().toString())
-                    ? DateTime.now()
-                    : DateTime.tryParse(widget.eventdata.endDateTime),
-                hideinit: widget.hideinit,
-                ht: "End Date And Time",
-                lt: "End Date And Time",
-                name: 'endDateTime',
-                valis: [FormBuilderValidators.required()],
-              ),
-              if(widget.eventStatus==0)
-              const SizedBox(
-                height: 25,
-              ),
-              if(widget.eventStatus==0)
-              AppTextbox(
-                  name: 'minAttendanceTime',
-                  lt: "Minium Attendance Time",
-                  ht: "Minium Attendance Time In Minutes",
+              if (widget.eventStatus == 0)
+                AppDateTImePicker(
+                  init: getTimeInMin(widget.eventdata.startDateTime) <
+                          getTimeInMin(DateTime.now().toString())
+                      ? DateTime.now()
+                      : DateTime.tryParse(widget.eventdata.startDateTime),
                   hideinit: widget.hideinit,
-                  init: widget.eventdata.minAttendanceTime.toString() == "0"
-                      ? ""
-                      : widget.eventdata.minAttendanceTime.toString(),
-                  keyboard: TextInputType.number,
-                  valis: [
-                    FormBuilderValidators.required(),
-                    FormBuilderValidators.integer(),
-                    FormBuilderValidators.min(0),
-                    (p0) {
-                      return widget.timeValidator(p0 as String);
-                    }
-                  ]),
+                  ht: "Start Date And Time",
+                  lt: "Start Date And Time",
+                  name: 'startDateTime',
+                  valis: [FormBuilderValidators.required()],
+                ),
+              if (widget.eventStatus == 0)
+                const SizedBox(
+                  height: 25,
+                ),
+              if (widget.eventStatus == 0)
+                AppDateTImePicker(
+                  init: getTimeInMin(widget.eventdata.endDateTime) <
+                          getTimeInMin(DateTime.now().toString())
+                      ? DateTime.now()
+                      : DateTime.tryParse(widget.eventdata.endDateTime),
+                  hideinit: widget.hideinit,
+                  ht: "End Date And Time",
+                  lt: "End Date And Time",
+                  name: 'endDateTime',
+                  valis: [FormBuilderValidators.required()],
+                ),
+              if (widget.eventStatus == 0)
+                const SizedBox(
+                  height: 25,
+                ),
+              if (widget.eventStatus == 0)
+                AppTextbox(
+                    name: 'minAttendanceTime',
+                    lt: "Minium Attendance Time",
+                    ht: "Minium Attendance Time In Minutes",
+                    hideinit: widget.hideinit,
+                    init: widget.eventdata.minAttendanceTime.toString() == "0"
+                        ? ""
+                        : widget.eventdata.minAttendanceTime.toString(),
+                    keyboard: TextInputType.number,
+                    valis: [
+                      FormBuilderValidators.required(),
+                      FormBuilderValidators.integer(),
+                      FormBuilderValidators.min(0),
+                      (p0) {
+                        return widget.timeValidator(p0 as String);
+                      }
+                    ]),
               const SizedBox(
-                height: 20,
+                height: 10,
               ),
               AppTextbox(
                   name: 'seats',
@@ -238,6 +219,35 @@ class _EventFormState extends State<EventForm> {
                     FormBuilderValidators.integer(),
                     FormBuilderValidators.min(0)
                   ]),
+                  const SizedBox(
+                height: 15,
+              ),
+                   SizedBox(
+          width: MediaQuery.of(context).size.width,
+          child: Button(
+            color: const Color.fromARGB(255, 98, 221, 193),
+            text: "Draw Digital Signiture",
+            cb: () async {
+              launchUrl(
+                  Uri.parse('https://signaturely.com/online-signature/draw/'),
+                  mode: LaunchMode.externalApplication);
+            },
+          ),
+        ),
+        const SizedBox(
+                height: 5,
+              ),
+        SizedBox(
+          width: MediaQuery.of(context).size.width,
+          child: Button(
+            text: "Type Digital Signiture",
+            cb: () async {
+              launchUrl(
+                  Uri.parse('https://signaturely.com/online-signature/type/'),
+                  mode: LaunchMode.externalApplication);
+            },
+          ),
+        ),
             ],
           ),
         )

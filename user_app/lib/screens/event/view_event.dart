@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:EventLink/widgets/button.dart';
 import 'package:flutter/material.dart';
 
 import 'package:url_launcher/url_launcher_string.dart';
@@ -54,63 +55,59 @@ class _ViewEventState extends State<ViewEvent> {
         builder: (data) {
           Event eventdata = data;
           return Scaffold(
-            appBar: buildAppBar(context, eventdata.title,
-                button: const BackButton(),),
+            appBar: buildAppBar(
+              context,
+              eventdata.title,
+              button: const BackButton(),
+            ),
             body: ListView(
               physics: const BouncingScrollPhysics(),
               children: [
                 buildcoverimage(null, eventdata.eventBackgroundPic),
                 const SizedBox(
-                  height: 24,
+                  height: 15,
                 ),
-                buildTitle(eventdata.title, orgdata!.orgName),
+                buildTitle(eventdata.title, orgdata!.orgName,context),
                 const SizedBox(
-                  height: 30,
-                ),
-                const SizedBox(
-                  height: 3,
+                  height: 10,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    ElevatedButton(
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all<Color>(Colors.green),
-                        ),
-                        onPressed: () {
+                    Button(
+                        text: "View Location On Map",
+                        cb: () {
                           showOnMap(context, eventdata.location);
                         },
-                        child: const Text("View Location On Map")),
-                    ElevatedButton(
-                        style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all<Color>(
-                              const Color.fromARGB(255, 15, 60, 182)),
-                        ),
-                        onPressed: () {
+                        color: Colors.green),
+                    Button(
+                        text: "View Org",
+                        cb: () {
                           goto(
                               context,
                               OrgView(
                                 orgId: widget.orgId,
                               ));
                         },
-                        child: const Text("View Org")),
-                    if (eventdata.status == 2)
-                      ElevatedButton(
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all<Color>(
-                                const Color.fromARGB(255, 180, 84, 6)),
-                          ),
-                          onPressed: () async {
-                            String cert = (await runFun(
+                        color: const Color.fromARGB(255, 64, 106, 223)),
+                  ],
+                ),
+                 if (eventdata.status == 2)
+                 const SizedBox(
+                  height: 10,
+                ),
+                 if (eventdata.status == 2)
+                    Button(text: "Cert", cb: ()async {
+                      String cert = (await runFun(
                               context,
                               () async {
                                 return await getCertificate(widget.eventId);
                               },
                             ))
-                                .data['msg'].toString();
+                                .data['msg']
+                                .toString();
 
-                            if (cert!='0') {
+                            if (cert != '0') {
                               launchUrlString(cert,
                                   mode: LaunchMode.externalApplication);
                             } else {
@@ -119,133 +116,144 @@ class _ViewEventState extends State<ViewEvent> {
                                   "You Did Not Get A Certificate For This Event",
                                   3);
                             }
-                          },
-                          child: const Text("Cert")),
-                  ],
-                ),
+                    }, color: const Color.fromARGB(255, 144, 69, 8)),
                 const SizedBox(
-                  height: 35,
+                  height: 13,
                 ),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     buildViewInfo(
-                        "Status", Event.eventStatusList[eventdata.status],
+                        icon: Event.eventStatusIconsList[eventdata.status],
+                        context: context,
+                        "Status",
+                        Event.eventStatusList[eventdata.status],
                         xcolor: Event.eventStatusColorList[eventdata.status]),
                     buildViewInfo(
-                        "EventType", Event.eventTypeList[eventdata.eventType],
+                        icon: Event.eventTypeIconsList[eventdata.eventType],
+                        context: context,
+                        "EventType",
+                        Event.eventTypeList[eventdata.eventType],
                         xcolor:
                             Event.eventStatusColorList[eventdata.eventType]),
                   ],
                 ),
                 const SizedBox(
-                  height: 30,
+                  height: 20,
                 ),
-                buildViewInfo(
-                  "Start Time",
-                  "${eventdata.startDateTime.substring(0, 10)} - ${timeTo12(eventdata.startDateTime)}",
-                  xcolor: Colors.green,
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-                buildViewInfo(
-                  "End Time",
-                  "${eventdata.endDateTime.substring(0, 10)} - ${timeTo12(eventdata.endDateTime)}",
-                  xcolor: Colors.red,
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-                buildViewInfo(
-                  "Minimum Attendance Time",
-                  "${eventdata.minAttendanceTime} Minutes",
-                ),
-                const SizedBox(
-                  height: 30,
-                ),
-                buildViewInfo(
-                  "Total Number Of Seats",
-                  "${eventdata.seats} Seats",
-                ),
-                if (eventdata.status == 2)
-                  const SizedBox(
-                    height: 30,
+                Container(
+                  margin: const EdgeInsets.all(5),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      buildViewInfo(
+                        icon: Icons.start,
+                        context: context,
+                        "Start Time",
+                        "${eventdata.startDateTime.substring(0, 10)} - ${timeTo12(eventdata.startDateTime)}",
+                        xcolor: Colors.green,
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      buildViewInfo(
+                        icon: Icons.timelapse,
+                        context: context,
+                        "End Time",
+                        "${eventdata.endDateTime.substring(0, 10)} - ${timeTo12(eventdata.endDateTime)}",
+                        xcolor: Colors.red,
+                        // bgColor: ThemeProvider.themeOf(context).;
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      buildViewInfo(
+                        titleicon: Icons.timer,
+                        context: context,
+                        "Minimum Attendance",
+                        "${eventdata.minAttendanceTime} Minute",
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          buildViewInfo(
+                            titleicon: Icons.chair_alt_outlined,
+                            context: context,
+                            "Total Seats",
+                            "${eventdata.seats} Seats",
+                          ),
+                          if (eventdata.status == 2)
+                            const SizedBox(
+                              height: 20,
+                            ),
+                          if (eventdata.status == 2)
+                            buildViewInfo(
+                              titleicon: Icons.person,
+                              context: context,
+                              "Attended",
+                              "${eventdata.attended} Individuals",
+                            ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      buildViewInfo(
+                          titleicon: Icons.description,
+                          context: context,
+                          "Description",
+                          eventdata.description),
+                    ],
                   ),
-                if (eventdata.status == 2)
-                  buildViewInfo(
-                    "Total Attended",
-                    "${eventdata.attended} Individuals",
-                  ),
-                const SizedBox(
-                  height: 30,
                 ),
-                buildViewInfo("Description", eventdata.description),
                 const SizedBox(
-                  height: 25,
+                  height: 10,
                 ),
                 if (!registred && eventdata.status != 2)
-                  Container(
-                    height: 45,
-                    margin: const EdgeInsets.all(7),
-                    width: double.infinity,
-                    child: ElevatedButton(
-                        onPressed: () async {
-                          res = await runFun(
-                            context,
-                            () async {
-                              return joinEvent(widget.eventId);
-                            },
-                          );
-                          if (res.statusCode == 200) {
-                            setState(() {});
-                            subscribeToTopic(widget.eventId);
-                          }
-                          snackbar(context, res.data['msg'], 4);
-                        },
-                        child: const Text(
-                          "Register",
-                          style: TextStyle(fontSize: 14),
-                        )),
-                  ),
+                  Button(text: "Register", cb: ()  async{
+                   res = await runFun(
+                          context,
+                          () async {
+                            return joinEvent(widget.eventId);
+                          },
+                        );
+                        if (res.statusCode == 200) {
+                          setState(() {});
+                          subscribeToTopic(widget.eventId);
+                        }
+                        snackbar(context, res.data['msg'], 4);
+                  
+                },),
                 if (registred && eventdata.status != 2)
-                  Container(
-                    height: 45,
-                    margin: const EdgeInsets.all(7),
-                    child: ElevatedButton(
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all<Color>(Colors.red),
-                        ),
-                        onPressed: () async {
-                          return showDialog(
-                            builder: (context) => CustomDialog(
-                              bigText: "Sure Wanna Unreigster?",
-                              smallerText:
-                                  "Unregistering will disable your ability to check in or check out, and you will need to check in again if you decide to re-register",
-                              fun: () async {
-                                res = await runFun(
-                                  context,
-                                  () async {
-                                    return quitEvent(widget.eventId);
-                                  },
-                                );
-                                if (res.statusCode == 200) {
-                                  setState(() {});
-                                  unsubscribeFromTopic(widget.eventId);
-                                }
-                                snackbar(context, res.data['msg'], 4);
-                                Navigator.pop(context);
-                                return await Future.value(Response());
-                              },
-                            ),
-                            context: context,
-                          );
-                        },
-                        child: const Text(
-                          "Unregister",
-                          style: TextStyle(fontSize: 14),
-                        )),
-                  ),
+                Button(text: "Unregister", cb:() async {
+                   return showDialog(
+                          builder: (context) => CustomDialog(
+                            bigText: "Sure Wanna Unreigster?",
+                            smallerText:
+                                "Unregistering will disable your ability to check in or check out, and you will need to check in again if you decide to re-register",
+                            fun: () async {
+                              res = await runFun(
+                                context,
+                                () async {
+                                  return quitEvent(widget.eventId);
+                                },
+                              );
+                              if (res.statusCode == 200) {
+                                setState(() {});
+                                unsubscribeFromTopic(widget.eventId);
+                              }
+                              snackbar(context, res.data['msg'], 4);
+                              Navigator.pop(context);
+                              return await Future.value(Response());
+                            },
+                          ),
+                          context: context,
+                        );
+                },color: Colors.red),
               ],
             ),
           );

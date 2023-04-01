@@ -22,7 +22,7 @@ module.exports.onlyOrgs = catchFun(
         if (req.logedinUser) {
             res.sendStatus(401)
             return
-        }
+        } 
 
         if (!req.logedinOrg) throw Error("ORG IS NULL -ONLYORGS")
 

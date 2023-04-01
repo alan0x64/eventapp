@@ -398,14 +398,14 @@ module.exports.removeUserFromEvent = async (req, res) => {
 
 module.exports.search = async (req, res) => {
 
+    console.log(req.body);
+
     let { fieldValue, fnum } = req.body
     let model, fieldToPopulate
     let events = []
     let eventsNearUser = []
     let status = req.query.status
     let type = req.query.type
-
-
 
     if (fnum > 0) {
         model = org
@@ -432,6 +432,7 @@ module.exports.search = async (req, res) => {
     for (const event of events) {
         if (isInsideCircle(req, event.location)) eventsNearUser.push(event)
     }
+
 
     return RESPONSE(res, 200, { 'events': eventsNearUser })
 }
