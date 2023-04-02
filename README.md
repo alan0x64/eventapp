@@ -16,11 +16,9 @@
 #### Organization App
 
 ##### Bugs 
-- Fix Refresh on home Screen and etc..
-- QR Screen Camera Buttons does not work
+- Unsubscribe from topics on sign-out and resubscribe on sign-in.
 - IOS Notification 
-- Save Theme Presets
-- Save Org Edit Form State  
+- Save Org-User Edit Form State  
 
 #### User App
 
