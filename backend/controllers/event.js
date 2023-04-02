@@ -208,8 +208,7 @@ let capitalizedFullName = fullName.charAt(0).toUpperCase() + fullName.slice(1);
         'allowCert': allowCert
     }
 
-
-    await certx.updateOne(updatebody)
+    certx= await cert.findByIdAndUpdate(certx._id,updatebody)
 
     await eventx.updateOne({
         'Attended': (await getCertAttendance(eventId, 1)).length,
