@@ -208,17 +208,17 @@ let capitalizedFullName = fullName.charAt(0).toUpperCase() + fullName.slice(1);
         'allowCert': allowCert
     }
 
-    certx= await cert.findByIdAndUpdate(certx._id,updatebody)
+    await cert.updateOne(updatebody)
 
     await eventx.updateOne({
         'Attended': (await getCertAttendance(eventId, 1)).length,
     })
 
-    if (certx.allowCert) {
+    if (allowCert) {
         allowed='Eligible'
     }
 
-    RESPONSE(res, 200, ` CheckOut Successful\n User : ${capitalizedFullName} \n Details recorded : \n\n Certification : ${allowed} \n Attended : ${certx.attendedMins} Minutes`)
+    RESPONSE(res, 200, ` CheckOut Successful\n User : ${capitalizedFullName} \n Details recorded : \n\n Certification : ${allowed} \n Attended : ${attendedMins} Minutes`)
 }
 
 module.exports.makeCerts = async (req, res) => {
