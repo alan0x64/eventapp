@@ -75,7 +75,7 @@ class _ViewEventState extends State<ViewEvent> {
                 ),
                 buildTitle(eventdata.title, orgdata!.orgName, context),
                 const SizedBox(
-                  height: 10,
+                  height: 6,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -83,7 +83,7 @@ class _ViewEventState extends State<ViewEvent> {
                     Button(
                       color: Colors.pinkAccent,
                       text: "Registred Users",
-                      cb: ()async {
+                      cb: () async {
                         goto(
                             context,
                             ViewEventUser(
@@ -97,7 +97,7 @@ class _ViewEventState extends State<ViewEvent> {
                     Button(
                       color: const Color.fromARGB(255, 198, 220, 34),
                       text: "Blacklisted Users",
-                      cb: () async{
+                      cb: () async {
                         goto(
                             context,
                             ViewEventUser(
@@ -115,14 +115,14 @@ class _ViewEventState extends State<ViewEvent> {
                 Button(
                   color: const Color.fromARGB(255, 45, 211, 197),
                   text: "View Location On Map",
-                  cb: ()async {
+                  cb: () async {
                     showOnMap(context, eventdata.location);
                   },
                 ),
                 if (eventdata.status == 2)
                   Button(
                     text: "View Generated Certs",
-                    cb: () async{
+                    cb: () async {
                       goto(
                           context,
                           CertsView(
@@ -131,7 +131,7 @@ class _ViewEventState extends State<ViewEvent> {
                     },
                   ),
                 const SizedBox(
-                  height: 13,
+                  height: 10,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -152,7 +152,7 @@ class _ViewEventState extends State<ViewEvent> {
                   ],
                 ),
                 const SizedBox(
-                  height: 13,
+                  height: 10,
                 ),
                 Container(
                   margin: const EdgeInsets.all(5),
@@ -168,7 +168,7 @@ class _ViewEventState extends State<ViewEvent> {
                         xcolor: Colors.green,
                       ),
                       const SizedBox(
-                        height: 13,
+                        height: 10,
                       ),
                       buildViewInfo(
                         icon: Icons.timelapse,
@@ -179,7 +179,7 @@ class _ViewEventState extends State<ViewEvent> {
                         // bgColor: ThemeProvider.themeOf(context).;
                       ),
                       const SizedBox(
-                        height: 13,
+                        height: 10,
                       ),
                       buildViewInfo(
                         titleicon: Icons.timer,
@@ -188,7 +188,7 @@ class _ViewEventState extends State<ViewEvent> {
                         "${eventdata.minAttendanceTime} Minute",
                       ),
                       const SizedBox(
-                        height: 13,
+                        height: 10,
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -201,19 +201,19 @@ class _ViewEventState extends State<ViewEvent> {
                           ),
                           if (eventdata.status == 2)
                             const SizedBox(
-                              height: 13,
+                              height: 10,
                             ),
                           if (eventdata.status == 2)
                             buildViewInfo(
                               titleicon: Icons.person,
                               context: context,
                               "Attended",
-                              "${eventdata.attended} Individuals",
+                              "${eventdata.attended} Individual",
                             ),
                         ],
                       ),
                       const SizedBox(
-                        height: 13,
+                        height: 10,
                       ),
                       buildViewInfo(
                           titleicon: Icons.description,
@@ -224,107 +224,108 @@ class _ViewEventState extends State<ViewEvent> {
                   ),
                 ),
                 const SizedBox(
-                  height: 10,
+                  height: 5,
                 ),
                 if (eventdata.status == 0)
-                Button(text:"Start Event" ,color: Colors.lightBlue, cb: ()async {
-                  showDialog(
-                          context: context,
-                          builder: (context) {
-                            return CustomDialog(
-                              bigText: "Are You Sure Wanna Start The Event ?",
-                              smallerText:
-                                  "This action will notify all users that the event has started. Please note that changes to the event will be limited and irreversible",
-                              quit: false,
-                              fun: () async {
-                                Console.log(
-                                    getTimeInMin(eventdata.startDateTime));
-                                if (getTimeInMin(eventdata.endDateTime) >
-                                    getTimeInMin(eventdata.startDateTime)) {
-                                  res = await updateEventStatus(
-                                      context, eventdata, 2);
-                                }
-
+                  Button(
+                    text: "Start Event",
+                    color: Colors.lightBlue,
+                    cb: () async {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return CustomDialog(
+                            bigText: "Are You Sure Wanna Start The Event ?",
+                            smallerText:
+                                "This action will notify all users that the event has started. Please note that changes to the event will be limited and irreversible",
+                            quit: false,
+                            fun: () async {
+                              Console.log(
+                                  getTimeInMin(eventdata.startDateTime));
+                              if (getTimeInMin(eventdata.endDateTime) >
+                                  getTimeInMin(eventdata.startDateTime)) {
                                 res = await updateEventStatus(
-                                    context, eventdata, 1);
+                                    context, eventdata, 2);
+                              }
 
-                                if (res.statusCode == 200) {
-                                  await notifySubscribers(eventdata.id);
-                                  Navigator.pop(context);
-                                  setState(() {});
-                                  snackbar(context,
-                                      "Event Started And Users Notified", 4);
-                                }
+                              res = await updateEventStatus(
+                                  context, eventdata, 1);
 
-                                return await Future.value(Response());
-                              },
-                            );
-                          },
-                        );
-                  
-                },),
+                              if (res.statusCode == 200) {
+                                await notifySubscribers(eventdata.id);
+                                Navigator.pop(context);
+                                setState(() {});
+                                snackbar(context,
+                                    "Event Started And Users Notified", 4);
+                              }
+
+                              return await Future.value(Response());
+                            },
+                          );
+                        },
+                      );
+                    },
+                  ),
                 if (eventdata.status == 1)
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       Expanded(
-                        flex: 1,
-                        child: Button(
-                          cb: () async{
-                             showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return Stack(
-                                      children: [
-                                        ModalBarrier(
-                                            dismissible: false,
-                                            color:
-                                                Colors.black.withOpacity(0.5)),
-                                        MessageDialog(
-                                          showButtonThree: true,
-                                          cupertino: true,
-                                          message: "QR Scan Mode",
-                                          buttonOneText: "CheckIn Mode",
-                                          buttonTwoText: "CheckOut Mode",
-                                          buttonThreeText: 'Cancel',
-                                          buttonOne: () {
-                                            moveBack(context, 1);
+                          flex: 1,
+                          child: Button(
+                            cb: () async {
+                              showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return Stack(
+                                    children: [
+                                      ModalBarrier(
+                                          dismissible: false,
+                                          color: Colors.black.withOpacity(0.5)),
+                                      MessageDialog(
+                                        showButtonThree: true,
+                                        cupertino: true,
+                                        message: "QR Scan Mode",
+                                        buttonOneText: "CheckIn Mode",
+                                        buttonTwoText: "CheckOut Mode",
+                                        buttonThreeText: 'Cancel',
+                                        buttonOne: () {
+                                          moveBack(context, 1);
 
-                                            goto(
-                                                context,
-                                                Status(
-                                                    scanMode: 0,
-                                                    eventId: widget.eventId));
-                                          },
-                                          buttonTwo: () {
-                                            moveBack(context, 1);
-                                            goto(
-                                                context,
-                                                Status(
-                                                    scanMode: 1,
-                                                    eventId: widget.eventId));
-                                          },
-                                          buttonThree: () {
-                                            moveBack(context, 1);
-                                          },
-                                          icon: const Icon(Icons.qr_code),
-                                        )
-                                      ],
-                                    );
-                                  },
-                                );
-                          },
-                          text:"Scan QRs" ,
-                          color: const Color.fromARGB(255, 31, 136, 189),
-                        ) 
-                      ),
+                                          goto(
+                                              context,
+                                              Status(
+                                                  scanMode: 0,
+                                                  eventId: widget.eventId));
+                                        },
+                                        buttonTwo: () {
+                                          moveBack(context, 1);
+                                          goto(
+                                              context,
+                                              Status(
+                                                  scanMode: 1,
+                                                  eventId: widget.eventId));
+                                        },
+                                        buttonThree: () {
+                                          moveBack(context, 1);
+                                        },
+                                        icon: const Icon(Icons.qr_code),
+                                      )
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                            text: "Scan QRs",
+                            color: const Color.fromARGB(255, 31, 136, 189),
+                          )),
                       Expanded(
-                        flex: 1,
-                        child: Button(
-                          color: const Color.fromARGB(255, 180, 26, 26),
-                          text: "Finish Event",
-                          cb: () {
-                             return showDialog(
+                          flex: 1,
+                          child: Button(
+                            color: const Color.fromARGB(255, 180, 26, 26),
+                            text: "Finish Event",
+                            cb: () {
+                              return showDialog(
                                 builder: (context) => CustomDialog(
                                   bigText: "Sure Wanna End Event?",
                                   smallerText:
@@ -334,8 +335,7 @@ class _ViewEventState extends State<ViewEvent> {
                                         context, eventdata, 2);
                                     res = await runFun(
                                       context,
-                                      () async =>
-                                          await genCerts(eventdata.id),
+                                      () async => await genCerts(eventdata.id),
                                     );
                                     await notifySubscribers(eventdata.id);
 
@@ -349,14 +349,16 @@ class _ViewEventState extends State<ViewEvent> {
                                 ),
                                 context: context,
                               );
-                          },
-                        )
-                      ),
+                            },
+                          )),
                     ],
                   ),
                 if (eventdata.status != 1)
-                Button(text: "Delete", color: Colors.red,cb: ()async {
-                  showDialog(
+                  Button(
+                    text: "Delete",
+                    color: Colors.red,
+                    cb: () async {
+                      showDialog(
                           context: context,
                           builder: (context) {
                             return CustomDialog(
@@ -364,8 +366,8 @@ class _ViewEventState extends State<ViewEvent> {
                               smallerText:
                                   "Please note that this action is irreversible",
                               fun: () async {
-                                res = await runFun(context,
-                                    () => deleteEvent(widget.eventId));
+                                res = await runFun(
+                                    context, () => deleteEvent(widget.eventId));
                                 if (res.statusCode == 200) {
                                   moveBack(context, 2);
                                 }
@@ -373,9 +375,9 @@ class _ViewEventState extends State<ViewEvent> {
                                 return res;
                               },
                             );
-                            });
-                },),
-
+                          });
+                    },
+                  ),
                 if (kDebugMode)
                   ElevatedButton(
                       onPressed: () async {

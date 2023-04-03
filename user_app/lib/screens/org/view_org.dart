@@ -63,14 +63,34 @@ class _OrgViewState extends State<OrgView> {
                   const SizedBox(
                     height: 10,
                   ),
-                  Button(
-                    color: Colors.blueAccent,
-                    text: 'Open Website',
-                    cb: () {
-                      String website = widget.orgdata.website;
-                      launchUrl(Uri.parse("https://$website"),
-                          mode: LaunchMode.externalApplication);
-                    },
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: Button(
+                          color: Colors.blueAccent,
+                          text: 'Open Website',
+                          cb: () {
+                            String website = widget.orgdata.website;
+                            launchUrl(Uri.parse(website),
+                                mode: LaunchMode.externalApplication);
+                          },
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Button(
+                          color: const Color.fromARGB(255, 37, 139, 19),
+                          text: 'Open Soical Media ',
+                          cb: () {
+                            String socialMedia = widget.orgdata.socialMedia;
+                            launchUrl(Uri.parse(socialMedia),
+                                mode: LaunchMode.externalApplication);
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                   const SizedBox(
                     height: 10,
@@ -80,6 +100,7 @@ class _OrgViewState extends State<OrgView> {
                     child: Column(
                       children: [
                         buildViewInfo(
+                            select: true,
                             titleicon: Icons.phone_android,
                             context: context,
                             "Phone Number",
@@ -87,24 +108,12 @@ class _OrgViewState extends State<OrgView> {
                         const SizedBox(
                           height: 13,
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            buildViewInfo(
-                                titleicon: Icons.web,
-                                context: context,
-                                "Website",
-                                widget.orgdata.website),
-                            const SizedBox(
-                              height: 13,
-                            ),
-                            buildViewInfo(
-                                titleicon: Icons.chat,
-                                context: context,
-                                "Soical Media",
-                                widget.orgdata.socialMedia),
-                          ],
-                        ),
+                        buildViewInfo(
+                            select: true,
+                            titleicon: Icons.web,
+                            context: context,
+                            "Website",
+                            widget.orgdata.website),
                         const SizedBox(
                           height: 13,
                         ),
@@ -113,6 +122,15 @@ class _OrgViewState extends State<OrgView> {
                             context: context,
                             "Organization Type",
                             orgtypes[widget.orgdata.orgtype]),
+                        const SizedBox(
+                          height: 13,
+                        ),
+                        buildViewInfo(
+                            select: true,
+                            titleicon: Icons.attachment,
+                            context: context,
+                            "Soical Media ",
+                            widget.orgdata.socialMedia),
                         const SizedBox(
                           height: 13,
                         ),

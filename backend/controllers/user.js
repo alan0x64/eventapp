@@ -257,8 +257,6 @@ module.exports.getCertificate = async (req, res) => {
         return  RESPONSE(res,200,certx.cert.url)
     }
 
-    console.log(checkFileExists(syspath));
-    
 
     RESPONSE(res, 200, { 'msg': 0 })
 }

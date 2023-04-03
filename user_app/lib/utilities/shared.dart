@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:io';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -99,17 +100,23 @@ AppBar buildAppBar(BuildContext context, String title,
     SearchDelegate? searchWidget}) {
   enableLocationService(context);
   return AppBar(
-    backgroundColor: getTheme(context)==0?Colors.black:const Color.fromARGB(255, 236, 233, 233),
-    title: Text(title,style: TextStyle(color: getTheme(context)==0?Colors.white:Colors.black )),
+    backgroundColor: getTheme(context) == 0
+        ? Colors.black
+        : const Color.fromARGB(255, 236, 233, 233),
+    title: Text(title,
+        style: TextStyle(
+            color: getTheme(context) == 0 ? Colors.white : Colors.black)),
     leading: button,
     elevation: 0,
     actions: [
       if (search)
         IconButton(
-            onPressed: () {
-              showSearch(context: context, delegate: searchWidget!);
-            },
-            icon: Icon(Icons.search,color:getTheme(context)==0?Colors.white:Colors.black ) ,),
+          onPressed: () {
+            showSearch(context: context, delegate: searchWidget!);
+          },
+          icon: Icon(Icons.search,
+              color: getTheme(context) == 0 ? Colors.white : Colors.black),
+        ),
       // IconButton(
       //   icon: Icon(CupertinoIcons.moon_stars,color:getTheme(context)==0?Colors.white:Colors.black ),
       //   onPressed: () {
@@ -275,7 +282,7 @@ List<String> getLocationList(BuildContext context, String loc) {
   return [lat, lng];
 }
 
-Widget buildcoverimage( XFile? localBackground, String netBackground) {
+Widget buildcoverimage(XFile? localBackground, String netBackground) {
   return Material(
       color: Colors.transparent,
       child: localBackground != null
@@ -435,8 +442,12 @@ Event mapEvent(Map<String, dynamic>? data) {
       endDateTime: endDateTime);
 }
 
-buildTitle(String textOne, String textTwo,
-    BuildContext context,{IconData? icon,}) {
+buildTitle(
+  String textOne,
+  String textTwo,
+  BuildContext context, {
+  IconData? icon,
+}) {
   return Container(
     margin: const EdgeInsets.all(5),
     width: 30,
@@ -477,6 +488,7 @@ buildTitle(String textOne, String textTwo,
 
 Widget buildViewInfo(String name, dynamic text,
     {Color? xcolor,
+    bool select = false,
     IconData? icon,
     IconData? titleicon,
     BuildContext? context}) {
@@ -502,16 +514,27 @@ Widget buildViewInfo(String name, dynamic text,
           ],
         ),
         const SizedBox(height: 5),
-        Row(
-          children: [
-            Text(
-              text.toString(),
-              style: TextStyle(color: xcolor, fontSize: 18, height: 1.4),
-            ),
-            if (icon != null) const SizedBox(width: 10),
-            if (icon != null) Icon(icon, color: xcolor),
-          ],
-        ),
+        SizedBox(
+          height: 30,
+          child: ListView(
+            shrinkWrap: true,
+            scrollDirection: Axis.horizontal,
+            children: [
+              if (select == false)
+                Text(
+                  text.toString(),
+                  style: TextStyle(color: xcolor, fontSize: 18, height: 1.4),
+                ),
+              if (select)
+                SelectableText(
+                  text.toString(),
+                  style: TextStyle(color: xcolor, fontSize: 18, height: 1.4),
+                ),
+              if (icon != null) const SizedBox(width: 10),
+              if (icon != null) Icon(icon, color: xcolor),
+            ],
+          ),
+        )
       ],
     ),
   );

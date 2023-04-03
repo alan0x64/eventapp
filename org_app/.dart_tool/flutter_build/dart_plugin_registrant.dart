@@ -11,13 +11,11 @@ import 'package:image_picker_android/image_picker_android.dart';
 import 'package:path_provider_android/path_provider_android.dart';
 import 'package:shared_preferences_android/shared_preferences_android.dart';
 import 'package:url_launcher_android/url_launcher_android.dart';
-import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:geolocator_apple/geolocator_apple.dart';
 import 'package:image_picker_ios/image_picker_ios.dart';
 import 'package:path_provider_foundation/path_provider_foundation.dart';
 import 'package:shared_preferences_foundation/shared_preferences_foundation.dart';
 import 'package:url_launcher_ios/url_launcher_ios.dart';
-import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 import 'package:path_provider_linux/path_provider_linux.dart';
 import 'package:shared_preferences_linux/shared_preferences_linux.dart';
 import 'package:url_launcher_linux/url_launcher_linux.dart';
@@ -85,16 +83,6 @@ class _PluginRegistrant {
         rethrow;
       }
 
-      try {
-        AndroidWebViewPlatform.registerWith();
-      } catch (err) {
-        print(
-          '`webview_flutter_android` threw an error: $err. '
-          'The app may not function as expected until you remove this plugin from pubspec.yaml'
-        );
-        rethrow;
-      }
-
     } else if (Platform.isIOS) {
       try {
         GeolocatorApple.registerWith();
@@ -141,16 +129,6 @@ class _PluginRegistrant {
       } catch (err) {
         print(
           '`url_launcher_ios` threw an error: $err. '
-          'The app may not function as expected until you remove this plugin from pubspec.yaml'
-        );
-        rethrow;
-      }
-
-      try {
-        WebKitWebViewPlatform.registerWith();
-      } catch (err) {
-        print(
-          '`webview_flutter_wkwebview` threw an error: $err. '
           'The app may not function as expected until you remove this plugin from pubspec.yaml'
         );
         rethrow;

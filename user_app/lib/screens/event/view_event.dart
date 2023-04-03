@@ -94,7 +94,7 @@ class _ViewEventState extends State<ViewEvent> {
                 ),
                  if (eventdata.status == 2)
                  const SizedBox(
-                  height: 10,
+                  height: 3,
                 ),
                  if (eventdata.status == 2)
                     Button(text: "Cert", cb: ()async {
@@ -118,7 +118,7 @@ class _ViewEventState extends State<ViewEvent> {
                             }
                     }, color: const Color.fromARGB(255, 144, 69, 8)),
                 const SizedBox(
-                  height: 13,
+                  height: 10,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -139,7 +139,7 @@ class _ViewEventState extends State<ViewEvent> {
                   ],
                 ),
                 const SizedBox(
-                  height: 20,
+                  height: 10,
                 ),
                 Container(
                   margin: const EdgeInsets.all(5),
@@ -155,7 +155,7 @@ class _ViewEventState extends State<ViewEvent> {
                         xcolor: Colors.green,
                       ),
                       const SizedBox(
-                        height: 20,
+                        height: 10,
                       ),
                       buildViewInfo(
                         icon: Icons.timelapse,
@@ -166,7 +166,7 @@ class _ViewEventState extends State<ViewEvent> {
                         // bgColor: ThemeProvider.themeOf(context).;
                       ),
                       const SizedBox(
-                        height: 20,
+                        height: 10,
                       ),
                       buildViewInfo(
                         titleicon: Icons.timer,
@@ -175,7 +175,7 @@ class _ViewEventState extends State<ViewEvent> {
                         "${eventdata.minAttendanceTime} Minute",
                       ),
                       const SizedBox(
-                        height: 20,
+                        height: 10,
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -188,19 +188,19 @@ class _ViewEventState extends State<ViewEvent> {
                           ),
                           if (eventdata.status == 2)
                             const SizedBox(
-                              height: 20,
+                              height: 10,
                             ),
                           if (eventdata.status == 2)
                             buildViewInfo(
                               titleicon: Icons.person,
                               context: context,
                               "Attended",
-                              "${eventdata.attended} Individuals",
+                              "${eventdata.attended} Individual",
                             ),
                         ],
                       ),
                       const SizedBox(
-                        height: 20,
+                        height: 10,
                       ),
                       buildViewInfo(
                           titleicon: Icons.description,
