@@ -6,7 +6,7 @@ const event = require("../models/event")
 const cert = require("../models/cert")
 const token_collection = require("../models/token")
 const { hashSync, compareSync } = require('bcrypt')
-const { RESPONSE, deleteImages, getUsersInCerts, searchFor, userSearchFields, logx, genCerts, getCertAttendance } = require('../utils/shared_funs')
+const { RESPONSE, deleteImages, getUsersInCerts, searchFor, userSearchFields, logx, genCerts, getCertAttendance, checkFileExists } = require('../utils/shared_funs')
 
 function userImages(req, userx = {}, cert = {}) {
     const profilePic = {
@@ -235,23 +235,26 @@ module.exports.RemoveUserFromEvent = async (req, res) => {
     RESPONSE(res, 200, "Unregistred")
 }
 
+
 module.exports.getCertificate = async (req, res) => {
     let userId = req.logedinUser._id
     let eventId = req.params.eventId
     let eventx = await event.findById(eventId)
-    
+
     if (eventx == null) return RESPONSE(res, 400, { 'msg': "Event Not Found" })
-    let certs = await getCertAttendance(eventId,1)
-   
-    for (const cert of certs) {
-        if (cert.userId.toString() == userId.toString() && cert.eventId.toString() == eventId.toString()) {
-            return RESPONSE(res,200,cert.cert.url)
-        }
+
+    let certx = await cert.findOne({
+        userId: userId,
+        eventId: eventId,
+    })
+
+
+    if (checkFileExists(certx.cert.url)){
+        return  RESPONSE(res,200,certx.cert.url)
     }
 
-    RESPONSE(res,200,{'msg':0})
+    RESPONSE(res, 200, { 'msg': 0 })
 }
-
 
 module.exports.getJoinedEvents = async (req, res) => {
     return RESPONSE(res, 200, { 'events': (await user.findById(req.logedinUser._id).populate('joinedEvents')).joinedEvents })

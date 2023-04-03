@@ -294,6 +294,15 @@ async function getCertAttendance(eventId, mode) {
 
 }
 
+function checkFileExists(path) {
+    try {
+        fs.accessSync(path,fs.constants.F_OK)
+        return true
+    } catch (error) {
+        return false
+    }
+    
+}
 
 module.exports = {
     RESPONSE,
@@ -312,7 +321,8 @@ module.exports = {
     getUsersInCerts,
     toMin,
     genCerts,
-    getCertAttendance
+    getCertAttendance,
+    checkFileExists
 }
 
 
