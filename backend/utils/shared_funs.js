@@ -224,13 +224,9 @@ async function genCerts(req, res, sendRes) {
                 page.setFontSize(18)
 
                 //draw text
-                // page.drawText(removeEmojis(userx.fullName), { x: 270, y: 630 })
-                // page.drawText(removeEmojis(eventx.title), { x: 257, y: 570 })
-                // page.drawText(new Date().toLocaleDateString(), { x: 257, y: 515 })
-
-                page.drawText(removeEmojis(userx.fullName), { x: 270, y: 630, encoding: "utf8" });
-                page.drawText(removeEmojis(eventx.title), { x: 257, y: 570, encoding: "utf8" });
-                page.drawText(new Date().toLocaleDateString(), { x: 257, y: 515 });
+                page.drawText(removeEmojis(userx.fullName), { x: 270, y: 630 })
+                page.drawText(removeEmojis(eventx.title), { x: 257, y: 570 })
+                page.drawText(new Date().toLocaleDateString(), { x: 257, y: 515 })
 
 
                 const { width, height } = image.scale(0.3);
