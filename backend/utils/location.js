@@ -22,7 +22,7 @@ function isInsideCircle(req, eventLocation) {
   let userLon = req.query.lon
   let eventLat = parseLatLon(eventLocation)[0]
   let eventLon = parseLatLon(eventLocation)[1]
-  let radius = req.query.radius || 10
+  let radius = req.query.radius || 20
 
   // const dis = calculateDis(eventLat, eventLon, userLat, userLon)
   const dis = calculateDis( userLat, userLon,eventLat, eventLon)
