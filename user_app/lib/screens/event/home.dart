@@ -29,9 +29,12 @@ class HomeState extends State<Home> {
   List<dynamic>? events;
   @override
   Widget build(BuildContext context) {
-    String title = "Events";
+    String title = "Home";
+    String screentext="Near By Events";
+
     if (widget.joinView) {
       title = "Registred Events";
+      screentext="Events You're Part Of";
     }
 
     try {
@@ -58,6 +61,26 @@ class HomeState extends State<Home> {
                     selectedType = selectbutton;
                     setState(() {});
                   },
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                Container(
+                  margin: const EdgeInsets.all(10),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children:  [
+                      Text(screentext,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  height: 5,
                 ),
                 BuildFuture(
                   callback: () async {
