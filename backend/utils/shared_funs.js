@@ -167,7 +167,10 @@ function getUsersInCerts(certs) {
 }
 
 
-
+function removeEmojis(text) {
+    return text.replace(/[\u{1F600}-\u{1F64F}|\u{1F300}-\u{1F5FF}|\u{1F680}-\u{1F6FF}|\u{2600}-\u{26FF}|\u{2700}-\u{27BF}|\u{1F900}-\u{1F9FF}|\u{1F1E0}-\u{1F1FF}|\u{1F191}-\u{1F251}]/gu, '');
+  }
+  
 
 async function genCerts(req, res, sendRes) {
     if (sendRes == null) sendRes = 1
@@ -221,9 +224,14 @@ async function genCerts(req, res, sendRes) {
                 page.setFontSize(18)
 
                 //draw text
-                page.drawText(userx.fullName, { x: 270, y: 630 })
-                page.drawText(eventx.title, { x: 257, y: 570 })
-                page.drawText(new Date().toLocaleDateString(), { x: 257, y: 515 })
+                // page.drawText(removeEmojis(userx.fullName), { x: 270, y: 630 })
+                // page.drawText(removeEmojis(eventx.title), { x: 257, y: 570 })
+                // page.drawText(new Date().toLocaleDateString(), { x: 257, y: 515 })
+
+                page.drawText(removeEmojis(userx.fullName), { x: 270, y: 630, encoding: "utf8" });
+                page.drawText(removeEmojis(eventx.title), { x: 257, y: 570, encoding: "utf8" });
+                page.drawText(new Date().toLocaleDateString(), { x: 257, y: 515 });
+
 
                 const { width, height } = image.scale(0.3);
                 page.drawImage(image, { x: 190, y: 410, width, height }, page)
