@@ -38,11 +38,11 @@ router.route('/delete').delete(authJWT_AT, onlyOrgs, handleAsync(org.deleteOrg))
 router.route('/update').patch(
     authJWT_AT,
     onlyOrgs,
-    validateUpdateOrg,
     orgImageHandler.fields([
         { name: 'orgPic' },
         { name: 'orgBackgroundPic' },
     ]),
+    validateUpdateOrg,
     handleAsync(org.updateOrg)
 )
 

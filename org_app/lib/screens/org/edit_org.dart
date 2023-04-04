@@ -71,13 +71,13 @@ class _EditOrgState extends State<EditOrg> {
                         imagepath: widget.orgdata!.orgPic,
                         isEdit: true,
                         onClick: () async {
-                          widget.profileImage =
-                              await picker.pickImage(source: ImageSource.gallery);
+                          widget.profileImage = await picker.pickImage(
+                              source: ImageSource.gallery);
                           setState(() {});
                         },
                         onClickbg: () async {
-                          widget.backgroundImage =
-                              await picker.pickImage(source: ImageSource.gallery);
+                          widget.backgroundImage = await picker.pickImage(
+                              source: ImageSource.gallery);
                           setState(() {});
                         },
                       ),
@@ -96,7 +96,8 @@ class _EditOrgState extends State<EditOrg> {
                         snackbar(context, "Cleared Selected Images", 3);
                       },
                       mainButton: () {
-                        validateLocationBeforeUpdating(context, widget.orgdata!.location,0);
+                        validateLocationBeforeUpdating(
+                            context, widget.orgdata!.location, 0);
                         FormRequestHandler(
                           create: false,
                           context: context,
@@ -159,7 +160,8 @@ class _EditOrgState extends State<EditOrg> {
         didFieldsChange(formkey, orgdata)) {
       res =
           await runFun(context, () async => await updateProfileNoImages(data));
-    } else if (didFieldsChange(formkey, orgdata)) {
+    } else if (didFieldsChange(formkey, orgdata) ||
+        (profileImage != null || backgroundImage != null)) {
       res = await runFun(
         context,
         () async {

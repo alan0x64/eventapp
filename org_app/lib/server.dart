@@ -15,8 +15,8 @@ void host(bool production) {
   // Android EMU
   // https://developer.android.com/studio/run/emulator-networking
   if (Platform.isAndroid) {
-    devServer = "http://10.0.2.2:3000";
-    authServer = "http://10.0.2.2:8000/RT";
+    devServer = "http://192.168.100.62:3000";
+    authServer = "http://192.168.100.62:8000/RT";
     return;
   }
 
