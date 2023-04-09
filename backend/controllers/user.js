@@ -248,10 +248,9 @@ module.exports.getCertificate = async (req, res) => {
         eventId: eventId,
     })
 
-    
+    if (certx ==null) return RESPONSE(res, 200, { 'msg': 0 })        
+
     let syspath=path.join(`${__dirname}/..`, `/public/certs`)+'/'+certx.cert.fileName
-
-
 
     if (checkFileExists(syspath)){
         return  RESPONSE(res,200,certx.cert.url)
