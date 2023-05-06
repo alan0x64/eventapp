@@ -6,7 +6,6 @@
 - Remove SingUp In Org App 
 
 ### Back-End
-- rewrite docs route
 - Refactor Cert Gen Fun
 
 
@@ -21,9 +20,6 @@
 - Save Org-User Edit Form State  
 
 #### User App
-
-- 
--
 
 
 
